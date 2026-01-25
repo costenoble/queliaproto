@@ -1,0 +1,120 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
+html, body {
+  @apply bg-gray-50 text-gray-900;
+  font-family: 'DM Sans', sans-serif;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+/* Improve Mobile Typography */
+@media (max-width: 768px) {
+  html {
+    font-size: 16px; /* Ensure base font size is large enough */
+  }
+  
+  h1 { @apply text-2xl; }
+  h2 { @apply text-xl; }
+  p { @apply text-base leading-relaxed; }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Custom scrollbar for better look */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Map specific styles */
+.leaflet-popup-content-wrapper {
+  padding: 0;
+  overflow: hidden;
+  border-radius: 0.5rem;
+}
+
+.leaflet-popup-content {
+  margin: 0;
+  width: 320px !important;
+}
+
+.leaflet-popup-tip {
+  background: white;
+}
+
+/* Leaflet Cluster Customization */
+.marker-cluster-small,
+.marker-cluster-medium,
+.marker-cluster-large {
+  background-color: rgba(79, 70, 229, 0.6); /* Indigo-600 with opacity */
+}
+
+.marker-cluster-small div,
+.marker-cluster-medium div,
+.marker-cluster-large div {
+  background-color: rgba(67, 56, 202, 0.9); /* Indigo-700 */
+  color: white;
+  font-weight: bold;
+}
+
+/* Leaflet Attribution Styling */
+.leaflet-control-attribution {
+  font-size: 0.7rem !important;
+  color: #9ca3af !important; /* text-gray-400 */
+  background: rgba(255, 255, 255, 0.7) !important;
+  padding: 2px 5px !important;
+  border-radius: 4px 0 0 0 !important;
+}
+.leaflet-control-attribution a {
+  color: #6b7280 !important; /* text-gray-500 */
+  text-decoration: none !important;
+}
+.leaflet-control-attribution a:hover {
+  text-decoration: underline !important;
+}
+
+/* Ensure z-indexes work well with Leaflet */
+.leaflet-pane {
+  z-index: 400;
+}
+.leaflet-top, .leaflet-bottom {
+  z-index: 1000;
+}
+
+/* Animation utilities for drawer */
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.animate-in.slide-in-from-right {
+  animation: slideInRight 0.3s ease-out forwards;
+}
