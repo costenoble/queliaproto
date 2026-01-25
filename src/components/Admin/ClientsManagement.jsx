@@ -226,18 +226,39 @@ const ClientsManagement = () => {
           }
 
           // Update user_profiles to link user to client
+          // Need to wait for the trigger to create the profile first
           if (authData.user) {
-            const { error: profileError } = await supabase
-              .from('user_profiles')
-              .update({
-                client_id: clientId,
-                role: 'client',
-                full_name: formData.name
-              })
-              .eq('id', authData.user.id);
+            let retries = 5;
+            let profileUpdated = false;
 
-            if (profileError) {
-              console.error('Error updating user profile:', profileError);
+            while (retries > 0 && !profileUpdated) {
+              // Wait a bit for the trigger to create the profile
+              await new Promise(resolve => setTimeout(resolve, 500));
+
+              const { error: profileError } = await supabase
+                .from('user_profiles')
+                .update({
+                  client_id: clientId,
+                  role: 'client',
+                  full_name: formData.name
+                })
+                .eq('id', authData.user.id);
+
+              if (!profileError) {
+                profileUpdated = true;
+              } else {
+                console.log(`Retry ${6 - retries}/5 - waiting for profile...`);
+                retries--;
+              }
+            }
+
+            if (!profileUpdated) {
+              console.error('Could not update user profile after 5 retries');
+              toast({
+                variant: 'destructive',
+                title: 'Attention',
+                description: 'Le profil utilisateur n\'a pas pu être lié au client. Vérifiez manuellement.'
+              });
             }
           }
 
