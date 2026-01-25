@@ -26,17 +26,45 @@ const ScrollToTop = () => {
 
 // Handle auth callback (email confirmation redirect)
 const AuthCallbackHandler = () => {
+  const [isProcessing, setIsProcessing] = React.useState(false);
+  const location = useLocation();
+
   React.useEffect(() => {
-    // Check if there's an access_token in the URL hash (from email confirmation)
     const hash = window.location.hash;
+
+    // Check if there's an access_token in the URL hash (from email confirmation)
     if (hash && hash.includes('access_token')) {
-      // Let Supabase process the token first, then clean URL and redirect
-      setTimeout(() => {
-        // Remove the hash and redirect to clean /login URL
-        window.location.replace('/login');
-      }, 500);
+      setIsProcessing(true);
+
+      // Import supabase to process the token
+      import('@/lib/customSupabaseClient').then(({ supabase }) => {
+        // Supabase automatically processes the hash when we call getSession
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          // Clean the URL by removing the hash
+          if (session) {
+            // Session established - redirect to admin
+            window.history.replaceState(null, '', '/admin');
+            window.location.reload();
+          } else {
+            // No session - redirect to login
+            window.history.replaceState(null, '', '/login');
+            window.location.reload();
+          }
+        });
+      });
     }
-  }, []);
+  }, [location]);
+
+  if (isProcessing) {
+    return (
+      <div className="fixed inset-0 bg-white z-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Confirmation en cours...</p>
+        </div>
+      </div>
+    );
+  }
 
   return null;
 };
