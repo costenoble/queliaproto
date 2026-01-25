@@ -118,6 +118,11 @@ const AdminPage = () => {
   };
 
   useEffect(() => {
+    // Pour les clients, attendre que clientId soit disponible avant de fetch
+    if (!isSuperAdmin && !clientId) {
+      return;
+    }
+
     fetchProjects();
     fetchClients();
     fetchStats();
