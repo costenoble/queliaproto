@@ -31,13 +31,7 @@ const ClientsManagement = () => {
     primary_color: '#3b82f6'
   });
 
-  // User credentials for new client
-  const [userCredentials, setUserCredentials] = useState({
-    email: '',
-    password: '',
-    createUser: false
-  });
-  const [isCreatingUser, setIsCreatingUser] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
 
   const handleLogoUpload = async (e, clientId) => {
@@ -147,11 +141,6 @@ const ClientsManagement = () => {
       logo_url: '',
       primary_color: '#3b82f6'
     });
-    setUserCredentials({
-      email: '',
-      password: '',
-      createUser: true
-    });
     setIsModalOpen(true);
   };
 
@@ -166,21 +155,14 @@ const ClientsManagement = () => {
       logo_url: client.logo_url || '',
       primary_color: client.primary_color || '#3b82f6'
     });
-    setUserCredentials({
-      email: '',
-      password: '',
-      createUser: false
-    });
     setIsModalOpen(true);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsCreatingUser(true);
+    setIsSaving(true);
 
     try {
-      let clientId = selectedClient?.id;
-
       if (selectedClient) {
         // Update existing client
         const { error } = await supabase
@@ -195,78 +177,12 @@ const ClientsManagement = () => {
         toast({ title: 'Client mis à jour', description: 'Les informations ont été enregistrées.' });
       } else {
         // Create new client
-        const { data: newClient, error: clientError } = await supabase
+        const { error: clientError } = await supabase
           .from('clients')
-          .insert([formData])
-          .select()
-          .single();
+          .insert([formData]);
 
         if (clientError) throw clientError;
-        clientId = newClient.id;
-
-        // Create user account if requested
-        if (userCredentials.createUser && userCredentials.email && userCredentials.password) {
-          // Create auth user
-          const { data: authData, error: authError } = await supabase.auth.signUp({
-            email: userCredentials.email,
-            password: userCredentials.password,
-            options: {
-              data: {
-                full_name: formData.name,
-                role: 'client'
-              },
-              emailRedirectTo: `${window.location.origin}/login`
-            }
-          });
-
-          if (authError) {
-            // Rollback: delete the client we just created
-            await supabase.from('clients').delete().eq('id', clientId);
-            throw new Error(`Erreur création utilisateur: ${authError.message}`);
-          }
-
-          // Update user_profiles to link user to client using RPC function
-          // This bypasses RLS issues when signUp changes auth context
-          if (authData.user) {
-            let retries = 5;
-            let profileUpdated = false;
-
-            while (retries > 0 && !profileUpdated) {
-              // Wait a bit for the trigger to create the profile
-              await new Promise(resolve => setTimeout(resolve, 500));
-
-              // Use RPC function that has SECURITY DEFINER
-              const { data, error: rpcError } = await supabase.rpc('link_user_to_client', {
-                p_user_id: authData.user.id,
-                p_client_id: clientId,
-                p_full_name: formData.name
-              });
-
-              if (!rpcError && data === true) {
-                profileUpdated = true;
-              } else {
-                console.log(`Retry ${6 - retries}/5 - waiting for profile...`, rpcError);
-                retries--;
-              }
-            }
-
-            if (!profileUpdated) {
-              console.error('Could not update user profile after 5 retries');
-              toast({
-                variant: 'destructive',
-                title: 'Attention',
-                description: 'Le profil utilisateur n\'a pas pu être lié au client. Vérifiez manuellement.'
-              });
-            }
-          }
-
-          toast({
-            title: 'Client et utilisateur créés',
-            description: `Identifiants: ${userCredentials.email}`
-          });
-        } else {
-          toast({ title: 'Client créé', description: 'Le nouveau client a été ajouté.' });
-        }
+        toast({ title: 'Client créé', description: 'Le nouveau client a été ajouté.' });
       }
 
       setIsModalOpen(false);
@@ -275,7 +191,7 @@ const ClientsManagement = () => {
       console.error('Error saving client:', err);
       toast({ variant: 'destructive', title: 'Erreur', description: err.message });
     } finally {
-      setIsCreatingUser(false);
+      setIsSaving(false);
     }
   };
 
@@ -541,67 +457,15 @@ const ClientsManagement = () => {
               </div>
             </div>
 
-            {/* User Credentials Section - Only for new clients */}
-            {!selectedClient && (
-              <div className="border-t border-gray-200 pt-4 mt-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <input
-                    type="checkbox"
-                    id="createUser"
-                    checked={userCredentials.createUser}
-                    onChange={(e) => setUserCredentials(prev => ({ ...prev, createUser: e.target.checked }))}
-                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                  />
-                  <label htmlFor="createUser" className="text-sm font-medium text-gray-700">
-                    Créer un compte utilisateur pour ce client
-                  </label>
-                </div>
-
-                {userCredentials.createUser && (
-                  <div className="space-y-3 pl-6 border-l-2 border-indigo-100">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Email de connexion *
-                      </label>
-                      <input
-                        type="email"
-                        value={userCredentials.email}
-                        onChange={(e) => setUserCredentials(prev => ({ ...prev, email: e.target.value }))}
-                        required={userCredentials.createUser}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        placeholder="utilisateur@client.com"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Mot de passe *
-                      </label>
-                      <input
-                        type="text"
-                        value={userCredentials.password}
-                        onChange={(e) => setUserCredentials(prev => ({ ...prev, password: e.target.value }))}
-                        required={userCredentials.createUser}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-mono"
-                        placeholder="MotDePasse123!"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">
-                        Min. 6 caractères. Transmettez ces identifiants au client.
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)} disabled={isCreatingUser}>
+              <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)} disabled={isSaving}>
                 Annuler
               </Button>
-              <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700" disabled={isCreatingUser}>
-                {isCreatingUser ? (
+              <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700" disabled={isSaving}>
+                {isSaving ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Création...
+                    Enregistrement...
                   </>
                 ) : (
                   selectedClient ? 'Enregistrer' : 'Créer'

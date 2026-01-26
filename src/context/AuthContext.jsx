@@ -18,10 +18,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const { data, error } = await supabase
         .from('user_profiles')
-        .select(`
-          *,
-          client:clients(id, name, slug, logo_url, primary_color)
-        `)
+        .select('*')
         .eq('id', userId)
         .single();
 
@@ -106,22 +103,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Helpers pour vérifier le rôle
-  const isSuperAdmin = userProfile?.role === 'super_admin';
-  const isClient = userProfile?.role === 'client';
-
   const value = {
     currentUser,
     userProfile,
     isAuthenticated: !!currentUser,
-    isSuperAdmin,
-    isClient,
-    clientId: userProfile?.client_id,
-    clientInfo: userProfile?.client,
     login,
     logout,
-    isLoading,
-    refreshProfile: () => currentUser && fetchUserProfile(currentUser.id).then(setUserProfile)
+    isLoading
   };
 
   return (

@@ -14,12 +14,11 @@ import ProjectsTable from '@/components/Admin/ProjectsTable';
 import SearchBar from '@/components/Admin/SearchBar';
 import DeleteConfirmationModal from '@/components/Admin/DeleteConfirmationModal';
 import ClientsManagement from '@/components/Admin/ClientsManagement';
-import ClientProfile from '@/components/Admin/ClientProfile';
 
 const ITEMS_PER_PAGE = 10;
 
 const AdminPage = () => {
-  const { logout, currentUser, userProfile, isSuperAdmin, clientId, clientInfo } = useAuth();
+  const { logout, currentUser, userProfile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -52,20 +51,13 @@ const AdminPage = () => {
     try {
       setIsLoading(true);
 
-      let query = supabase
+      const { data, error } = await supabase
         .from('projects')
         .select(`
           *,
           client:clients(id, name, slug, logo_url, primary_color)
         `)
         .order('created_at', { ascending: false });
-
-      // Si c'est un client, filtrer par son client_id
-      if (!isSuperAdmin && clientId) {
-        query = query.eq('client_id', clientId);
-      }
-
-      const { data, error } = await query;
 
       if (error) throw error;
       setProjects(data || []);
@@ -79,8 +71,6 @@ const AdminPage = () => {
   };
 
   const fetchClients = async () => {
-    if (!isSuperAdmin) return;
-
     try {
       const { data, error } = await supabase
         .from('clients')
@@ -96,21 +86,17 @@ const AdminPage = () => {
 
   const fetchStats = async () => {
     try {
-      let projectQuery = supabase.from('projects').select('*', { count: 'exact', head: true });
-      if (!isSuperAdmin && clientId) {
-        projectQuery = projectQuery.eq('client_id', clientId);
-      }
-      const { count: projectCount } = await projectQuery;
+      const { count: projectCount } = await supabase
+        .from('projects')
+        .select('*', { count: 'exact', head: true });
 
-      let clientCount = 0;
-      if (isSuperAdmin) {
-        const { count } = await supabase.from('clients').select('*', { count: 'exact', head: true });
-        clientCount = count || 0;
-      }
+      const { count: clientCount } = await supabase
+        .from('clients')
+        .select('*', { count: 'exact', head: true });
 
       setStats({
         totalProjects: projectCount || 0,
-        totalClients: clientCount
+        totalClients: clientCount || 0
       });
     } catch (err) {
       console.error("Error fetching stats:", err);
@@ -118,11 +104,6 @@ const AdminPage = () => {
   };
 
   useEffect(() => {
-    // Pour les clients, attendre que clientId soit disponible avant de fetch
-    if (!isSuperAdmin && !clientId) {
-      return;
-    }
-
     fetchProjects();
     fetchClients();
     fetchStats();
@@ -150,13 +131,13 @@ const AdminPage = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [isSuperAdmin, clientId]);
+  }, []);
 
   // Filter Logic
   const filteredProjects = useMemo(() => {
     let result = projects;
 
-    if (isSuperAdmin && filterClientId !== 'all') {
+    if (filterClientId !== 'all') {
       result = result.filter(p => p.client_id === filterClientId);
     }
 
@@ -172,7 +153,7 @@ const AdminPage = () => {
     }
 
     return result;
-  }, [projects, searchTerm, filterClientId, isSuperAdmin]);
+  }, [projects, searchTerm, filterClientId]);
 
   // Sort Logic
   const sortedProjects = useMemo(() => {
@@ -249,9 +230,7 @@ const AdminPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       <Helmet>
-        <title>
-          {isSuperAdmin ? 'Administration Quelia' : `Espace ${clientInfo?.name || 'Client'}`} - Quelia
-        </title>
+        <title>Administration Quelia</title>
       </Helmet>
 
       {/* Header */}
@@ -260,14 +239,12 @@ const AdminPage = () => {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
               <div className="flex items-center gap-3">
-                {isSuperAdmin && (
-                  <span className="bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
-                    <Shield className="w-3 h-3" />
-                    SUPER ADMIN
-                  </span>
-                )}
+                <span className="bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                  <Shield className="w-3 h-3" />
+                  ADMIN
+                </span>
                 <h1 className="text-3xl font-extrabold tracking-tight">
-                  {isSuperAdmin ? 'Administration Quelia' : `Espace ${clientInfo?.name || 'Client'}`}
+                  Administration Quelia
                 </h1>
               </div>
               <p className="mt-1 text-indigo-200 text-sm font-medium">
@@ -296,41 +273,36 @@ const AdminPage = () => {
             </div>
           </div>
 
-          {/* Tabs (Super Admin only) */}
-          {isSuperAdmin && (
-            <div className="mt-6 flex gap-2">
-              <button
-                onClick={() => setActiveTab('projects')}
-                className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
-                  activeTab === 'projects'
-                    ? 'bg-white text-indigo-900'
-                    : 'bg-white/10 text-white hover:bg-white/20'
-                }`}
-              >
-                <MapPin className="w-4 h-4" />
-                Projets ({stats.totalProjects})
-              </button>
-              <button
-                onClick={() => setActiveTab('clients')}
-                className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
-                  activeTab === 'clients'
-                    ? 'bg-white text-indigo-900'
-                    : 'bg-white/10 text-white hover:bg-white/20'
-                }`}
-              >
-                <Building2 className="w-4 h-4" />
-                Clients ({stats.totalClients})
-              </button>
-            </div>
-          )}
+          {/* Tabs */}
+          <div className="mt-6 flex gap-2">
+            <button
+              onClick={() => setActiveTab('projects')}
+              className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                activeTab === 'projects'
+                  ? 'bg-white text-indigo-900'
+                  : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
+            >
+              <MapPin className="w-4 h-4" />
+              Projets ({stats.totalProjects})
+            </button>
+            <button
+              onClick={() => setActiveTab('clients')}
+              className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                activeTab === 'clients'
+                  ? 'bg-white text-indigo-900'
+                  : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
+            >
+              <Building2 className="w-4 h-4" />
+              Clients ({stats.totalClients})
+            </button>
+          </div>
         </div>
       </header>
 
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full -mt-4">
-        {/* Client Profile Card - For client users only */}
-        {!isSuperAdmin && clientInfo && <ClientProfile />}
-
-        {isSuperAdmin && activeTab === 'clients' ? (
+        {activeTab === 'clients' ? (
           <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
             <ClientsManagement />
           </div>
@@ -347,13 +319,13 @@ const AdminPage = () => {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500 font-medium uppercase tracking-wide">
-                      {isSuperAdmin ? 'Total Projets' : 'Vos Projets'}
+                      Total Projets
                     </p>
                     <p className="text-xs text-gray-400">Base de donnees active</p>
                   </div>
                 </div>
 
-                {isSuperAdmin && clients.length > 0 && (
+                {clients.length > 0 && (
                   <div className="hidden md:block">
                     <select
                       value={filterClientId}
@@ -406,7 +378,7 @@ const AdminPage = () => {
                     onDelete={handleDeleteClick}
                     sortConfig={sortConfig}
                     onSort={handleSort}
-                    showClient={isSuperAdmin}
+                    showClient={true}
                   />
 
                   {totalPages > 1 && (
@@ -491,8 +463,7 @@ const AdminPage = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         project={selectedProject}
-        clientId={isSuperAdmin ? null : clientId}
-        clients={isSuperAdmin ? clients : null}
+        clients={clients}
         onSave={() => {
           fetchProjects();
           fetchStats();
