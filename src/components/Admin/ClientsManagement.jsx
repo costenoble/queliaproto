@@ -225,8 +225,8 @@ const ClientsManagement = () => {
             throw new Error(`Erreur création utilisateur: ${authError.message}`);
           }
 
-          // Update user_profiles to link user to client
-          // Need to wait for the trigger to create the profile first
+          // Update user_profiles to link user to client using RPC function
+          // This bypasses RLS issues when signUp changes auth context
           if (authData.user) {
             let retries = 5;
             let profileUpdated = false;
@@ -235,19 +235,17 @@ const ClientsManagement = () => {
               // Wait a bit for the trigger to create the profile
               await new Promise(resolve => setTimeout(resolve, 500));
 
-              const { error: profileError } = await supabase
-                .from('user_profiles')
-                .update({
-                  client_id: clientId,
-                  role: 'client',
-                  full_name: formData.name
-                })
-                .eq('id', authData.user.id);
+              // Use RPC function that has SECURITY DEFINER
+              const { data, error: rpcError } = await supabase.rpc('link_user_to_client', {
+                p_user_id: authData.user.id,
+                p_client_id: clientId,
+                p_full_name: formData.name
+              });
 
-              if (!profileError) {
+              if (!rpcError && data === true) {
                 profileUpdated = true;
               } else {
-                console.log(`Retry ${6 - retries}/5 - waiting for profile...`);
+                console.log(`Retry ${6 - retries}/5 - waiting for profile...`, rpcError);
                 retries--;
               }
             }
