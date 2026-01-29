@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button.jsx';
 import { supabase } from '@/lib/customSupabaseClient';
 import mockData from '@/data/mockPOIData.json';
 
-const MapContainer = ({ config, clientSlug = null }) => {
+const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
   const [map, setMap] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   
@@ -156,6 +156,7 @@ const MapContainer = ({ config, clientSlug = null }) => {
           zoom={config?.mapZoom || 6}
           onMapLoad={setMap}
           pois={filteredPois}
+          selectedPoiId={selectedPoiId}
         />
         
         <ProjectLegend />

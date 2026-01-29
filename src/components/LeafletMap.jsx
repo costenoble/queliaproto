@@ -18,7 +18,26 @@ const MapController = ({ center, zoom }) => {
   return null;
 };
 
-const LeafletMap = ({ center, zoom, onMapLoad, pois = [] }) => {
+// Component to handle auto-opening a selected POI
+const SelectedPoiHandler = ({ pois, selectedPoiId }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!selectedPoiId || !pois.length) return;
+
+    const selectedPoi = pois.find(p => p.id === selectedPoiId);
+    if (selectedPoi && selectedPoi.lat && selectedPoi.lng) {
+      // Center map on the selected POI with a good zoom level
+      setTimeout(() => {
+        map.flyTo([selectedPoi.lat, selectedPoi.lng], 14, { duration: 1 });
+      }, 500);
+    }
+  }, [selectedPoiId, pois, map]);
+
+  return null;
+};
+
+const LeafletMap = ({ center, zoom, onMapLoad, pois = [], selectedPoiId = null }) => {
   // Default center (France) - ensuring consistent fallback
   const defaultCenter = [46.2276, 2.2137];
   const mapCenter = center || defaultCenter;
@@ -40,8 +59,9 @@ const LeafletMap = ({ center, zoom, onMapLoad, pois = [] }) => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        
+
         <MapController center={center} zoom={zoom} />
+        <SelectedPoiHandler pois={pois} selectedPoiId={selectedPoiId} />
 
         <MarkerClusterGroup
           chunkedLoading
@@ -49,7 +69,7 @@ const LeafletMap = ({ center, zoom, onMapLoad, pois = [] }) => {
           showCoverageOnHover={false}
         >
           {pois.map((poi) => (
-            <PointOfInterest key={poi.id} poi={poi} />
+            <PointOfInterest key={poi.id} poi={poi} isSelected={poi.id === selectedPoiId} />
           ))}
         </MarkerClusterGroup>
       </MapContainer>

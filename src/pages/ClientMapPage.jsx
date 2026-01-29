@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useParams, Navigate } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import MapContainer from '@/components/MapContainer.jsx';
 import { supabase } from '@/lib/customSupabaseClient';
@@ -8,6 +8,8 @@ import { Loader2, AlertTriangle } from 'lucide-react';
 
 const ClientMapPage = () => {
   const { clientSlug } = useParams();
+  const [searchParams] = useSearchParams();
+  const selectedPoiId = searchParams.get('poi');
   const [client, setClient] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -113,7 +115,7 @@ const ClientMapPage = () => {
         {/* Carte */}
         <div className="flex-1 relative">
           <main className="h-[calc(100vh-72px)] min-h-[500px]">
-            <MapContainer config={config} clientSlug={clientSlug} />
+            <MapContainer config={config} clientSlug={clientSlug} selectedPoiId={selectedPoiId} />
           </main>
         </div>
       </div>
