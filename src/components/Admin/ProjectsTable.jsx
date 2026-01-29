@@ -1,8 +1,9 @@
 
-import React, { useState } from 'react';
-import { Edit, Trash2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import React from 'react';
+import { Edit, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Link2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getStatusColorClass } from '@/utils/mapUtils';
+import { useToast } from '@/components/ui/use-toast';
 
 const SimpleTooltip = ({ text, children }) => {
   return (
@@ -18,6 +19,31 @@ const SimpleTooltip = ({ text, children }) => {
 };
 
 const ProjectsTable = ({ projects, onEdit, onDelete, sortConfig, onSort, showClient = false }) => {
+  const { toast } = useToast();
+
+  const copyPoiLink = async (project) => {
+    if (!project.client?.slug) {
+      toast({ variant: 'destructive', title: 'Erreur', description: 'Ce projet n\'est pas associé à un client.' });
+      return;
+    }
+
+    const url = `${window.location.origin}/carte/${project.client.slug}?poi=${project.id}`;
+
+    try {
+      await navigator.clipboard.writeText(url);
+      toast({ title: 'Lien copié', description: 'Le lien vers ce POI a été copié dans le presse-papier.' });
+    } catch (err) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = url;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      toast({ title: 'Lien copié', description: 'Le lien vers ce POI a été copié.' });
+    }
+  };
+
   const getSortIcon = (key) => {
     if (sortConfig.key !== key) return <ArrowUpDown className="w-3 h-3 ml-1 opacity-30" />;
     return sortConfig.direction === 'asc' ? 
@@ -126,9 +152,22 @@ const ProjectsTable = ({ projects, onEdit, onDelete, sortConfig, onSort, showCli
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-2">
+                      {project.client?.slug && (
+                        <SimpleTooltip text="Copier le lien">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => copyPoiLink(project)}
+                            className="h-8 w-8 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-full transition-all duration-200 hover:scale-110 hover:shadow-md"
+                          >
+                            <Link2 className="w-4 h-4" />
+                          </Button>
+                        </SimpleTooltip>
+                      )}
+
                       <SimpleTooltip text="Modifier">
-                        <Button 
-                          variant="ghost" 
+                        <Button
+                          variant="ghost"
                           size="icon"
                           onClick={() => onEdit(project)}
                           className="h-8 w-8 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 rounded-full transition-all duration-200 hover:scale-110 hover:shadow-md"
@@ -136,10 +175,10 @@ const ProjectsTable = ({ projects, onEdit, onDelete, sortConfig, onSort, showCli
                           <Edit className="w-4 h-4" />
                         </Button>
                       </SimpleTooltip>
-                      
+
                       <SimpleTooltip text="Supprimer">
-                        <Button 
-                          variant="ghost" 
+                        <Button
+                          variant="ghost"
                           size="icon"
                           onClick={() => onDelete(project)}
                           className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200 hover:scale-110 hover:shadow-md"
