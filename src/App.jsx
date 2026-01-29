@@ -10,6 +10,7 @@ import { AuthProvider, useAuth } from '@/context/AuthContext';
 import MapPage from '@/pages/MapPage.jsx';
 import LoginPage from '@/pages/LoginPage.jsx';
 import AdminPage from '@/pages/AdminPage.jsx';
+import ClientMapPage from '@/pages/ClientMapPage.jsx';
 
 import '@/animations.css';
 
@@ -143,6 +144,9 @@ function App() {
         <Routes>
           {/* Carte interactive - Page principale */}
           <Route path="/" element={<Layout><MapPage /></Layout>} />
+
+          {/* Carte client (URL a partager avec les clients) */}
+          <Route path="/carte/:clientSlug" element={<ClientMapPage />} />
 
           {/* Auth */}
           <Route path="/login" element={<Layout><LoginPage /></Layout>} />

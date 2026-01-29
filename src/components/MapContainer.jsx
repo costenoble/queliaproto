@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button.jsx';
 import { supabase } from '@/lib/customSupabaseClient';
 import mockData from '@/data/mockPOIData.json';
 
-const MapContainer = ({ config }) => {
+const MapContainer = ({ config, clientSlug = null }) => {
   const [map, setMap] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   
@@ -29,35 +29,47 @@ const MapContainer = ({ config }) => {
     const fetchProjects = async () => {
       try {
         setIsLoading(true);
-        // Attempt to fetch from Supabase
-        const { data, error } = await supabase
+
+        // Build query - filter by client slug if provided
+        let query = supabase
           .from('projects')
-          .select('*')
+          .select(`
+            *,
+            client:clients(id, name, slug, logo_url, primary_color)
+          `)
           .order('created_at', { ascending: false });
 
+        // Filter by client slug if provided
+        if (clientSlug) {
+          query = query.eq('client.slug', clientSlug);
+        }
+
+        const { data, error } = await query;
+
         if (error) throw error;
-        
+
+        // Filter out projects without matching client (for client-specific views)
+        const filteredData = clientSlug
+          ? (data || []).filter(p => p.client?.slug === clientSlug)
+          : (data || []);
+
         // Transform Supabase records to match POI format expected by components
-        // Our table structure matches the POI structure fairly well, just need to map lat/lng
-        const transformedData = (data || []).map(record => ({
+        const transformedData = filteredData.map(record => ({
           ...record,
           id: record.id,
           lat: record.latitude,
           lng: record.longitude,
-          // Properties needed for popup
           properties: {
              ...record
           }
         }));
 
         setPois(transformedData);
-        
+
       } catch (err) {
         console.warn("Supabase fetch failed, using mock data fallback.", err);
-        // Fallback to mock data if fetch fails (e.g. no connection or table empty)
-        // Parse the mock data
         setPois(parsePOIData(mockData));
-        setError("Mode démo (Offline)"); 
+        setError("Mode démo (Offline)");
       } finally {
         setIsLoading(false);
       }
@@ -76,7 +88,7 @@ const MapContainer = ({ config }) => {
           table: 'projects',
         },
         () => {
-          fetchProjects(); 
+          fetchProjects();
         }
       )
       .subscribe();
@@ -84,7 +96,7 @@ const MapContainer = ({ config }) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [clientSlug]);
 
   // Extract unique cities for filter
   const availableCities = useMemo(() => {
