@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Wind, Sun, Factory, Users, MapPin, Zap, Battery } from 'lucide-react';
+import { Wind, Sun, Factory, Users, MapPin, Zap, Battery, Droplet, CircleDot } from 'lucide-react';
 
 /**
  * Validates if the provided string is a valid Mapbox API key format
@@ -118,19 +118,101 @@ export const parsePOIData = (jsonData) => {
 };
 
 /**
- * Gets color for marker based on POI type
- * @param {string} type - POI type/category
+ * Gets color for marker based on energy category
+ * @param {string} category - Energy category or legacy type
  * @returns {string} - Hex color code
  */
-export const getMarkerColor = (type) => {
-  const normalizedType = type?.toLowerCase() || '';
-  if (normalizedType.includes('éolien') || normalizedType.includes('wind')) return '#3b82f6'; // Blue
+export const getMarkerColor = (category) => {
+  const normalizedType = category?.toLowerCase() || '';
+  // New energy categories
   if (normalizedType.includes('solaire') || normalizedType.includes('solar')) return '#f97316'; // Orange
-  if (normalizedType.includes('méthanisation') || normalizedType.includes('biogas')) return '#10b981'; // Green
+  if (normalizedType.includes('éolien') || normalizedType.includes('wind')) return '#3b82f6'; // Blue
+  if (normalizedType.includes('biométhane') || normalizedType.includes('biogas') || normalizedType.includes('méthanisation')) return '#10b981'; // Green
+  if (normalizedType.includes('cogénération')) return '#ec4899'; // Pink
+  if (normalizedType.includes('hydroélectricité') || normalizedType.includes('hydro')) return '#06b6d4'; // Cyan
+  // Legacy types
   if (normalizedType.includes('consultation')) return '#8b5cf6'; // Purple
   if (normalizedType.includes('stockage') || normalizedType.includes('battery')) return '#ef4444'; // Red
   if (normalizedType.includes('ligne') || normalizedType.includes('électrique')) return '#eab308'; // Yellow
   return '#6b7280'; // Default Gray
+};
+
+/**
+ * Energy categories and their subtypes
+ */
+export const ENERGY_CATEGORIES = {
+  solaire: {
+    label: 'Solaire',
+    subtypes: [
+      { value: 'agri-pv', label: 'Agri-PV' },
+      { value: 'ombrières', label: 'Ombrières' },
+      { value: 'toiture', label: 'Toiture' },
+      { value: 'au sol', label: 'Au sol' }
+    ]
+  },
+  éolien: {
+    label: 'Éolien',
+    subtypes: [
+      { value: 'off shore', label: 'Off shore' },
+      { value: 'on shore', label: 'On shore' }
+    ]
+  },
+  biométhane: {
+    label: 'Biométhane',
+    subtypes: []
+  },
+  'cogénération-électricité': {
+    label: 'Cogénération-électricité',
+    subtypes: []
+  },
+  hydroélectricité: {
+    label: 'Hydroélectricité',
+    subtypes: []
+  }
+};
+
+/**
+ * Power units available
+ */
+export const POWER_UNITS = ['kW', 'MW', 'Nm3/h'];
+
+/**
+ * Equivalent display types
+ */
+export const EQUIVALENT_TYPES = [
+  { value: 'foyers', label: 'Foyers' },
+  { value: 'voitures', label: 'Voitures électriques' },
+  { value: 'industrie', label: 'Industries' }
+];
+
+/**
+ * Calculate equivalents based on power
+ * @param {number} power - Power value
+ * @param {string} unit - Power unit (kW, MW, Nm3/h)
+ * @param {string} equivalentType - Type of equivalent (foyers, voitures, industrie)
+ * @returns {object} - Calculated equivalent value and label
+ */
+export const calculateEquivalent = (power, unit, equivalentType) => {
+  if (!power || !unit) return null;
+
+  // Convert to MW for calculation
+  let powerInMW = power;
+  if (unit === 'kW') powerInMW = power / 1000;
+  if (unit === 'Nm3/h') powerInMW = power * 0.01; // Approximation for biogas
+
+  const conversions = {
+    foyers: { factor: 2000, label: 'foyers alimentés' }, // 1 MW ≈ 2000 foyers
+    voitures: { factor: 500, label: 'voitures électriques/an' }, // 1 MW ≈ 500 véhicules
+    industrie: { factor: 10, label: 'sites industriels' } // 1 MW ≈ 10 PME
+  };
+
+  const conversion = conversions[equivalentType] || conversions.foyers;
+  const value = Math.round(powerInMW * conversion.factor);
+
+  return {
+    value: value.toLocaleString('fr-FR'),
+    label: conversion.label
+  };
 };
 
 /**
@@ -148,20 +230,24 @@ export const getStatusColorClass = (status) => {
 };
 
 /**
- * Gets marker SVG string based on POI type
- * @param {string} type - POI type/category
+ * Gets marker SVG string based on energy category
+ * @param {string} category - Energy category or legacy type
  * @returns {string} - SVG string
  */
-export const getMarkerIconSvg = (type, color) => {
-  const normalizedType = type?.toLowerCase() || '';
+export const getMarkerIconSvg = (category, color) => {
+  const normalizedType = category?.toLowerCase() || '';
   let iconPath = '';
-  
-  if (normalizedType.includes('éolien')) {
-    iconPath = '<path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
-  } else if (normalizedType.includes('solaire')) {
+
+  if (normalizedType.includes('solaire')) {
     iconPath = '<circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
-  } else if (normalizedType.includes('méthanisation')) {
+  } else if (normalizedType.includes('éolien')) {
+    iconPath = '<path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+  } else if (normalizedType.includes('biométhane') || normalizedType.includes('méthanisation')) {
     iconPath = '<path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 18h1M12 18h1M7 18h1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+  } else if (normalizedType.includes('cogénération')) {
+    iconPath = '<path d="M12 2v10l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="m12 12-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="18" r="4" stroke="currentColor" stroke-width="2"/>';
+  } else if (normalizedType.includes('hydroélectricité') || normalizedType.includes('hydro')) {
+    iconPath = '<path d="M12 2v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 22a8 8 0 0 0 8-8c0-4.4-8-10-8-10S4 9.6 4 14a8 8 0 0 0 8 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
   } else if (normalizedType.includes('consultation')) {
     iconPath = '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
   } else if (normalizedType.includes('stockage')) {
@@ -176,17 +262,19 @@ export const getMarkerIconSvg = (type, color) => {
 };
 
 /**
- * Gets marker component based on POI type (for use in React components)
- * @param {string} type - POI type/category
+ * Gets marker component based on energy category (for use in React components)
+ * @param {string} category - Energy category or legacy type
  * @param {string} className - Additional CSS classes
  * @returns {React.Component} - Icon component
  */
-export const getMarkerIconComponent = (type, className = "") => {
-  const normalizedType = type?.toLowerCase() || '';
-  
-  if (normalizedType.includes('éolien')) return <Wind className={className} />;
+export const getMarkerIconComponent = (category, className = "") => {
+  const normalizedType = category?.toLowerCase() || '';
+
   if (normalizedType.includes('solaire')) return <Sun className={className} />;
-  if (normalizedType.includes('méthanisation')) return <Factory className={className} />;
+  if (normalizedType.includes('éolien')) return <Wind className={className} />;
+  if (normalizedType.includes('biométhane') || normalizedType.includes('méthanisation')) return <Factory className={className} />;
+  if (normalizedType.includes('cogénération')) return <CircleDot className={className} />;
+  if (normalizedType.includes('hydroélectricité') || normalizedType.includes('hydro')) return <Droplet className={className} />;
   if (normalizedType.includes('consultation')) return <Users className={className} />;
   if (normalizedType.includes('stockage')) return <Battery className={className} />;
   if (normalizedType.includes('ligne')) return <Zap className={className} />;

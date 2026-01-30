@@ -1,19 +1,26 @@
 
-import React from 'react';
-import { Edit, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Link2, Check } from 'lucide-react';
+import { useState } from 'react';
+import { Edit, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Link2, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getStatusColorClass } from '@/utils/mapUtils';
 import { useToast } from '@/components/ui/use-toast';
 
 const SimpleTooltip = ({ text, children }) => {
+  const [show, setShow] = useState(false);
+
   return (
-    <div className="group relative flex items-center justify-center">
+    <div
+      className="relative flex items-center justify-center flex-shrink-0"
+      onMouseEnter={() => setShow(true)}
+      onMouseLeave={() => setShow(false)}
+    >
       {children}
-      <span className="absolute bottom-full mb-2 hidden w-auto whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:block group-hover:opacity-100 z-50">
-        {text}
-        {/* Little triangle arrow */}
-        <span className="absolute top-full left-1/2 -ml-1 h-2 w-2 -translate-y-1 rotate-45 bg-gray-900"></span>
-      </span>
+      {show && (
+        <span className="absolute bottom-full mb-2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white z-[100] pointer-events-none">
+          {text}
+          <span className="absolute top-full left-1/2 -ml-1 h-2 w-2 -translate-y-1 rotate-45 bg-gray-900"></span>
+        </span>
+      )}
     </div>
   );
 };
@@ -31,16 +38,32 @@ const ProjectsTable = ({ projects, onEdit, onDelete, sortConfig, onSort, showCli
 
     try {
       await navigator.clipboard.writeText(url);
-      toast({ title: 'Lien copié', description: 'Le lien vers ce POI a été copié dans le presse-papier.' });
+      toast({ title: 'Lien carte copié', description: 'Le lien vers la carte avec ce POI a été copié.' });
     } catch (err) {
-      // Fallback for older browsers
       const textArea = document.createElement('textarea');
       textArea.value = url;
       document.body.appendChild(textArea);
       textArea.select();
       document.execCommand('copy');
       document.body.removeChild(textArea);
-      toast({ title: 'Lien copié', description: 'Le lien vers ce POI a été copié.' });
+      toast({ title: 'Lien carte copié', description: 'Le lien vers la carte avec ce POI a été copié.' });
+    }
+  };
+
+  const copyEmbedLink = async (project) => {
+    const url = `${window.location.origin}/poi/${project.id}`;
+
+    try {
+      await navigator.clipboard.writeText(url);
+      toast({ title: 'Lien embed copié', description: 'Le lien vers la fiche POI a été copié.' });
+    } catch (err) {
+      const textArea = document.createElement('textarea');
+      textArea.value = url;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      toast({ title: 'Lien embed copié', description: 'Le lien vers la fiche POI a été copié.' });
     }
   };
 
@@ -56,8 +79,8 @@ const ProjectsTable = ({ projects, onEdit, onDelete, sortConfig, onSort, showCli
   };
 
   return (
-    <div className="w-full overflow-hidden rounded-xl border border-gray-200 shadow-sm bg-white">
-      <div className="overflow-x-auto">
+    <div className="w-full rounded-xl border border-gray-200 shadow-sm bg-white">
+      <div className="overflow-x-auto overflow-y-visible">
         <table className="w-full whitespace-nowrap text-left text-sm">
           <thead>
             <tr className="bg-gray-50/50 border-b border-gray-200">
@@ -150,10 +173,10 @@ const ProjectsTable = ({ projects, onEdit, onDelete, sortConfig, onSort, showCli
                   <td className="px-6 py-4 text-gray-600">
                     {project.city || <span className="text-gray-400 italic">Non spécifié</span>}
                   </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex justify-end gap-2">
+                  <td className="px-6 py-4 text-right overflow-visible">
+                    <div className="flex justify-end gap-1 items-center">
                       {project.client?.slug && (
-                        <SimpleTooltip text="Copier le lien">
+                        <SimpleTooltip text="Lien carte">
                           <Button
                             variant="ghost"
                             size="icon"
@@ -164,6 +187,19 @@ const ProjectsTable = ({ projects, onEdit, onDelete, sortConfig, onSort, showCli
                           </Button>
                         </SimpleTooltip>
                       )}
+
+                      <SimpleTooltip text="Lien fiche POI">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => copyEmbedLink(project)}
+                          className="h-8 w-8 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-full transition-all duration-200 hover:scale-110 hover:shadow-md"
+                        >
+                          <Square className="w-4 h-4" />
+                        </Button>
+                      </SimpleTooltip>
+
+                      <span className="w-px h-6 bg-gray-200 mx-1"></span>
 
                       <SimpleTooltip text="Modifier">
                         <Button

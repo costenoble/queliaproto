@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
-import { getMarkerColor } from '@/utils/mapUtils.jsx';
-import { ChevronDown, ChevronUp, Wind, Sun, Factory, Users } from 'lucide-react';
+import { getMarkerColor, ENERGY_CATEGORIES } from '@/utils/mapUtils.jsx';
+import { ChevronDown, ChevronUp, Wind, Sun, Factory, Users, Droplet, CircleDot } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
 
 const LegendItem = ({ color, label, icon: Icon }) => (
   <div className="flex items-center space-x-2 mb-2 last:mb-0">
-    <div 
+    <div
       className="w-8 h-8 rounded-full flex items-center justify-center border-2 border-white shadow-sm flex-shrink-0"
       style={{ backgroundColor: color }}
     >
@@ -19,10 +19,19 @@ const LegendItem = ({ color, label, icon: Icon }) => (
 const ProjectLegend = () => {
   const [isOpen, setIsOpen] = useState(true);
 
+  // Map energy categories to icons
+  const categoryIcons = {
+    solaire: Sun,
+    éolien: Wind,
+    biométhane: Factory,
+    'cogénération-électricité': CircleDot,
+    hydroélectricité: Droplet
+  };
+
   return (
     <div className="absolute bottom-8 right-4 z-10 max-w-[200px] w-full">
       <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 overflow-hidden">
-        <div 
+        <div
           className="flex items-center justify-between p-3 bg-gray-50 border-b border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors"
           onClick={() => setIsOpen(!isOpen)}
         >
@@ -31,30 +40,19 @@ const ProjectLegend = () => {
             {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
           </Button>
         </div>
-        
+
         {isOpen && (
           <div className="p-3">
-            <LegendItem 
-              color={getMarkerColor('Parc éolien')} 
-              label="Éolien" 
-              icon={Wind} 
-            />
-            <LegendItem 
-              color={getMarkerColor('Station solaire')} 
-              label="Solaire" 
-              icon={Sun} 
-            />
-            <LegendItem 
-              color={getMarkerColor('Méthanisation')} 
-              label="Méthanisation" 
-              icon={Factory} 
-            />
-            <LegendItem 
-              color={getMarkerColor('Consultation publique')} 
-              label="Consultation" 
-              icon={Users} 
-            />
-            
+            {/* Energy categories */}
+            {Object.entries(ENERGY_CATEGORIES).map(([key, category]) => (
+              <LegendItem
+                key={key}
+                color={getMarkerColor(key)}
+                label={category.label}
+                icon={categoryIcons[key] || Sun}
+              />
+            ))}
+
             <div className="mt-4 pt-3 border-t border-gray-100">
                <p className="text-xs text-gray-500 font-semibold mb-2 uppercase tracking-wide">Statut</p>
                <div className="space-y-1.5">

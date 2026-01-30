@@ -99,16 +99,17 @@ const ClientMapPage = () => {
           style={{ backgroundColor: client?.primary_color || '#4f46e5' }}
         >
           <div className="max-w-7xl mx-auto flex items-center gap-4">
-            {client?.logo_url && (
+            {client?.logo_url ? (
               <img
                 src={client.logo_url}
                 alt={client.name}
                 className="h-10 w-auto object-contain bg-white rounded-lg p-1"
               />
+            ) : (
+              <h1 className="text-xl font-bold text-white">
+                {client?.name || 'Carte des projets'}
+              </h1>
             )}
-            <h1 className="text-xl font-bold text-white">
-              {client?.name || 'Carte des projets'}
-            </h1>
           </div>
         </header>
 

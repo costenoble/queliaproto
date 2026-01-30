@@ -107,15 +107,17 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
   // Filter Logic
   const filteredPois = useMemo(() => {
     return pois.filter(poi => {
-      const typeMatch = filters.types.length === 0 || filters.types.includes(poi.type);
-      
+      // Check energy_category (new) or type (legacy) for type filtering
+      const poiEnergyType = poi.energy_category || poi.type;
+      const typeMatch = filters.types.length === 0 || filters.types.includes(poiEnergyType);
+
       let statusMatch = filters.status.length === 0;
       if (!statusMatch && poi.status) {
          statusMatch = filters.status.includes(poi.status);
       }
-      
+
       const cityMatch = filters.cities.length === 0 || (poi.city && filters.cities.includes(poi.city));
-      
+
       return typeMatch && statusMatch && cityMatch;
     });
   }, [pois, filters]);

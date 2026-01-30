@@ -19,8 +19,10 @@ const PointOfInterest = ({ poi, isSelected = false }) => {
 
   if (!poi || !poi.lat || !poi.lng) return null;
 
-  const color = getMarkerColor(poi.type);
-  const svgIcon = getMarkerIconSvg(poi.type, 'white');
+  // Use energy_category for color/icon, fallback to legacy type
+  const energyType = poi.energy_category || poi.type;
+  const color = getMarkerColor(energyType);
+  const svgIcon = getMarkerIconSvg(energyType, 'white');
 
   // Create a custom DivIcon that mimics the previous CSS styling
   const customIcon = L.divIcon({

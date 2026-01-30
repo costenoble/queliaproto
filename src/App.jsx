@@ -11,6 +11,7 @@ import MapPage from '@/pages/MapPage.jsx';
 import LoginPage from '@/pages/LoginPage.jsx';
 import AdminPage from '@/pages/AdminPage.jsx';
 import ClientMapPage from '@/pages/ClientMapPage.jsx';
+import PoiEmbedPage from '@/pages/PoiEmbedPage.jsx';
 
 import '@/animations.css';
 
@@ -147,6 +148,9 @@ function App() {
 
           {/* Carte client (URL a partager avec les clients) */}
           <Route path="/carte/:clientSlug" element={<ClientMapPage />} />
+
+          {/* POI Embed - Affichage d'un POI seul sur fond blanc */}
+          <Route path="/poi/:poiId" element={<PoiEmbedPage />} />
 
           {/* Auth */}
           <Route path="/login" element={<Layout><LoginPage /></Layout>} />

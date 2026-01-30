@@ -2,11 +2,11 @@
 import React, { useState } from 'react';
 import { Filter, Check, RotateCcw, ChevronDown, ChevronUp, MapPin, Zap, Activity, X } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
-import { getMarkerColor } from '@/utils/mapUtils.jsx';
+import { getMarkerColor, ENERGY_CATEGORIES } from '@/utils/mapUtils.jsx';
 
 const ProjectFilter = ({ filters, onFilterChange, resultCount, cities = [] }) => {
   const [isOpenMobile, setIsOpenMobile] = useState(false);
-  
+
   const [collapsedSections, setCollapsedSections] = useState({
     types: false,
     status: false,
@@ -20,14 +20,12 @@ const ProjectFilter = ({ filters, onFilterChange, resultCount, cities = [] }) =>
     }));
   };
 
-  const projectTypes = [
-    { id: 'Parc éolien', label: 'Éolien', color: getMarkerColor('Parc éolien') },
-    { id: 'Station solaire', label: 'Solaire', color: getMarkerColor('Station solaire') },
-    { id: 'Méthanisation', label: 'Méthanisation', color: getMarkerColor('Méthanisation') },
-    { id: 'Consultation publique', label: 'Consultation', color: getMarkerColor('Consultation publique') },
-    { id: 'Centre de stockage', label: 'Stockage', color: getMarkerColor('Centre de stockage') },
-    { id: 'Ligne électrique', label: 'Réseau', color: getMarkerColor('Ligne électrique') }
-  ];
+  // Build energy types from ENERGY_CATEGORIES
+  const energyTypes = Object.entries(ENERGY_CATEGORIES).map(([key, category]) => ({
+    id: key,
+    label: category.label,
+    color: getMarkerColor(key)
+  }));
 
   const statuses = [
     { id: 'en étude', label: 'En étude' },
@@ -92,7 +90,7 @@ const ProjectFilter = ({ filters, onFilterChange, resultCount, cities = [] }) =>
           
           {!collapsedSections.types && (
             <div className="p-3 space-y-2 bg-white">
-              {projectTypes.map((type) => (
+              {energyTypes.map((type) => (
                 <div 
                   key={type.id}
                   onClick={() => toggleSelection('types', type.id)}
