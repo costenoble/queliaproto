@@ -124,6 +124,9 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
     actualPower: '',
     actualPowerUnit: 'MW',
     equivalentDisplay: 'foyers',
+    // Live Data
+    liveDataUrl: '',
+    liveDataPath: 'current_power',
     // Other
     description: '',
     urlType: 'Website URL',
@@ -161,6 +164,8 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
         actualPower: project.actual_power || '',
         actualPowerUnit: project.actual_power_unit || 'MW',
         equivalentDisplay: project.equivalent_display || 'foyers',
+        liveDataUrl: project.live_data_url || '',
+        liveDataPath: project.live_data_path || 'current_power',
         description: project.description || '',
         urlType: project.url_type || 'Website URL',
         projectUrl: project.project_url || ''
@@ -290,6 +295,8 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
         actual_power: formData.actualPower ? parseFloat(formData.actualPower) : null,
         actual_power_unit: formData.actualPowerUnit,
         equivalent_display: formData.equivalentDisplay,
+        live_data_url: formData.liveDataUrl || null,
+        live_data_path: formData.liveDataPath || 'current_power',
         description: formData.description,
         url_type: formData.urlType,
         project_url: formData.projectUrl,
@@ -615,6 +622,48 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
                     <span className="text-sm font-medium">{eq.label}</span>
                   </label>
                 ))}
+              </div>
+            </div>
+
+            {/* Live Data from External API */}
+            <div className="pt-4 border-t border-gray-100">
+              <div className="flex items-center gap-2 mb-3">
+                <Zap className="w-4 h-4 text-green-500" />
+                <span className="text-sm font-semibold text-gray-700">Données temps réel (optionnel)</span>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <label className={labelClass}>
+                    <Globe className="w-4 h-4 mr-1.5 text-gray-500" /> URL API JSON
+                  </label>
+                  <input
+                    type="url"
+                    name="liveDataUrl"
+                    value={formData.liveDataUrl}
+                    onChange={handleChange}
+                    className={inputClass}
+                    placeholder="https://api-client.com/project/123/power"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">
+                    URL qui retourne les données en temps réel au format JSON
+                  </p>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Chemin JSON</label>
+                  <input
+                    type="text"
+                    name="liveDataPath"
+                    value={formData.liveDataPath}
+                    onChange={handleChange}
+                    className={inputClass}
+                    placeholder="current_power"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">
+                    Chemin vers la valeur dans le JSON (ex: "current_power" ou "data.measurements.power")
+                  </p>
+                </div>
               </div>
             </div>
           </div>

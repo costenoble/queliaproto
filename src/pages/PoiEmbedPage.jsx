@@ -4,12 +4,20 @@ import { useParams } from 'react-router-dom';
 import { supabase } from '@/lib/customSupabaseClient';
 import { getStatusColorClass, getMarkerColor, getMarkerIconComponent, calculateEquivalent, ENERGY_CATEGORIES } from '@/utils/mapUtils.jsx';
 import { Calendar, Zap, MapPin, Building, User, ExternalLink, Home, Map as MapIcon, Loader2 } from 'lucide-react';
+import { useLiveData } from '@/hooks/useLiveData';
 
 const PoiEmbedPage = () => {
   const { poiId } = useParams();
   const [poi, setPoi] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Fetch live data if URL is configured
+  const { value: liveValue, error: liveError, loading: liveLoading } = useLiveData(
+    poi?.live_data_url,
+    poi?.live_data_path || 'current_power',
+    5000
+  );
 
   useEffect(() => {
     const fetchPoi = async () => {
@@ -199,6 +207,31 @@ const PoiEmbedPage = () => {
                   <span className="text-2xl font-bold text-green-600">
                     {poi.actual_power} <span className="text-lg font-medium">{poi.actual_power_unit || 'MW'}</span>
                   </span>
+                </div>
+              )}
+
+              {/* Live Data from External API */}
+              {poi.live_data_url && (
+                <div className="bg-green-50 rounded-xl p-4 border-2 border-green-200">
+                  <div className="flex items-center text-green-600 mb-1">
+                    <Zap className="w-4 h-4 mr-2 animate-pulse" />
+                    <span className="text-sm font-semibold">Temps réel</span>
+                  </div>
+                  {liveError ? (
+                    <span className="text-sm text-red-600">Erreur de connexion</span>
+                  ) : liveLoading ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin text-green-600" />
+                      <span className="text-sm text-green-600">Chargement...</span>
+                    </div>
+                  ) : liveValue !== null ? (
+                    <span className="text-2xl font-bold text-green-600">
+                      {typeof liveValue === 'number' ? liveValue.toFixed(2) : liveValue}{' '}
+                      <span className="text-lg font-medium">{poi.actual_power_unit || 'MW'}</span>
+                    </span>
+                  ) : (
+                    <span className="text-sm text-gray-400">Pas de données</span>
+                  )}
                 </div>
               )}
 

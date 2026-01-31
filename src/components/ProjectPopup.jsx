@@ -2,6 +2,7 @@
 import React from 'react';
 import { getStatusColorClass, getMarkerColor, getMarkerIconComponent, calculateEquivalent, ENERGY_CATEGORIES } from '@/utils/mapUtils.jsx';
 import { Calendar, Zap, MapPin, Building, User, ExternalLink, Home, Map as MapIcon } from 'lucide-react';
+import { useLiveData } from '@/hooks/useLiveData';
 
 const ProjectPopup = ({ poi }) => {
   if (!poi) return null;
@@ -11,6 +12,13 @@ const ProjectPopup = ({ poi }) => {
   const energyType = poi.energy_category || poi.type;
   const typeColor = getMarkerColor(energyType);
   const TypeIcon = getMarkerIconComponent(energyType, "w-4 h-4 mr-1");
+
+  // Fetch live data if URL is configured
+  const { value: liveValue, error: liveError, loading: liveLoading } = useLiveData(
+    poi.live_data_url,
+    poi.live_data_path || 'current_power',
+    5000 // Refresh every 5 seconds
+  );
 
   // Get display label for energy type
   const getEnergyLabel = () => {
@@ -143,6 +151,27 @@ const ProjectPopup = ({ poi }) => {
               <div>
                 <span className="block text-xs text-gray-500">Puissance en direct</span>
                 <span className="font-semibold text-green-600">{poi.actual_power} {poi.actual_power_unit || 'MW'}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Live Data from External API */}
+          {poi.live_data_url && (
+            <div className="flex items-start text-gray-700">
+              <Zap className="w-4 h-4 mr-2 text-green-500 mt-0.5 animate-pulse" />
+              <div>
+                <span className="block text-xs text-gray-500">Temps réel</span>
+                {liveError ? (
+                  <span className="text-xs text-red-600">Erreur</span>
+                ) : liveLoading ? (
+                  <span className="text-xs text-gray-400">Chargement...</span>
+                ) : liveValue !== null ? (
+                  <span className="font-semibold text-green-600">
+                    {typeof liveValue === 'number' ? liveValue.toFixed(2) : liveValue} {poi.actual_power_unit || 'MW'}
+                  </span>
+                ) : (
+                  <span className="text-xs text-gray-400">---</span>
+                )}
               </div>
             </div>
           )}
