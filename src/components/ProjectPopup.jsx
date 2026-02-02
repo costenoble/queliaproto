@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { getStatusColorClass, getMarkerColor, getMarkerIconComponent, calculateEquivalent, ENERGY_CATEGORIES } from '@/utils/mapUtils.jsx';
-import { Calendar, Zap, MapPin, Building, User, ExternalLink, Home, Map as MapIcon } from 'lucide-react';
-import { useLiveData } from '@/hooks/useLiveData';
+import { Calendar, Zap, MapPin, Building, User, ExternalLink, Home, Map as MapIcon, Loader2 } from 'lucide-react';
+import useHybridLiveData from '@/hooks/useHybridLiveData';
 
 const ProjectPopup = ({ poi }) => {
   if (!poi) return null;
@@ -13,10 +13,9 @@ const ProjectPopup = ({ poi }) => {
   const typeColor = getMarkerColor(energyType);
   const TypeIcon = getMarkerIconComponent(energyType, "w-4 h-4 mr-1");
 
-  // Fetch live data if URL is configured
-  const { value: liveValue, error: liveError, loading: liveLoading } = useLiveData(
-    poi.live_data_url,
-    poi.live_data_path || 'current_power',
+  // Fetch live data (PUSH depuis live_data OU PULL depuis live_data_url)
+  const { data: liveData, error: liveError, loading: liveLoading, source } = useHybridLiveData(
+    poi.id,
     5000 // Refresh every 5 seconds
   );
 
@@ -144,8 +143,8 @@ const ProjectPopup = ({ poi }) => {
             </div>
           )}
 
-          {/* Actual Power */}
-          {poi.actual_power && (
+          {/* Actual Power (statique) */}
+          {poi.actual_power && !liveData && (
             <div className="flex items-start text-gray-700">
               <Zap className="w-4 h-4 mr-2 text-green-500 mt-0.5" />
               <div>
@@ -155,19 +154,29 @@ const ProjectPopup = ({ poi }) => {
             </div>
           )}
 
-          {/* Live Data from External API */}
-          {poi.live_data_url && (
+          {/* Live Data - Temps réel (PUSH ou PULL) */}
+          {(liveData || liveLoading || poi.live_data_url) && (
             <div className="flex items-start text-gray-700">
               <Zap className="w-4 h-4 mr-2 text-green-500 mt-0.5 animate-pulse" />
-              <div>
-                <span className="block text-xs text-gray-500">Temps réel</span>
+              <div className="flex-1">
+                <div className="flex items-center gap-1">
+                  <span className="block text-xs text-gray-500">Temps réel</span>
+                  {source && (
+                    <span className="text-[10px] bg-green-100 text-green-700 px-1 py-0.5 rounded font-medium">
+                      {source === 'push' ? 'PUSH' : 'PULL'}
+                    </span>
+                  )}
+                </div>
                 {liveError ? (
                   <span className="text-xs text-red-600">Erreur</span>
                 ) : liveLoading ? (
-                  <span className="text-xs text-gray-400">Chargement...</span>
-                ) : liveValue !== null ? (
+                  <div className="flex items-center gap-1">
+                    <Loader2 className="w-3 h-3 animate-spin text-green-600" />
+                    <span className="text-xs text-gray-400">...</span>
+                  </div>
+                ) : liveData?.value !== null && liveData?.value !== undefined ? (
                   <span className="font-semibold text-green-600">
-                    {typeof liveValue === 'number' ? liveValue.toFixed(2) : liveValue} {poi.actual_power_unit || 'MW'}
+                    {typeof liveData.value === 'number' ? liveData.value.toFixed(2) : liveData.value} {liveData.unit || 'kW'}
                   </span>
                 ) : (
                   <span className="text-xs text-gray-400">---</span>
