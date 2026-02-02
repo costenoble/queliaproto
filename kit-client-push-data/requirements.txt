@@ -1,0 +1,8 @@
+# Dépendances Python pour l'envoi de données
+requests>=2.31.0
+
+# Dépendances optionnelles selon votre cas d'usage :
+# pymodbus>=3.5.0        # Pour Modbus TCP/RTU
+# psycopg2-binary>=2.9.0 # Pour PostgreSQL
+# pymysql>=1.1.0         # Pour MySQL
+# pyserial>=3.5          # Pour communication série

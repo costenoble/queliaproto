@@ -4,6 +4,7 @@ import { Edit, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Link2, Square } from 'lu
 import { Button } from '@/components/ui/button';
 import { getStatusColorClass } from '@/utils/mapUtils';
 import { useToast } from '@/components/ui/use-toast';
+import ApiKeyDisplay from './ApiKeyDisplay';
 
 const SimpleTooltip = ({ text, children }) => {
   const [show, setShow] = useState(false);
@@ -113,13 +114,16 @@ const ProjectsTable = ({ projects, onEdit, onDelete, sortConfig, onSort, showCli
                   STATUT {getSortIcon('status')}
                 </div>
               </th>
-              <th 
+              <th
                 className="px-6 py-4 font-semibold text-gray-600 cursor-pointer hover:bg-gray-50 transition-colors select-none"
                 onClick={() => handleSort('city')}
               >
                 <div className="flex items-center">
                   VILLE {getSortIcon('city')}
                 </div>
+              </th>
+              <th className="px-6 py-4 font-semibold text-gray-600">
+                CLÉ API
               </th>
               <th className="px-6 py-4 font-semibold text-gray-600 text-right">
                 ACTIONS
@@ -129,7 +133,7 @@ const ProjectsTable = ({ projects, onEdit, onDelete, sortConfig, onSort, showCli
           <tbody className="divide-y divide-gray-100">
             {projects.length === 0 ? (
               <tr>
-                <td colSpan={showClient ? 6 : 5} className="px-6 py-12 text-center text-gray-500 italic">
+                <td colSpan={showClient ? 7 : 6} className="px-6 py-12 text-center text-gray-500 italic">
                   Aucun projet trouvé
                 </td>
               </tr>
@@ -172,6 +176,9 @@ const ProjectsTable = ({ projects, onEdit, onDelete, sortConfig, onSort, showCli
                   </td>
                   <td className="px-6 py-4 text-gray-600">
                     {project.city || <span className="text-gray-400 italic">Non spécifié</span>}
+                  </td>
+                  <td className="px-6 py-4">
+                    <ApiKeyDisplay projectId={project.id} projectName={project.name} />
                   </td>
                   <td className="px-6 py-4 text-right overflow-visible">
                     <div className="flex justify-end gap-1 items-center">
