@@ -264,7 +264,7 @@ const PoiEmbedPage = () => {
 
             {/* Website Link */}
             {poi.project_url && (
-              
+              <a
                 href={poi.project_url}
                 target="_blank"
                 rel="noopener noreferrer"
