@@ -1,0 +1,531 @@
+
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [6.5628, 46.5333] },
+      "properties": {
+        "id": "prj-001",
+        "name": "Parc Solaire Renens Gare",
+        "description": "Installation photovoltaïque sur les toitures des bâtiments de la gare et ombrières de parking.",
+        "type": "Station solaire",
+        "status": "en construction",
+        "capacity": "2.5 MW",
+        "startDate": "2024-03-01",
+        "endDate": "2024-11-30",
+        "city": "Renens"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [6.5500, 46.5400] },
+      "properties": {
+        "id": "prj-002",
+        "name": "Chaufferie Biomasse Ouest",
+        "description": "Centrale de chauffage urbain alimentée par des déchets de bois locaux.",
+        "type": "Méthanisation",
+        "status": "en exploitation",
+        "capacity": "15 MWth",
+        "startDate": "2022-01-15",
+        "endDate": "2042-01-15",
+        "city": "Renens"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [2.3522, 48.8566] },
+      "properties": {
+        "id": "prj-003",
+        "name": "Consultation Plan Climat Paris",
+        "description": "Série d'ateliers participatifs pour définir les priorités énergétiques des arrondissements.",
+        "type": "Consultation publique",
+        "status": "consultation en cours",
+        "capacity": "N/A",
+        "startDate": "2023-09-01",
+        "endDate": "2024-06-30",
+        "city": "Paris"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [2.4000, 48.8800] },
+      "properties": {
+        "id": "prj-004",
+        "name": "Solarisation Toitures Publiques Est",
+        "description": "Campagne d'équipement de 50 écoles et gymnases en panneaux solaires.",
+        "type": "Station solaire",
+        "status": "en étude",
+        "capacity": "4 MW",
+        "startDate": "2025-01-01",
+        "endDate": "2026-12-31",
+        "city": "Paris"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [2.3000, 48.8200] },
+      "properties": {
+        "id": "prj-005",
+        "name": "Modernisation Réseau Électrique Sud",
+        "description": "Enfouissement de lignes haute tension et renforcement des capacités.",
+        "type": "Ligne électrique",
+        "status": "en construction",
+        "capacity": "225 kV",
+        "startDate": "2023-06-01",
+        "endDate": "2025-03-31",
+        "city": "Paris"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [5.3698, 43.2965] },
+      "properties": {
+        "id": "prj-006",
+        "name": "Ferme Éolienne Offshore Calanques",
+        "description": "Projet pilote d'éoliennes flottantes au large des côtes marseillaises.",
+        "type": "Parc éolien",
+        "status": "en étude",
+        "capacity": "24 MW",
+        "startDate": "2026-01-01",
+        "endDate": "2028-12-31",
+        "city": "Marseille"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [5.4000, 43.3200] },
+      "properties": {
+        "id": "prj-007",
+        "name": "Solaire Photovoltaïque Marseille Nord",
+        "description": "Réhabilitation d'une friche industrielle en centrale solaire au sol.",
+        "type": "Station solaire",
+        "status": "en exploitation",
+        "capacity": "12 MW",
+        "startDate": "2021-05-15",
+        "endDate": "2041-05-15",
+        "city": "Marseille"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [5.3500, 43.2800] },
+      "properties": {
+        "id": "prj-008",
+        "name": "Débat Public Transition Marseille",
+        "description": "Concertation sur la sortie des énergies fossiles dans le port.",
+        "type": "Consultation publique",
+        "status": "consultation en cours",
+        "capacity": "N/A",
+        "startDate": "2024-02-01",
+        "endDate": "2024-09-30",
+        "city": "Marseille"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-2.0260, 48.6493] },
+      "properties": {
+        "id": "prj-009",
+        "name": "Parc Éolien des Terres Neuvas",
+        "description": "Extension du parc éolien existant avec 3 nouvelles turbines.",
+        "type": "Parc éolien",
+        "status": "en construction",
+        "capacity": "9 MW",
+        "startDate": "2023-11-01",
+        "endDate": "2024-08-31",
+        "city": "Saint-Malo"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-2.0000, 48.6300] },
+      "properties": {
+        "id": "prj-010",
+        "name": "Unité de Méthanisation Agricole",
+        "description": "Valorisation des effluents d'élevage de 15 exploitations partenaires.",
+        "type": "Méthanisation",
+        "status": "en étude",
+        "capacity": "150 Nm3/h",
+        "startDate": "2025-03-01",
+        "endDate": "2026-06-30",
+        "city": "Saint-Malo"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [4.8357, 45.7640] },
+      "properties": {
+        "id": "prj-011",
+        "name": "Stockage Énergie Vallée de la Chimie",
+        "description": "Installation de batteries stationnaires pour la régulation du réseau.",
+        "type": "Centre de stockage",
+        "status": "en exploitation",
+        "capacity": "10 MWh",
+        "startDate": "2023-01-10",
+        "endDate": "2033-01-10",
+        "city": "Lyon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [4.8800, 45.7500] },
+      "properties": {
+        "id": "prj-012",
+        "name": "Ombrières Solaires Parc Olympique",
+        "description": "Couverture des parkings du stade par des panneaux photovoltaïques.",
+        "type": "Station solaire",
+        "status": "en construction",
+        "capacity": "6 MW",
+        "startDate": "2023-09-15",
+        "endDate": "2024-05-30",
+        "city": "Lyon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [4.8000, 45.7800] },
+      "properties": {
+        "id": "prj-013",
+        "name": "Concertation Zone à Faibles Émissions",
+        "description": "Dialogue citoyen sur l'extension de la ZFE et ses impacts énergétiques.",
+        "type": "Consultation publique",
+        "status": "consultation en cours",
+        "capacity": "N/A",
+        "startDate": "2024-01-01",
+        "endDate": "2024-12-31",
+        "city": "Lyon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-0.5792, 44.8378] },
+      "properties": {
+        "id": "prj-014",
+        "name": "Solaire Flottant Lac de Bordeaux",
+        "description": "Projet innovant de panneaux solaires sur plan d'eau artificiel.",
+        "type": "Station solaire",
+        "status": "en étude",
+        "capacity": "15 MW",
+        "startDate": "2025-06-01",
+        "endDate": "2026-12-31",
+        "city": "Bordeaux"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-0.6000, 44.8500] },
+      "properties": {
+        "id": "prj-015",
+        "name": "Renforcement Ligne THT Gironde",
+        "description": "Sécurisation de l'alimentation électrique de la métropole.",
+        "type": "Ligne électrique",
+        "status": "en exploitation",
+        "capacity": "400 kV",
+        "startDate": "2019-01-01",
+        "endDate": "2059-12-31",
+        "city": "Bordeaux"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-0.5500, 44.8200] },
+      "properties": {
+        "id": "prj-016",
+        "name": "Méthaniseur Vignoble Bordelais",
+        "description": "Valorisation des marcs de raisin et déchets viticoles.",
+        "type": "Méthanisation",
+        "status": "en construction",
+        "capacity": "200 Nm3/h",
+        "startDate": "2023-10-01",
+        "endDate": "2024-10-31",
+        "city": "Bordeaux"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-1.5536, 47.2184] },
+      "properties": {
+        "id": "prj-017",
+        "name": "Parc Éolien Citoyen de Nantes",
+        "description": "Projet éolien financé et gouverné par les habitants.",
+        "type": "Parc éolien",
+        "status": "en exploitation",
+        "capacity": "6 MW",
+        "startDate": "2020-04-01",
+        "endDate": "2040-04-01",
+        "city": "Nantes"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-1.5800, 47.2300] },
+      "properties": {
+        "id": "prj-018",
+        "name": "Solaire Toitures Logistique",
+        "description": "Équipement de 3 grandes plateformes logistiques.",
+        "type": "Station solaire",
+        "status": "en étude",
+        "capacity": "3.5 MW",
+        "startDate": "2024-11-01",
+        "endDate": "2025-08-31",
+        "city": "Nantes"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [7.7521, 48.5734] },
+      "properties": {
+        "id": "prj-019",
+        "name": "Géothermie Profonde Strasbourg",
+        "description": "Centrale géothermique pour la production de chaleur et d'électricité.",
+        "type": "Méthanisation",
+        "status": "en exploitation",
+        "capacity": "5 MWe / 25 MWth",
+        "startDate": "2018-01-01",
+        "endDate": "2048-12-31",
+        "city": "Strasbourg"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [7.7800, 48.5900] },
+      "properties": {
+        "id": "prj-020",
+        "name": "Concertation Extension Réseau Chaleur",
+        "description": "Réunions publiques sur les travaux d'extension du réseau urbain.",
+        "type": "Consultation publique",
+        "status": "consultation en cours",
+        "capacity": "N/A",
+        "startDate": "2024-03-15",
+        "endDate": "2024-06-15",
+        "city": "Strasbourg"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [1.4442, 43.6047] },
+      "properties": {
+        "id": "prj-021",
+        "name": "Solaire Aérospatial Toulouse",
+        "description": "Projet d'autoconsommation pour le pôle industriel aérospatial.",
+        "type": "Station solaire",
+        "status": "en construction",
+        "capacity": "8 MW",
+        "startDate": "2023-07-01",
+        "endDate": "2024-07-31",
+        "city": "Toulouse"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [1.4800, 43.6200] },
+      "properties": {
+        "id": "prj-022",
+        "name": "Parc Éolien Lauragais",
+        "description": "Projet de 6 éoliennes sur les crêtes ventées du sud-est toulousain.",
+        "type": "Parc éolien",
+        "status": "en étude",
+        "capacity": "18 MW",
+        "startDate": "2026-01-01",
+        "endDate": "2027-12-31",
+        "city": "Toulouse"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [7.2620, 43.7102] },
+      "properties": {
+        "id": "prj-023",
+        "name": "Smart Grid Nice Méridia",
+        "description": "Réseau intelligent pilotant production solaire et stockage.",
+        "type": "Centre de stockage",
+        "status": "en exploitation",
+        "capacity": "2 MWh",
+        "startDate": "2022-06-01",
+        "endDate": "2032-06-01",
+        "city": "Nice"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [7.2200, 43.6800] },
+      "properties": {
+        "id": "prj-024",
+        "name": "Solaire Serres Agricoles Var",
+        "description": "Agrivoltaïsme sur cultures maraîchères sous serres.",
+        "type": "Station solaire",
+        "status": "en construction",
+        "capacity": "4 MW",
+        "startDate": "2023-12-01",
+        "endDate": "2024-09-30",
+        "city": "Nice"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [3.0573, 50.6292] },
+      "properties": {
+        "id": "prj-025",
+        "name": "Revalorisation Biogaz Lille Métropole",
+        "description": "Modernisation de l'unité de méthanisation de la station d'épuration.",
+        "type": "Méthanisation",
+        "status": "en construction",
+        "capacity": "400 Nm3/h",
+        "startDate": "2023-05-01",
+        "endDate": "2025-05-31",
+        "city": "Lille"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [3.0800, 50.6000] },
+      "properties": {
+        "id": "prj-026",
+        "name": "Débat Éolien Hauts-de-France",
+        "description": "Grande consultation régionale sur le développement éolien terrestre.",
+        "type": "Consultation publique",
+        "status": "consultation en cours",
+        "capacity": "N/A",
+        "startDate": "2024-01-15",
+        "endDate": "2024-07-15",
+        "city": "Lille"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [5.7245, 45.1885] },
+      "properties": {
+        "id": "prj-027",
+        "name": "Hydroélectricité Drac-Romanche",
+        "description": "Optimisation des centrales hydroélectriques existantes.",
+        "type": "Ligne électrique",
+        "status": "en exploitation",
+        "capacity": "120 MW",
+        "startDate": "2015-01-01",
+        "endDate": "2055-12-31",
+        "city": "Grenoble"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [5.7500, 45.2000] },
+      "properties": {
+        "id": "prj-028",
+        "name": "Solaire Campus Universitaire",
+        "description": "Autoconsommation collective pour les bâtiments de l'université.",
+        "type": "Station solaire",
+        "status": "en étude",
+        "capacity": "1.5 MW",
+        "startDate": "2025-02-01",
+        "endDate": "2025-11-30",
+        "city": "Grenoble"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [3.8767, 43.6108] },
+      "properties": {
+        "id": "prj-029",
+        "name": "Solaire Ombrières Commerciales",
+        "description": "Projet d'envergure sur les zones commerciales périphériques.",
+        "type": "Station solaire",
+        "status": "en exploitation",
+        "capacity": "9 MW",
+        "startDate": "2022-09-01",
+        "endDate": "2042-09-01",
+        "city": "Montpellier"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [3.9000, 43.6300] },
+      "properties": {
+        "id": "prj-030",
+        "name": "Centre Stockage Hydrogène Vert",
+        "description": "Projet pilote de production et stockage d'hydrogène pour la mobilité.",
+        "type": "Centre de stockage",
+        "status": "en étude",
+        "capacity": "2 MW",
+        "startDate": "2025-06-01",
+        "endDate": "2027-06-01",
+        "city": "Montpellier"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-1.6778, 48.1173] },
+      "properties": {
+        "id": "prj-031",
+        "name": "Réseau Électrique Bretagne Sud",
+        "description": "Création d'une nouvelle liaison souterraine 225kV.",
+        "type": "Ligne électrique",
+        "status": "en construction",
+        "capacity": "225 kV",
+        "startDate": "2023-03-01",
+        "endDate": "2025-09-30",
+        "city": "Rennes"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-1.6500, 48.1300] },
+      "properties": {
+        "id": "prj-032",
+        "name": "Méthanisation Territoriale Rennes",
+        "description": "Projet multi-acteurs (agriculteurs, industries agro-alim).",
+        "type": "Méthanisation",
+        "status": "en exploitation",
+        "capacity": "250 Nm3/h",
+        "startDate": "2021-11-01",
+        "endDate": "2041-11-01",
+        "city": "Rennes"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [5.0415, 47.3220] },
+      "properties": {
+        "id": "prj-033",
+        "name": "Solaire Photovoltaïque Dijon Nord",
+        "description": "Centrale solaire au sol sur ancien terrain militaire.",
+        "type": "Station solaire",
+        "status": "en étude",
+        "capacity": "14 MW",
+        "startDate": "2026-01-01",
+        "endDate": "2027-06-30",
+        "city": "Dijon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [5.0200, 47.3000] },
+      "properties": {
+        "id": "prj-034",
+        "name": "Concertation Hydrogène Bourgogne",
+        "description": "Ateliers sur le déploiement des écosystèmes hydrogène régionaux.",
+        "type": "Consultation publique",
+        "status": "consultation en cours",
+        "capacity": "N/A",
+        "startDate": "2024-04-01",
+        "endDate": "2024-10-31",
+        "city": "Dijon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [6.5700, 46.5350] },
+      "properties": {
+        "id": "prj-035",
+        "name": "Batteries Réseau Renens",
+        "description": "Stockage tampon pour lisser la production solaire locale.",
+        "type": "Centre de stockage",
+        "status": "en étude",
+        "capacity": "5 MWh",
+        "startDate": "2025-01-01",
+        "endDate": "2025-12-31",
+        "city": "Renens"
+      }
+    }
+  ]
+}

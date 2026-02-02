@@ -1,0 +1,124 @@
+
+/* Pulsing animation for POI markers */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+/* Glow effect on hover */
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(107, 114, 128, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(107, 114, 128, 0.8);
+  }
+}
+
+/* Overlay fade in */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Overlay fade out */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Slide in from right */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Slide out to right */
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* Apply animations */
+.poi-marker {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.poi-marker:hover {
+  animation: pulse 2s ease-in-out infinite, glow 1.5s ease-in-out infinite;
+}
+
+.overlay-enter {
+  animation: fadeIn 300ms ease-out;
+}
+
+.overlay-exit {
+  animation: fadeOut 300ms ease-out;
+}
+
+.panel-enter {
+  animation: slideInRight 300ms ease-out;
+}
+
+.panel-exit {
+  animation: slideOutRight 300ms ease-out;
+}
+
+/* Mapbox popup custom styling */
+.mapboxgl-popup-content {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 0;
+  background: #ffffff;
+  max-width: 300px;
+}
+
+.mapboxgl-popup-close-button {
+  font-size: 20px;
+  color: #666666;
+  padding: 8px;
+}
+
+.mapboxgl-popup-close-button:hover {
+  background-color: #f8f8f8;
+  color: #1a1a1a;
+}
+
+.mapboxgl-popup-tip {
+  border-top-color: #ffffff;
+}
+
+/* Smooth transitions */
+.transition-all {
+  transition: all 300ms ease-in-out;
+}
+
+.transition-transform {
+  transition: transform 300ms ease-in-out;
+}
+
+.transition-opacity {
+  transition: opacity 500ms ease-in-out;
+}
