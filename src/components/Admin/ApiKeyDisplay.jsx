@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Copy, Eye, EyeOff, Key, Check } from 'lucide-react';
 import { supabase } from '@/lib/customSupabaseClient';
 import { useToast } from '@/components/ui/use-toast';
+import PowerShellScriptDisplay from './PowerShellScriptDisplay';
 
 const ApiKeyDisplay = ({ projectId, projectName }) => {
   const [apiKey, setApiKey] = useState(null);
@@ -117,30 +118,36 @@ const ApiKeyDisplay = ({ projectId, projectName }) => {
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <code className="text-xs bg-gray-100 px-2 py-1 rounded font-mono">
-        {showKey ? apiKey : maskKey(apiKey)}
-      </code>
-      
-      <Button
-        onClick={() => setShowKey(!showKey)}
-        size="sm"
-        variant="ghost"
-        className="h-7 w-7 p-0"
-        title={showKey ? "Masquer" : "Afficher"}
-      >
-        {showKey ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-      </Button>
+    <div className="space-y-2">
+      {/* Clé API */}
+      <div className="flex items-center gap-2">
+        <code className="text-xs bg-gray-100 px-2 py-1 rounded font-mono">
+          {showKey ? apiKey : maskKey(apiKey)}
+        </code>
 
-      <Button
-        onClick={copyToClipboard}
-        size="sm"
-        variant="ghost"
-        className="h-7 w-7 p-0"
-        title="Copier"
-      >
-        {copied ? <Check className="w-3 h-3 text-green-600" /> : <Copy className="w-3 h-3" />}
-      </Button>
+        <Button
+          onClick={() => setShowKey(!showKey)}
+          size="sm"
+          variant="ghost"
+          className="h-7 w-7 p-0"
+          title={showKey ? "Masquer" : "Afficher"}
+        >
+          {showKey ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+        </Button>
+
+        <Button
+          onClick={copyToClipboard}
+          size="sm"
+          variant="ghost"
+          className="h-7 w-7 p-0"
+          title="Copier"
+        >
+          {copied ? <Check className="w-3 h-3 text-green-600" /> : <Copy className="w-3 h-3" />}
+        </Button>
+      </div>
+
+      {/* Script PowerShell */}
+      <PowerShellScriptDisplay projectId={projectId} apiKey={apiKey} />
     </div>
   );
 };
