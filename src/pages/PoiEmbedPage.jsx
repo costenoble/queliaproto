@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/lib/customSupabaseClient';
 import { getStatusColorClass, getMarkerColor, getMarkerIconComponent, calculateEquivalent, ENERGY_CATEGORIES } from '@/utils/mapUtils.jsx';
 import { Calendar, Zap, MapPin, Building, User, ExternalLink, Home, Map as MapIcon, Loader2 } from 'lucide-react';
-import { useLiveData } from '@/hooks/useLiveData';
+import useHybridLiveData from '@/hooks/useHybridLiveData';
 
 const PoiEmbedPage = () => {
   const { poiId } = useParams();
@@ -12,10 +11,9 @@ const PoiEmbedPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch live data if URL is configured
-  const { value: liveValue, error: liveError, loading: liveLoading } = useLiveData(
-    poi?.live_data_url,
-    poi?.live_data_path || 'current_power',
+  // Fetch live data (PUSH depuis live_data OU PULL depuis live_data_url)
+  const { data: liveData, error: liveError, loading: liveLoading, source } = useHybridLiveData(
+    poiId,
     5000
   );
 
@@ -197,8 +195,8 @@ const PoiEmbedPage = () => {
                 </div>
               )}
 
-              {/* Actual Power */}
-              {poi.actual_power && (
+              {/* Actual Power (statique) */}
+              {poi.actual_power && !liveData && (
                 <div className="bg-green-50 rounded-xl p-4">
                   <div className="flex items-center text-green-600 mb-1">
                     <Zap className="w-4 h-4 mr-2" />
@@ -210,12 +208,17 @@ const PoiEmbedPage = () => {
                 </div>
               )}
 
-              {/* Live Data from External API */}
-              {poi.live_data_url && (
+              {/* Live Data - Temps réel (PUSH ou PULL) */}
+              {(liveData || liveLoading || poi.live_data_url) && (
                 <div className="bg-green-50 rounded-xl p-4 border-2 border-green-200">
                   <div className="flex items-center text-green-600 mb-1">
                     <Zap className="w-4 h-4 mr-2 animate-pulse" />
                     <span className="text-sm font-semibold">Temps réel</span>
+                    {source && (
+                      <span className="ml-2 text-xs bg-green-200 px-1.5 py-0.5 rounded">
+                        {source === 'push' ? 'PUSH' : 'PULL'}
+                      </span>
+                    )}
                   </div>
                   {liveError ? (
                     <span className="text-sm text-red-600">Erreur de connexion</span>
@@ -224,10 +227,10 @@ const PoiEmbedPage = () => {
                       <Loader2 className="w-4 h-4 animate-spin text-green-600" />
                       <span className="text-sm text-green-600">Chargement...</span>
                     </div>
-                  ) : liveValue !== null ? (
+                  ) : liveData?.value !== null && liveData?.value !== undefined ? (
                     <span className="text-2xl font-bold text-green-600">
-                      {typeof liveValue === 'number' ? liveValue.toFixed(2) : liveValue}{' '}
-                      <span className="text-lg font-medium">{poi.actual_power_unit || 'MW'}</span>
+                      {typeof liveData.value === 'number' ? liveData.value.toFixed(2) : liveData.value}{' '}
+                      <span className="text-lg font-medium">{liveData.unit || 'kW'}</span>
                     </span>
                   ) : (
                     <span className="text-sm text-gray-400">Pas de données</span>
@@ -261,7 +264,7 @@ const PoiEmbedPage = () => {
 
             {/* Website Link */}
             {poi.project_url && (
-              <a
+              
                 href={poi.project_url}
                 target="_blank"
                 rel="noopener noreferrer"
