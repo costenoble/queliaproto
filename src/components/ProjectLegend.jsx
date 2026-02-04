@@ -58,11 +58,7 @@ const ProjectLegend = () => {
                <div className="space-y-1.5">
                  <div className="flex items-center">
                    <span className="w-2.5 h-2.5 rounded-full bg-blue-500 mr-2"></span>
-                   <span className="text-xs text-gray-600">En étude</span>
-                 </div>
-                 <div className="flex items-center">
-                   <span className="w-2.5 h-2.5 rounded-full bg-yellow-500 mr-2"></span>
-                   <span className="text-xs text-gray-600">En construction</span>
+                   <span className="text-xs text-gray-600">En projet</span>
                  </div>
                  <div className="flex items-center">
                    <span className="w-2.5 h-2.5 rounded-full bg-green-500 mr-2"></span>

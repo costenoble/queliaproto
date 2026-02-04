@@ -10,6 +10,7 @@ require('dotenv').config();
 const authRoutes = require('./routes/auth');
 const projectsRoutes = require('./routes/projects');
 const clientsRoutes = require('./routes/clients');
+const demoRoutes = require('./routes/demo');
 
 const app = express();
 
@@ -63,6 +64,7 @@ if (process.env.NODE_ENV === 'development') {
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectsRoutes);
 app.use('/api/clients', clientsRoutes);
+app.use('/api/demo', demoRoutes);
 
 // Route de health check
 app.get('/health', (req, res) => {

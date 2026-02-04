@@ -108,7 +108,7 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
     poiLogoUrl: '',
     energyCategory: '',
     energySubtype: '',
-    status: 'en étude',
+    status: 'en projet',
     commissioningYear: '',
     // Geography
     city: '',
@@ -150,7 +150,7 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
         poiLogoUrl: project.poi_logo_url || '',
         energyCategory: project.energy_category || '',
         energySubtype: project.energy_subtype || '',
-        status: project.status || 'en étude',
+        status: project.status || 'en projet',
         commissioningYear: project.commissioning_year || '',
         city: project.city || '',
         address: project.address || '',
@@ -522,10 +522,8 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
                   onChange={handleChange}
                   className={inputClass}
                 >
-                  <option value="en étude">En étude</option>
-                  <option value="en construction">En construction</option>
+                  <option value="en projet">En projet</option>
                   <option value="en exploitation">En exploitation</option>
-                  <option value="consultation en cours">Consultation en cours</option>
                 </select>
               </div>
               <div>

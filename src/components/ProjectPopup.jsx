@@ -97,6 +97,14 @@ const ProjectPopup = ({ poi }) => {
             {poi.region && <span className="ml-1 text-gray-400">• {poi.region}</span>}
           </div>
 
+          {/* Intercommunalités */}
+          {poi.intercommunalites?.length > 0 && (
+            <div className="flex items-center text-xs text-gray-500 px-1">
+              <Building className="w-3 h-3 mr-1 text-gray-400" />
+              {poi.intercommunalites.slice(0, 2).join(', ')}{poi.intercommunalites.length > 2 ? ` +${poi.intercommunalites.length - 2}` : ''}
+            </div>
+          )}
+
           {/* Communes */}
           {communesDisplay && (
             <div className="flex items-center text-xs text-gray-500 px-1">

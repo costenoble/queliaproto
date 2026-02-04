@@ -170,7 +170,7 @@ const ProjectsTable = ({ projects, onEdit, onDelete, sortConfig, onSort, showCli
                   </td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColorClass(project.status)}`}>
-                      <span className={`w-1.5 h-1.5 mr-1.5 rounded-full ${project.status?.includes('construction') ? 'bg-yellow-500' : project.status?.includes('étude') ? 'bg-blue-500' : 'bg-green-500'}`}></span>
+                      <span className={`w-1.5 h-1.5 mr-1.5 rounded-full ${project.status?.includes('projet') ? 'bg-blue-500' : 'bg-green-500'}`}></span>
                       {project.status}
                     </span>
                   </td>

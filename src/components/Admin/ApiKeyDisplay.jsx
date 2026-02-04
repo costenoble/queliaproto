@@ -4,6 +4,7 @@ import { Copy, Eye, EyeOff, Key, Check } from 'lucide-react';
 import { supabase } from '@/lib/customSupabaseClient';
 import { useToast } from '@/components/ui/use-toast';
 import PowerShellScriptDisplay from './PowerShellScriptDisplay';
+import PythonKitDownload from './PythonKitDownload';
 
 const ApiKeyDisplay = ({ projectId, projectName }) => {
   const [apiKey, setApiKey] = useState(null);
@@ -146,8 +147,11 @@ const ApiKeyDisplay = ({ projectId, projectName }) => {
         </Button>
       </div>
 
-      {/* Script PowerShell */}
+      {/* Script PowerShell (test rapide) */}
       <PowerShellScriptDisplay projectId={projectId} apiKey={apiKey} />
+
+      {/* Kit Python (automatisation) */}
+      <PythonKitDownload projectId={projectId} projectName={projectName} apiKey={apiKey} />
     </div>
   );
 };
