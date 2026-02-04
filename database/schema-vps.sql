@@ -54,6 +54,7 @@ CREATE TABLE IF NOT EXISTS projects (
     name VARCHAR(255) NOT NULL,
     display_name VARCHAR(255),
     operator VARCHAR(255),
+    contact_email VARCHAR(255),
     poi_logo_url TEXT,
 
     -- Categorie energie
