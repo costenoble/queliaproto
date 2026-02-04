@@ -19,17 +19,23 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // Générer une valeur aléatoire entre 10 et 50 MW
-  const randomPower = (Math.random() * 40 + 10).toFixed(2);
+  // Valeur basée sur le temps : monte de 1 MW par 5s entre 10 et 50, puis redescend
+  const MIN = 10, MAX = 50;
+  const RANGE = MAX - MIN;
+  const CYCLE = RANGE * 2;
+  const tick = Math.floor(Date.now() / 5000) % CYCLE;
+  const position = tick <= RANGE ? tick : CYCLE - tick;
+  const current_power = MIN + position;
 
   // Réponse JSON simple
   const response = {
-    current_power: parseFloat(randomPower),
+    current_power,
+    unit: 'MW',
     timestamp: new Date().toISOString(),
     status: 'ok'
   };
 
-  console.log(`[${new Date().toLocaleTimeString()}] Requête reçue → Réponse: ${randomPower} MW`);
+  console.log(`[${new Date().toLocaleTimeString()}] Requête reçue → Réponse: ${current_power} MW`);
 
   res.writeHead(200);
   res.end(JSON.stringify(response));
@@ -40,6 +46,6 @@ server.listen(PORT, () => {
   console.log(`\n📋 Configuration pour l'admin :`);
   console.log(`   URL API JSON : http://localhost:${PORT}`);
   console.log(`   Chemin JSON  : current_power`);
-  console.log(`\n💡 Les valeurs changent à chaque requête (10-50 MW aléatoire)\n`);
+  console.log(`\n💡 Valeur monte/descend de 1 MW toutes les 5s (10-50 MW)\n`);
   console.log(`Appuyez sur Ctrl+C pour arrêter le serveur\n`);
 });
