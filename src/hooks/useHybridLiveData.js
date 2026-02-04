@@ -76,8 +76,8 @@ const useHybridLiveData = (projectId, refreshInterval = 5000) => {
 
       return {
         value: parseFloat(value),
-        unit: 'kW',
-        timestamp: new Date().toISOString()
+        unit: jsonData.unit || 'kW',
+        timestamp: jsonData.timestamp || new Date().toISOString()
       };
     } catch (err) {
       console.error('Erreur fetch URL:', err);
