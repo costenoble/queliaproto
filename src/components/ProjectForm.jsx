@@ -5,7 +5,7 @@ import { supabase } from '@/lib/customSupabaseClient';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import {
   AlertCircle, Calendar, MapPin, Save, Zap, Building, Flag, AlignLeft,
-  Globe, Link as LinkIcon, Search, Loader2, User, Image, Hash,
+  Globe, Link as LinkIcon, Loader2, User, Image, Hash,
   Map as MapIcon, Home, X, Plus
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
@@ -94,7 +94,6 @@ const TagInput = ({ value = [], onChange, placeholder }) => {
 const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [isGeocoding, setIsGeocoding] = useState(false);
   const [error, setError] = useState(null);
 
   // Selected client for super_admin
@@ -112,7 +111,6 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
     commissioningYear: '',
     // Geography
     city: '',
-    address: '',
     latitude: 46.2276,
     longitude: 2.2137,
     communes: [],
@@ -153,7 +151,6 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
         status: project.status || 'en projet',
         commissioningYear: project.commissioning_year || '',
         city: project.city || '',
-        address: project.address || '',
         latitude: project.latitude || 46.2276,
         longitude: project.longitude || 2.2137,
         communes: project.communes || [],
@@ -202,6 +199,13 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === 'latitude' || name === 'longitude') {
+      const lat = parseFloat(name === 'latitude' ? value : formData.latitude);
+      const lng = parseFloat(name === 'longitude' ? value : formData.longitude);
+      if (!isNaN(lat) && !isNaN(lng)) {
+        setMapPosition({ lat, lng });
+      }
+    }
   };
 
   const validateUrl = (url) => {
@@ -211,46 +215,6 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
       return true;
     } catch (_) {
       return false;
-    }
-  };
-
-  const handleGeocode = async () => {
-    if (!formData.address) return;
-
-    setIsGeocoding(true);
-    try {
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(formData.address)}`);
-      if (!response.ok) throw new Error("Erreur réseau");
-
-      const data = await response.json();
-
-      if (data && data.length > 0) {
-        const result = data[0];
-        const newLat = parseFloat(result.lat);
-        const newLng = parseFloat(result.lon);
-
-        setMapPosition({ lat: newLat, lng: newLng });
-
-        toast({
-          title: "Adresse trouvée",
-          description: "La position sur la carte a été mise à jour.",
-        });
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Adresse non trouvée",
-          description: "Essayez de préciser l'adresse (ville, code postal).",
-        });
-      }
-    } catch (err) {
-      console.error("Geocoding error:", err);
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: "Impossible de contacter le service de géocodage.",
-      });
-    } finally {
-      setIsGeocoding(false);
     }
   };
 
@@ -288,7 +252,6 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
         status: formData.status,
         commissioning_year: formData.commissioningYear ? parseInt(formData.commissioningYear) : null,
         city: formData.city,
-        address: formData.address,
         latitude: parseFloat(formData.latitude),
         longitude: parseFloat(formData.longitude),
         communes: formData.communes,
@@ -676,33 +639,34 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
               <MapIcon className="w-4 h-4" /> Géographie
             </h3>
 
-            <div>
-              <label className={labelClass}>
-                <MapPin className="w-4 h-4 mr-1.5 text-gray-500" /> Adresse complète
-              </label>
-              <div className="flex gap-2">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass}>
+                  <MapPin className="w-4 h-4 mr-1.5 text-gray-500" /> Latitude
+                </label>
                 <input
-                  type="text"
-                  name="address"
-                  value={formData.address}
+                  type="number"
+                  name="latitude"
+                  value={formData.latitude}
                   onChange={handleChange}
-                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleGeocode())}
-                  placeholder="Ex: 10 Rue de la Paix, Paris"
-                  className={`${inputClass} flex-grow`}
+                  className={inputClass}
+                  placeholder="Ex: 48.8566"
+                  step="0.00001"
                 />
-                <Button
-                  type="button"
-                  onClick={handleGeocode}
-                  disabled={isGeocoding || !formData.address}
-                  className="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-200"
-                  title="Localiser sur la carte"
-                >
-                  {isGeocoding ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Search className="w-4 h-4" />
-                  )}
-                </Button>
+              </div>
+              <div>
+                <label className={labelClass}>
+                  <MapPin className="w-4 h-4 mr-1.5 text-gray-500" /> Longitude
+                </label>
+                <input
+                  type="number"
+                  name="longitude"
+                  value={formData.longitude}
+                  onChange={handleChange}
+                  className={inputClass}
+                  placeholder="Ex: 2.3522"
+                  step="0.00001"
+                />
               </div>
             </div>
 
