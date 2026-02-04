@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/customSupabaseClient';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
@@ -98,6 +98,10 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
 
   // Selected client for super_admin
   const [selectedClientId, setSelectedClientId] = useState(project?.client_id || clientId || '');
+
+  // Logo upload
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const logoFileRef = useRef(null);
 
   // Form State with new fields
   const [formData, setFormData] = useState({
@@ -207,6 +211,47 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
       if (!isNaN(lat) && !isNaN(lng)) {
         setMapPosition({ lat, lng });
       }
+    }
+  };
+
+  const handleLogoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({ variant: 'destructive', title: 'Erreur', description: 'Veuillez sélectionner une image.' });
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ variant: 'destructive', title: 'Erreur', description: "L'image ne doit pas dépasser 2 MB." });
+      return;
+    }
+
+    setIsUploadingLogo(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${project?.id || 'new'}-${Date.now()}.${fileExt}`;
+      const filePath = `poi-logos/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('client-assets')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from('client-assets')
+        .getPublicUrl(filePath);
+
+      setFormData(prev => ({ ...prev, poiLogoUrl: urlData.publicUrl }));
+      toast({ title: 'Logo uploadé', description: "L'image a été téléchargée avec succès." });
+    } catch (err) {
+      console.error('Upload error:', err);
+      toast({ variant: 'destructive', title: 'Erreur d\'upload', description: 'Échec du téléchargement. Vérifiez le bucket Supabase.' });
+    } finally {
+      setIsUploadingLogo(false);
+      if (logoFileRef.current) logoFileRef.current.value = '';
     }
   };
 
@@ -374,16 +419,47 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className={labelClass}>
-                  <Image className="w-4 h-4 mr-1.5 text-gray-500" /> Logo du POI (URL)
+                  <Image className="w-4 h-4 mr-1.5 text-gray-500" /> Logo du POI
                 </label>
                 <input
-                  type="url"
-                  name="poiLogoUrl"
-                  value={formData.poiLogoUrl}
-                  onChange={handleChange}
-                  className={inputClass}
-                  placeholder="https://..."
+                  ref={logoFileRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                  className="sr-only"
                 />
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => logoFileRef.current?.click()}
+                    disabled={isUploadingLogo}
+                    className="flex items-center gap-1.5 px-3 py-2 text-sm border border-gray-300 rounded-md bg-white hover:bg-gray-50 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {isUploadingLogo ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-indigo-600" />
+                    ) : (
+                      <Image className="w-4 h-4 text-gray-500" />
+                    )}
+                    {isUploadingLogo ? 'Upload...' : formData.poiLogoUrl ? 'Changer' : 'Choisir fichier'}
+                  </button>
+                  {formData.poiLogoUrl && (
+                    <>
+                      <img
+                        src={formData.poiLogoUrl}
+                        alt="Logo POI"
+                        className="h-10 w-auto object-contain border border-gray-200 rounded"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, poiLogoUrl: '' }))}
+                        className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                        title="Supprimer le logo"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
               <div>
                 <label className={labelClass}>
