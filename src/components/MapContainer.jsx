@@ -22,7 +22,10 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
   const [filters, setFilters] = useState({
     types: [],
     status: [],
-    cities: []
+    cities: [],
+    regions: [],
+    communes: [],
+    intercommunalites: []
   });
 
   useEffect(() => {
@@ -104,6 +107,21 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
     return Array.from(cities).sort();
   }, [pois]);
 
+  const availableRegions = useMemo(() => {
+    const regions = new Set(pois.map(p => p.region).filter(Boolean));
+    return Array.from(regions).sort();
+  }, [pois]);
+
+  const availableCommunes = useMemo(() => {
+    const communes = new Set(pois.flatMap(p => p.communes || []));
+    return Array.from(communes).sort();
+  }, [pois]);
+
+  const availableIntercommunalites = useMemo(() => {
+    const intercommunalites = new Set(pois.flatMap(p => p.intercommunalites || []));
+    return Array.from(intercommunalites).sort();
+  }, [pois]);
+
   // Filter Logic
   const filteredPois = useMemo(() => {
     return pois.filter(poi => {
@@ -117,8 +135,11 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
       }
 
       const cityMatch = filters.cities.length === 0 || (poi.city && filters.cities.includes(poi.city));
+      const regionMatch = filters.regions.length === 0 || (poi.region && filters.regions.includes(poi.region));
+      const communeMatch = filters.communes.length === 0 || (poi.communes && poi.communes.some(c => filters.communes.includes(c)));
+      const intercommunaliteMatch = filters.intercommunalites.length === 0 || (poi.intercommunalites && poi.intercommunalites.some(i => filters.intercommunalites.includes(i)));
 
-      return typeMatch && statusMatch && cityMatch;
+      return typeMatch && statusMatch && cityMatch && regionMatch && communeMatch && intercommunaliteMatch;
     });
   }, [pois, filters]);
 
@@ -131,11 +152,14 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
       
       {/* Filters */}
       <div className={`${isFullscreen ? 'absolute left-4 top-4 z-[101] max-w-xs' : 'w-full md:w-1/4 h-auto md:h-full z-10'}`}>
-        <ProjectFilter 
-          filters={filters} 
-          onFilterChange={setFilters} 
+        <ProjectFilter
+          filters={filters}
+          onFilterChange={setFilters}
           resultCount={filteredPois.length}
           cities={availableCities}
+          regions={availableRegions}
+          communes={availableCommunes}
+          intercommunalites={availableIntercommunalites}
         />
       </div>
 
@@ -177,7 +201,7 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
              <h3 className="text-lg font-bold text-gray-900 mb-1">Aucun résultat</h3>
              <p className="text-gray-600 mb-4">Aucun projet ne correspond à vos filtres actuels.</p>
              <Button 
-               onClick={() => setFilters({ types: [], status: [], cities: [] })}
+               onClick={() => setFilters({ types: [], status: [], cities: [], regions: [], communes: [], intercommunalites: [] })}
                variant="outline"
              >
                Réinitialiser les filtres

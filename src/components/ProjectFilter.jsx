@@ -1,16 +1,19 @@
 
 import React, { useState } from 'react';
-import { Filter, Check, RotateCcw, ChevronDown, ChevronUp, MapPin, Zap, Activity, X } from 'lucide-react';
+import { Filter, Check, RotateCcw, ChevronDown, ChevronUp, MapPin, Zap, Activity, X, Globe, Home, Building } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
 import { getMarkerColor, ENERGY_CATEGORIES } from '@/utils/mapUtils.jsx';
 
-const ProjectFilter = ({ filters, onFilterChange, resultCount, cities = [] }) => {
+const ProjectFilter = ({ filters, onFilterChange, resultCount, cities = [], regions = [], communes = [], intercommunalites = [] }) => {
   const [isOpenMobile, setIsOpenMobile] = useState(false);
 
   const [collapsedSections, setCollapsedSections] = useState({
     types: false,
     status: false,
-    regions: false
+    regions: false,
+    region: false,
+    communes: false,
+    intercommunalites: false
   });
 
   const toggleSection = (section) => {
@@ -56,14 +59,20 @@ const ProjectFilter = ({ filters, onFilterChange, resultCount, cities = [] }) =>
     onFilterChange({
       types: [],
       status: [],
-      cities: []
+      cities: [],
+      regions: [],
+      communes: [],
+      intercommunalites: []
     });
   };
 
-  const hasActiveFilters = 
-    (filters.types && filters.types.length > 0) || 
-    (filters.status && filters.status.length > 0) || 
-    (filters.cities && filters.cities.length > 0);
+  const hasActiveFilters =
+    (filters.types && filters.types.length > 0) ||
+    (filters.status && filters.status.length > 0) ||
+    (filters.cities && filters.cities.length > 0) ||
+    (filters.regions && filters.regions.length > 0) ||
+    (filters.communes && filters.communes.length > 0) ||
+    (filters.intercommunalites && filters.intercommunalites.length > 0);
 
   // Content rendering function to reuse between desktop sidebar and mobile drawer
   const renderFilterContent = () => (
@@ -209,6 +218,150 @@ const ProjectFilter = ({ filters, onFilterChange, resultCount, cities = [] }) =>
                   </div>
                   <span className={`text-base ${isSelected('cities', city) ? 'font-medium text-gray-900' : 'text-gray-600'}`}>
                     {city}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Région */}
+        <div className="border border-gray-100 rounded-lg overflow-hidden">
+          <button
+            className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+            onClick={() => toggleSection('region')}
+          >
+            <div className="flex items-center font-semibold text-gray-700 text-sm">
+              <Globe className="w-5 h-5 mr-3 text-gray-400" />
+              Région
+              {filters.regions?.length > 0 && (
+                <span className="ml-2 bg-indigo-100 text-indigo-700 text-xs px-2 py-0.5 rounded-full">
+                  {filters.regions.length}
+                </span>
+              )}
+            </div>
+            {collapsedSections.region ? <ChevronDown className="w-4 h-4 text-gray-400" /> : <ChevronUp className="w-4 h-4 text-gray-400" />}
+          </button>
+
+          {!collapsedSections.region && (
+            <div className="p-3 space-y-2 bg-white max-h-60 overflow-y-auto">
+              {regions.map((region) => (
+                <div
+                  key={region}
+                  onClick={() => toggleSelection('regions', region)}
+                  className={`
+                    flex items-center p-3 rounded-md cursor-pointer transition-all border min-h-[44px]
+                    ${isSelected('regions', region)
+                      ? 'bg-indigo-50 border-indigo-200'
+                      : 'hover:bg-gray-50 border-transparent hover:border-gray-100'
+                    }
+                  `}
+                >
+                  <div
+                    className={`w-5 h-5 rounded border flex items-center justify-center mr-3 transition-colors ${
+                      isSelected('regions', region) ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300 bg-white'
+                    }`}
+                  >
+                    {isSelected('regions', region) && <Check className="w-3 h-3 text-white" />}
+                  </div>
+                  <span className={`text-base ${isSelected('regions', region) ? 'font-medium text-gray-900' : 'text-gray-600'}`}>
+                    {region}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Communes */}
+        <div className="border border-gray-100 rounded-lg overflow-hidden">
+          <button
+            className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+            onClick={() => toggleSection('communes')}
+          >
+            <div className="flex items-center font-semibold text-gray-700 text-sm">
+              <Home className="w-5 h-5 mr-3 text-gray-400" />
+              Communes
+              {filters.communes?.length > 0 && (
+                <span className="ml-2 bg-indigo-100 text-indigo-700 text-xs px-2 py-0.5 rounded-full">
+                  {filters.communes.length}
+                </span>
+              )}
+            </div>
+            {collapsedSections.communes ? <ChevronDown className="w-4 h-4 text-gray-400" /> : <ChevronUp className="w-4 h-4 text-gray-400" />}
+          </button>
+
+          {!collapsedSections.communes && (
+            <div className="p-3 space-y-2 bg-white max-h-60 overflow-y-auto">
+              {communes.map((commune) => (
+                <div
+                  key={commune}
+                  onClick={() => toggleSelection('communes', commune)}
+                  className={`
+                    flex items-center p-3 rounded-md cursor-pointer transition-all border min-h-[44px]
+                    ${isSelected('communes', commune)
+                      ? 'bg-indigo-50 border-indigo-200'
+                      : 'hover:bg-gray-50 border-transparent hover:border-gray-100'
+                    }
+                  `}
+                >
+                  <div
+                    className={`w-5 h-5 rounded border flex items-center justify-center mr-3 transition-colors ${
+                      isSelected('communes', commune) ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300 bg-white'
+                    }`}
+                  >
+                    {isSelected('communes', commune) && <Check className="w-3 h-3 text-white" />}
+                  </div>
+                  <span className={`text-base ${isSelected('communes', commune) ? 'font-medium text-gray-900' : 'text-gray-600'}`}>
+                    {commune}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Intercommunalités */}
+        <div className="border border-gray-100 rounded-lg overflow-hidden">
+          <button
+            className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+            onClick={() => toggleSection('intercommunalites')}
+          >
+            <div className="flex items-center font-semibold text-gray-700 text-sm">
+              <Building className="w-5 h-5 mr-3 text-gray-400" />
+              Intercommunalités
+              {filters.intercommunalites?.length > 0 && (
+                <span className="ml-2 bg-indigo-100 text-indigo-700 text-xs px-2 py-0.5 rounded-full">
+                  {filters.intercommunalites.length}
+                </span>
+              )}
+            </div>
+            {collapsedSections.intercommunalites ? <ChevronDown className="w-4 h-4 text-gray-400" /> : <ChevronUp className="w-4 h-4 text-gray-400" />}
+          </button>
+
+          {!collapsedSections.intercommunalites && (
+            <div className="p-3 space-y-2 bg-white max-h-60 overflow-y-auto">
+              {intercommunalites.map((intercommunalite) => (
+                <div
+                  key={intercommunalite}
+                  onClick={() => toggleSelection('intercommunalites', intercommunalite)}
+                  className={`
+                    flex items-center p-3 rounded-md cursor-pointer transition-all border min-h-[44px]
+                    ${isSelected('intercommunalites', intercommunalite)
+                      ? 'bg-indigo-50 border-indigo-200'
+                      : 'hover:bg-gray-50 border-transparent hover:border-gray-100'
+                    }
+                  `}
+                >
+                  <div
+                    className={`w-5 h-5 rounded border flex items-center justify-center mr-3 transition-colors ${
+                      isSelected('intercommunalites', intercommunalite) ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300 bg-white'
+                    }`}
+                  >
+                    {isSelected('intercommunalites', intercommunalite) && <Check className="w-3 h-3 text-white" />}
+                  </div>
+                  <span className={`text-base ${isSelected('intercommunalites', intercommunalite) ? 'font-medium text-gray-900' : 'text-gray-600'}`}>
+                    {intercommunalite}
                   </span>
                 </div>
               ))}
