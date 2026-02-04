@@ -28,10 +28,8 @@ const ProjectFilter = ({ filters, onFilterChange, resultCount, cities = [] }) =>
   }));
 
   const statuses = [
-    { id: 'en étude', label: 'En étude' },
-    { id: 'en construction', label: 'En construction' },
-    { id: 'en exploitation', label: 'En exploitation' },
-    { id: 'consultation en cours', label: 'Consultation en cours' }
+    { id: 'en projet', label: 'En projet' },
+    { id: 'en exploitation', label: 'En exploitation' }
   ];
 
   const isSelected = (category, id) => {

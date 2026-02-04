@@ -706,31 +706,32 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className={labelClass}>
-                  <Building className="w-4 h-4 mr-1.5 text-gray-500" /> Ville principale
-                </label>
-                <input
-                  type="text"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleChange}
-                  className={inputClass}
-                  placeholder="Ex: Paris"
-                />
-              </div>
-              <div>
-                <label className={labelClass}>Région</label>
-                <input
-                  type="text"
-                  name="region"
-                  value={formData.region}
-                  onChange={handleChange}
-                  className={inputClass}
-                  placeholder="Ex: Île-de-France"
-                />
-              </div>
+            <div>
+              <label className={labelClass}>
+                <Building className="w-4 h-4 mr-1.5 text-gray-500" /> Ville principale
+              </label>
+              <input
+                type="text"
+                name="city"
+                value={formData.city}
+                onChange={handleChange}
+                className={inputClass}
+                placeholder="Ex: Paris"
+              />
+            </div>
+
+            <div>
+              <label className={labelClass}>
+                <MapPin className="w-4 h-4 mr-1.5 text-gray-500" /> Région
+              </label>
+              <input
+                type="text"
+                name="region"
+                value={formData.region}
+                onChange={handleChange}
+                className={inputClass}
+                placeholder="Ex: Île-de-France"
+              />
             </div>
 
             <div>
@@ -745,7 +746,9 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
             </div>
 
             <div>
-              <label className={labelClass}>Intercommunalités</label>
+              <label className={labelClass}>
+                <Building className="w-4 h-4 mr-1.5 text-gray-500" /> Intercommunalités
+              </label>
               <TagInput
                 value={formData.intercommunalites}
                 onChange={(newValue) => setFormData(prev => ({ ...prev, intercommunalites: newValue }))}
