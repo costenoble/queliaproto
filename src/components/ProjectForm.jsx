@@ -5,7 +5,7 @@ import { supabase } from '@/lib/customSupabaseClient';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import {
   AlertCircle, Calendar, MapPin, Save, Zap, Building, Flag, AlignLeft,
-  Globe, Link as LinkIcon, Loader2, User, Image, Hash,
+  Globe, Link as LinkIcon, Loader2, User, Mail, Image, Hash,
   Map as MapIcon, Home, X, Plus
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
@@ -104,6 +104,7 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
     name: '',
     displayName: '',
     operator: '',
+    contactEmail: '',
     poiLogoUrl: '',
     energyCategory: '',
     energySubtype: '',
@@ -145,6 +146,7 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
         name: project.name || '',
         displayName: project.display_name || '',
         operator: project.operator || '',
+        contactEmail: project.contact_email || '',
         poiLogoUrl: project.poi_logo_url || '',
         energyCategory: project.energy_category || '',
         energySubtype: project.energy_subtype || '',
@@ -242,6 +244,7 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
         name: formData.name,
         display_name: formData.displayName || null,
         operator: formData.operator || null,
+        contact_email: formData.contactEmail || null,
         poi_logo_url: formData.poiLogoUrl || null,
         energy_category: formData.energyCategory || null,
         energy_subtype: formData.energySubtype || null,
@@ -351,6 +354,20 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
                 onChange={handleChange}
                 className={inputClass}
                 placeholder="Ex: EDF Renouvelables"
+              />
+            </div>
+
+            <div>
+              <label className={labelClass}>
+                <Mail className="w-4 h-4 mr-1.5 text-gray-500" /> Email de contact du POI
+              </label>
+              <input
+                type="email"
+                name="contactEmail"
+                value={formData.contactEmail}
+                onChange={handleChange}
+                className={inputClass}
+                placeholder="Par défaut : contact@quelia.fr"
               />
             </div>
 
