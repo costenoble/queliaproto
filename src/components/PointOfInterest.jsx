@@ -50,7 +50,7 @@ const PointOfInterest = ({ poi, isSelected = false }) => {
 
   return (
     <Marker ref={markerRef} position={[poi.lat, poi.lng]} icon={customIcon}>
-      <Popup className="project-popup-wrapper" maxWidth={320} closeButton={false}>
+      <Popup className="project-popup-wrapper" maxWidth={320} closeButton={true}>
         <ProjectPopup poi={poi} />
       </Popup>
     </Marker>
