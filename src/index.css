@@ -61,6 +61,11 @@ html, body {
   height: 100%;
 }
 
+/* min-height scoped sur la carte principale uniquement (pas celle du ProjectForm) */
+.main-map .leaflet-container {
+  min-height: 500px;
+}
+
 .leaflet-popup-content-wrapper {
   padding: 0;
   overflow: hidden;

@@ -164,7 +164,7 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
       </div>
 
       {/* Map Area */}
-      <div className={`w-full relative rounded-xl overflow-hidden shadow-md border border-gray-200 ${isFullscreen ? 'h-full rounded-none border-0' : 'md:w-3/4 h-[600px] md:h-full min-h-[500px]'}`}>
+      <div className={`main-map w-full relative rounded-xl overflow-hidden shadow-md border border-gray-200 ${isFullscreen ? 'h-full rounded-none border-0' : 'md:w-3/4 h-[600px] md:h-full min-h-[500px]'}`}>
         
         {/* Fullscreen Toggle */}
         <Button
