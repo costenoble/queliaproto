@@ -17,7 +17,7 @@ const LegendItem = ({ color, label, icon: Icon }) => (
 );
 
 const ProjectLegend = () => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   // Map energy categories to icons
   const categoryIcons = {

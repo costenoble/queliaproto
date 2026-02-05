@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { supabase } from '@/lib/customSupabaseClient';
 import { getStatusColorClass, getMarkerColor, getMarkerIconComponent, ENERGY_CATEGORIES } from '@/utils/mapUtils.jsx';
 import { Building, ExternalLink, Home, Mic, Mail, Loader2, Car } from 'lucide-react';
 import useHybridLiveData from '@/hooks/useHybridLiveData';
 
-// Même ratio que dans ProjectPopup : 10.12 MW = 264 voitures à 80 km/h
-const CARS_PER_MW = 264 / 10.12;
+// Ratio voitures compactes à 100 km/h : puissance MW × 67
+const CARS_PER_MW = 67;
 
 const PoiEmbedPage = () => {
   const { poiId } = useParams();
@@ -79,11 +79,19 @@ const PoiEmbedPage = () => {
 
   const locationParts = [poi.city, poi.region].filter(Boolean);
 
-  const nominalPowerMW = poi.nominal_power
-    ? (poi.nominal_power_unit === 'kW' ? poi.nominal_power / 1000 : poi.nominal_power)
-    : null;
-
-  const carsCount = nominalPowerMW ? Math.round(nominalPowerMW * CARS_PER_MW) : null;
+  // Calcul voitures basé sur la puissance LIVE (pas nominale)
+  const getLivePowerMW = () => {
+    if (liveData?.value !== null && liveData?.value !== undefined) {
+      const unit = liveData.unit || 'MW';
+      return unit === 'kW' ? liveData.value / 1000 : liveData.value;
+    }
+    if (poi.actual_power) {
+      return poi.actual_power_unit === 'kW' ? poi.actual_power / 1000 : poi.actual_power;
+    }
+    return null;
+  };
+  const livePowerMW = getLivePowerMW();
+  const carsCount = livePowerMW ? Math.round(livePowerMW * CARS_PER_MW) : null;
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-4">
@@ -127,21 +135,48 @@ const PoiEmbedPage = () => {
               )}
             </div>
 
-            {/* Ville / Agglomération */}
+            {/* Ville / Agglomération — cliquables vers la carte */}
             <div className="mb-5">
               <div className="flex items-center text-base text-gray-600">
                 <Building className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
-                <span>{locationParts.join(' • ') || 'Localisation non spécifiée'}</span>
+                <span>
+                  {poi.city && (
+                    <Link to={`/map?city=${encodeURIComponent(poi.city)}`} className="hover:text-indigo-600 hover:underline">
+                      {poi.city}
+                    </Link>
+                  )}
+                  {poi.city && poi.region && ' • '}
+                  {poi.region && (
+                    <Link to={`/map?region=${encodeURIComponent(poi.region)}`} className="hover:text-indigo-600 hover:underline">
+                      {poi.region}
+                    </Link>
+                  )}
+                  {!poi.city && !poi.region && 'Localisation non spécifiée'}
+                </span>
               </div>
               {poi.intercommunalites?.length > 0 && (
-                <div className="text-sm text-gray-500 mt-0.5 pl-6">
-                  {poi.intercommunalites.join(', ')}
+                <div className="text-sm text-gray-500 mt-0.5 pl-6 flex flex-wrap gap-x-1">
+                  {poi.intercommunalites.map((interco, i) => (
+                    <span key={interco}>
+                      <Link to={`/map?intercommunalite=${encodeURIComponent(interco)}`} className="hover:text-indigo-600 hover:underline">
+                        {interco}
+                      </Link>
+                      {i < poi.intercommunalites.length - 1 && ', '}
+                    </span>
+                  ))}
                 </div>
               )}
               {poi.communes?.length > 0 && (
-                <div className="flex items-center text-sm text-gray-500 mt-0.5 pl-5">
+                <div className="flex items-center text-sm text-gray-500 mt-0.5 pl-5 flex-wrap gap-x-1">
                   <Home className="w-3.5 h-3.5 mr-1.5 text-gray-400" />
-                  {poi.communes.join(', ')}
+                  {poi.communes.map((commune, i) => (
+                    <span key={commune}>
+                      <Link to={`/map?commune=${encodeURIComponent(commune)}`} className="hover:text-indigo-600 hover:underline">
+                        {commune}
+                      </Link>
+                      {i < poi.communes.length - 1 && ', '}
+                    </span>
+                  ))}
                 </div>
               )}
             </div>
@@ -191,7 +226,7 @@ const PoiEmbedPage = () => {
               <div className="flex justify-end mb-4">
                 <span className="text-sm text-gray-500 flex items-center gap-1.5">
                   <Car className="w-4 h-4 text-gray-600" />
-                  <span className="font-semibold text-gray-700">{carsCount.toLocaleString('fr-FR')}</span> voitures à 80 km/h
+                  <span className="font-semibold text-gray-700">{carsCount.toLocaleString('fr-FR')}</span> voitures compactes à 100 km/h
                 </span>
               </div>
             )}
@@ -220,29 +255,35 @@ const PoiEmbedPage = () => {
 
             {/* Contact + Mailing + Propulsé par Quelia */}
             <div className="border-t border-gray-100 pt-4 mt-3 space-y-3">
-              <a
-                href={`mailto:${poi.contact_email || 'contact@quelia.fr'}`}
-                className="flex items-center text-base text-gray-600 hover:text-indigo-600 transition-colors"
-              >
-                <Mail className="w-5 h-5 mr-2.5 text-gray-400 flex-shrink-0" />
-                <span>Faites-nous le savoir par mail</span>
-              </a>
-              <a
-                href="https://app.ekoo.co/capture?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdfaWQiOiIwOGQ2NmZkMy01M2U0LTQ5YzAtYTkzMS03NjU2ZWYzYTgwMzciLCJwcm9kdWN0X2lkIjoiYjM5MDY1MTktODJiZC00YzdjLTliYTktN2Y4MWFmYTkyZDJkIiwidHlwZSI6InJldmlldyIsImlhdCI6MTcyNzI3ODAxOX0.D3j-mGrgBYl-HW4rBBQid-E-q9sQonuboWXb9eZzuvA"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center text-base text-gray-600 hover:text-indigo-600 transition-colors"
-              >
-                <Mic className="w-5 h-5 mr-2.5 text-gray-400 flex-shrink-0" />
-                <span>Faites-nous le savoir par vocal</span>
-              </a>
+              {/* Un signalement ? */}
+              <div className="flex items-center gap-2 text-base text-gray-600">
+                <span>Un signalement ?</span>
+                <a
+                  href={`mailto:${poi.contact_email || 'contact@quelia.fr'}`}
+                  className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 transition-colors"
+                  title="Par email"
+                >
+                  <Mail className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://app.ekoo.co/capture?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdfaWQiOiIwOGQ2NmZkMy01M2U0LTQ5YzAtYTkzMS03NjU2ZWYzYTgwMzciLCJwcm9kdWN0X2lkIjoiYjM5MDY1MTktODJiZC00YzdjLTliYTktN2Y4MWFmYTkyZDJkIiwidHlwZSI6InJldmlldyIsImlhdCI6MTcyNzI3ODAxOX0.D3j-mGrgBYl-HW4rBBQid-E-q9sQonuboWXb9eZzuvA"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 transition-colors"
+                  title="Par vocal"
+                >
+                  <Mic className="w-5 h-5" />
+                </a>
+              </div>
+              {/* Liste de diffusion */}
               <a
                 href="https://5e8e3e74.sibforms.com/serve/MUIFALMeowQ2_u9o7ZKghaSGt2q9gF_F-AO4Y5fae_qGmH8pdDoAqnohFKAnKsmwVbOMFr09VMIFCHrBqsmEuCNMltlAMGRhPBovsl2K6RkzPGoF94tkDj5p-hVijehAvVKums-TslaUnqRPKSwbNIC7EpxzK8oasGbFwNJQqKXPc-3wqQz4wUUz9Uj-SN6d4Eod8ROpEMl6jdaI"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center text-base text-indigo-600 hover:text-indigo-800 transition-colors pt-3 border-t border-gray-100"
+                className="flex items-center gap-2 text-base text-indigo-600 hover:text-indigo-800 transition-colors"
               >
-                <span>Vous voulez des infos ? <span className="font-semibold underline">Inscrivez votre email</span> à la liste de diffusion</span>
+                <span>Liste de diffusion : <span className="font-semibold underline">votre email</span></span>
+                <Mail className="w-5 h-5" />
               </a>
               <a
                 href="https://quelia.fr"

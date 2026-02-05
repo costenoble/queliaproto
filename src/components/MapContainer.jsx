@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import LeafletMap from '@/components/LeafletMap.jsx';
 import ProjectLegend from '@/components/ProjectLegend.jsx';
 import ProjectFilter from '@/components/ProjectFilter.jsx';
@@ -18,6 +19,9 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // URL params for deep linking filters
+  const [searchParams] = useSearchParams();
+
   // Filters State
   const [filters, setFilters] = useState({
     types: [],
@@ -27,6 +31,23 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
     communes: [],
     intercommunalites: []
   });
+
+  // Read URL params on mount to pre-set filters
+  useEffect(() => {
+    const region = searchParams.get('region');
+    const commune = searchParams.get('commune');
+    const intercommunalite = searchParams.get('intercommunalite');
+    const city = searchParams.get('city');
+    if (region || commune || intercommunalite || city) {
+      setFilters(prev => ({
+        ...prev,
+        regions: region ? [region] : prev.regions,
+        communes: commune ? [commune] : prev.communes,
+        intercommunalites: intercommunalite ? [intercommunalite] : prev.intercommunalites,
+        cities: city ? [city] : prev.cities
+      }));
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const fetchProjects = async () => {

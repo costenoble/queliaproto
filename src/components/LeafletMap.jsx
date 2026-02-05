@@ -52,7 +52,7 @@ const LeafletMap = ({ center, zoom, onMapLoad, pois = [], selectedPoiId = null }
     setGeoError(false);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        mapRef.current.flyTo([pos.coords.latitude, pos.coords.longitude], 15, { duration: 1.5 });
+        mapRef.current.flyTo([pos.coords.latitude, pos.coords.longitude], 12, { duration: 1.5 });
         setGeoLoading(false);
       },
       () => {
