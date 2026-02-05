@@ -57,7 +57,14 @@ const LeafletMap = ({ center, zoom, onMapLoad, pois = [], selectedPoiId = null }
   const mapZoom = zoom || 6;
 
   const handleGeolocate = () => {
-    if (!navigator.geolocation || !mapRef.current) return;
+    if (!navigator.geolocation) {
+      alert('Géolocalisation non supportée par ce navigateur');
+      return;
+    }
+    if (!mapRef.current) {
+      console.error('Map ref not available');
+      return;
+    }
     setGeoLoading(true);
     setGeoError(false);
     navigator.geolocation.getCurrentPosition(
@@ -65,11 +72,20 @@ const LeafletMap = ({ center, zoom, onMapLoad, pois = [], selectedPoiId = null }
         mapRef.current.flyTo([pos.coords.latitude, pos.coords.longitude], 12, { duration: 1.5 });
         setGeoLoading(false);
       },
-      () => {
+      (err) => {
+        console.error('Geolocation error:', err.code, err.message);
         setGeoLoading(false);
         setGeoError(true);
-        setTimeout(() => setGeoError(false), 2000);
-      }
+        // Messages selon le code d'erreur
+        const messages = {
+          1: 'Autorisation refusée. Cliquez sur l\'icône cadenas dans la barre d\'adresse pour autoriser la localisation.',
+          2: 'Position non disponible. Vérifiez que le GPS est activé.',
+          3: 'Délai d\'attente dépassé.'
+        };
+        alert(messages[err.code] || 'Erreur de géolocalisation');
+        setTimeout(() => setGeoError(false), 3000);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
     );
   };
 

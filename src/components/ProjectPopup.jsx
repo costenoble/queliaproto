@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { getStatusColorClass, getMarkerColor, getMarkerIconComponent, ENERGY_CATEGORIES } from '@/utils/mapUtils.jsx';
 import { Building, ExternalLink, Home, Mic, Mail, Loader2, Car } from 'lucide-react';
 import useHybridLiveData from '@/hooks/useHybridLiveData';
@@ -85,21 +86,50 @@ const ProjectPopup = ({ poi }) => {
           )}
         </div>
 
-        {/* Ville / Agglomération */}
+        {/* Ville / Agglomération — cliquables vers carte filtrée */}
         <div className="mb-4">
           <div className="flex items-center text-sm text-gray-600">
             <Building className="w-3.5 h-3.5 mr-1.5 text-gray-400 flex-shrink-0" />
-            <span>{locationParts.join(' • ') || 'Localisation non spécifiée'}</span>
+            <span>
+              {poi.city && (
+                <Link to={`/map?city=${encodeURIComponent(poi.city)}`} className="hover:text-indigo-600 hover:underline">
+                  {poi.city}
+                </Link>
+              )}
+              {poi.city && poi.region && ' • '}
+              {poi.region && (
+                <Link to={`/map?region=${encodeURIComponent(poi.region)}`} className="hover:text-indigo-600 hover:underline">
+                  {poi.region}
+                </Link>
+              )}
+              {!poi.city && !poi.region && 'Localisation non spécifiée'}
+            </span>
           </div>
           {poi.intercommunalites?.length > 0 && (
             <div className="text-xs text-gray-500 mt-0.5 pl-5">
-              {poi.intercommunalites.slice(0, 2).join(', ')}{poi.intercommunalites.length > 2 ? ` +${poi.intercommunalites.length - 2}` : ''}
+              {poi.intercommunalites.slice(0, 2).map((interco, i) => (
+                <span key={interco}>
+                  <Link to={`/map?intercommunalite=${encodeURIComponent(interco)}`} className="hover:text-indigo-600 hover:underline">
+                    {interco}
+                  </Link>
+                  {i < Math.min(poi.intercommunalites.length, 2) - 1 && ', '}
+                </span>
+              ))}
+              {poi.intercommunalites.length > 2 && ` +${poi.intercommunalites.length - 2}`}
             </div>
           )}
           {poi.communes?.length > 0 && (
             <div className="flex items-center text-xs text-gray-500 mt-0.5 pl-4">
               <Home className="w-3 h-3 mr-1 text-gray-400" />
-              {poi.communes.slice(0, 3).join(', ')}{poi.communes.length > 3 ? ` +${poi.communes.length - 3}` : ''}
+              {poi.communes.slice(0, 3).map((commune, i) => (
+                <span key={commune}>
+                  <Link to={`/map?commune=${encodeURIComponent(commune)}`} className="hover:text-indigo-600 hover:underline">
+                    {commune}
+                  </Link>
+                  {i < Math.min(poi.communes.length, 3) - 1 && ', '}
+                </span>
+              ))}
+              {poi.communes.length > 3 && ` +${poi.communes.length - 3}`}
             </div>
           )}
         </div>
