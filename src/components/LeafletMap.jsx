@@ -37,6 +37,16 @@ const SelectedPoiHandler = ({ pois, selectedPoiId }) => {
   return null;
 };
 
+// Component to capture map instance for external use (geolocation button)
+const MapRefSetter = ({ mapRef, onMapLoad }) => {
+  const map = useMap();
+  useEffect(() => {
+    mapRef.current = map;
+    if (onMapLoad) onMapLoad(map);
+  }, [map, mapRef, onMapLoad]);
+  return null;
+};
+
 const LeafletMap = ({ center, zoom, onMapLoad, pois = [], selectedPoiId = null }) => {
   const mapRef = useRef(null);
   const [geoLoading, setGeoLoading] = useState(false);
@@ -70,16 +80,13 @@ const LeafletMap = ({ center, zoom, onMapLoad, pois = [], selectedPoiId = null }
         zoom={mapZoom}
         style={{ height: '100%', width: '100%', zIndex: 0 }}
         scrollWheelZoom={true}
-        whenCreated={(map) => {
-          mapRef.current = map;
-          if (onMapLoad) onMapLoad(map);
-        }}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
+        <MapRefSetter mapRef={mapRef} onMapLoad={onMapLoad} />
         <MapController center={center} zoom={zoom} />
         <SelectedPoiHandler pois={pois} selectedPoiId={selectedPoiId} />
 
