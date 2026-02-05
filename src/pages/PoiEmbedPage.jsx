@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '@/lib/customSupabaseClient';
 import { getStatusColorClass, getMarkerColor, getMarkerIconComponent, ENERGY_CATEGORIES } from '@/utils/mapUtils.jsx';
-import { Building, ExternalLink, Home, Mic, Mail, Loader2, Car } from 'lucide-react';
+import { Building, ExternalLink, Home, Mic, Mail, Loader2, Car, MapPin } from 'lucide-react';
 import useHybridLiveData from '@/hooks/useHybridLiveData';
 
 // Ratio voitures compactes à 100 km/h : puissance MW × 67
@@ -177,6 +177,13 @@ const PoiEmbedPage = () => {
                       {i < poi.communes.length - 1 && ', '}
                     </span>
                   ))}
+                </div>
+              )}
+              {/* Coordonnées GPS */}
+              {poi.lat && poi.lng && (
+                <div className="flex items-center text-sm text-gray-500 mt-2">
+                  <MapPin className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
+                  <span>{poi.lat.toFixed(5)}, {poi.lng.toFixed(5)}</span>
                 </div>
               )}
             </div>

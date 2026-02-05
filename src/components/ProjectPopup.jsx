@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { getStatusColorClass, getMarkerColor, getMarkerIconComponent, ENERGY_CATEGORIES } from '@/utils/mapUtils.jsx';
-import { Building, ExternalLink, Home, Mic, Mail, Loader2, Car } from 'lucide-react';
+import { Building, ExternalLink, Home, Mic, Mail, Loader2, Car, MapPin } from 'lucide-react';
 import useHybridLiveData from '@/hooks/useHybridLiveData';
 
 const CARS_PER_MW = 67;
@@ -41,9 +41,9 @@ const ProjectPopup = ({ poi }) => {
   const livePowerMW = getLivePowerMW();
   const carsCount = livePowerMW ? Math.round(livePowerMW * CARS_PER_MW) : null;
 
-  // Tronquer la description à 80 caractères
+  // Tronquer la description à 150 caractères
   const truncatedDescription = poi.description
-    ? (poi.description.length > 80 ? poi.description.slice(0, 80) + '...' : poi.description)
+    ? (poi.description.length > 150 ? poi.description.slice(0, 150) + '...' : poi.description)
     : null;
 
   return (
@@ -103,6 +103,14 @@ const ProjectPopup = ({ poi }) => {
             {!poi.city && !poi.region && 'Non spécifiée'}
           </span>
         </div>
+
+        {/* Coordonnées GPS */}
+        {poi.lat && poi.lng && (
+          <div className="flex items-center text-[10px] text-gray-500">
+            <MapPin className="w-3 h-3 mr-1 text-gray-400 flex-shrink-0" />
+            <span>{poi.lat.toFixed(5)}, {poi.lng.toFixed(5)}</span>
+          </div>
+        )}
 
         {/* Séparateur */}
         <div className="border-t border-gray-100" />
