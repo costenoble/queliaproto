@@ -47,7 +47,7 @@ const ProjectPopup = ({ poi }) => {
     : null;
 
   return (
-    <div className="w-72 bg-white overflow-hidden font-sans rounded-lg shadow-sm">
+    <div className="w-[300px] bg-white overflow-hidden font-sans rounded-lg shadow-sm">
       {/* Barre de couleur */}
       <div className="h-2 w-full" style={{ backgroundColor: typeColor }} />
 
