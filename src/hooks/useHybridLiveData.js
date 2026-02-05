@@ -53,7 +53,7 @@ const useHybridLiveData = (projectId, refreshInterval = 5000) => {
 
       return {
         value: liveData.value,
-        unit: liveData.unit || 'kW',
+        unit: liveData.unit || 'MW',
         timestamp: liveData.timestamp,
         metadata: liveData.metadata
       };
@@ -76,7 +76,7 @@ const useHybridLiveData = (projectId, refreshInterval = 5000) => {
 
       return {
         value: parseFloat(value),
-        unit: jsonData.unit || 'kW',
+        unit: jsonData.unit || 'MW',
         timestamp: jsonData.timestamp || new Date().toISOString()
       };
     } catch (err) {
