@@ -8,7 +8,7 @@ const MapPage = () => {
     dataUrl: '',
     // Fixed coordinates order: [Latitude, Longitude] for Leaflet
     mapCenter: [46.2276, 2.2137], // France center
-    mapZoom: 6 // Set to 6 as requested for better initial view
+    mapZoom: 5 // Zoom pour voir toute la France sur mobile
   });
 
   return (
