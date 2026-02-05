@@ -78,15 +78,42 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
           : (data || []);
 
         // Transform Supabase records to match POI format expected by components
-        const transformedData = filteredData.map(record => ({
-          ...record,
-          id: record.id,
-          lat: record.latitude,
-          lng: record.longitude,
-          properties: {
-             ...record
+        // Convertir kW en MW pour uniformiser les données
+        const transformedData = filteredData.map(record => {
+          // Conversion puissance nominale kW → MW
+          let nominalPower = record.nominal_power;
+          let nominalPowerUnit = record.nominal_power_unit || 'MW';
+          if (nominalPowerUnit === 'kW' && nominalPower) {
+            nominalPower = nominalPower / 1000;
+            nominalPowerUnit = 'MW';
           }
-        }));
+
+          // Conversion puissance réelle kW → MW
+          let actualPower = record.actual_power;
+          let actualPowerUnit = record.actual_power_unit || 'MW';
+          if (actualPowerUnit === 'kW' && actualPower) {
+            actualPower = actualPower / 1000;
+            actualPowerUnit = 'MW';
+          }
+
+          return {
+            ...record,
+            id: record.id,
+            lat: record.latitude,
+            lng: record.longitude,
+            nominal_power: nominalPower,
+            nominal_power_unit: nominalPowerUnit,
+            actual_power: actualPower,
+            actual_power_unit: actualPowerUnit,
+            properties: {
+               ...record,
+               nominal_power: nominalPower,
+               nominal_power_unit: nominalPowerUnit,
+               actual_power: actualPower,
+               actual_power_unit: actualPowerUnit
+            }
+          };
+        });
 
         setPois(transformedData);
 
