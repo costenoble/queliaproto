@@ -54,8 +54,8 @@ const LeafletMap = ({ center, zoom, onMapLoad, pois = [], selectedPoiId = null }
 
   const defaultCenter = [46.2276, 2.2137];
   const mapCenter = center || defaultCenter;
-  // Zoom 5 pour voir toute la France sur mobile
-  const mapZoom = zoom || 5;
+  // Zoom 3 pour voir toute la France sur mobile
+  const mapZoom = zoom || 3;
 
   const handleGeolocate = () => {
     if (!navigator.geolocation) {
