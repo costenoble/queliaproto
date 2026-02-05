@@ -91,25 +91,16 @@ const useHybridLiveData = (projectId, refreshInterval = 5000) => {
       setLoading(true);
       setError(null);
 
-      // 1. Essayer d'abord PUSH (live_data)
-      const pushData = await fetchFromPushData();
-      
-      if (pushData) {
-        setData(pushData);
-        setSource('push');
-        setLoading(false);
-        return;
-      }
-
-      // 2. Si pas de PUSH, essayer PULL (live_data_url)
+      // Récupérer d'abord les infos du projet pour savoir si une URL est configurée
       if (!projectRef.current) {
         await fetchProjectInfo();
       }
 
+      // 1. Si une URL API est configurée, la préférer (PULL)
       if (projectRef.current?.live_data_url) {
         const pullData = await fetchFromPullUrl(
           projectRef.current.live_data_url,
-          projectRef.current.live_data_path || 'value'
+          projectRef.current.live_data_path || 'current_power'
         );
 
         if (pullData) {
@@ -118,6 +109,16 @@ const useHybridLiveData = (projectId, refreshInterval = 5000) => {
           setLoading(false);
           return;
         }
+      }
+
+      // 2. Sinon, essayer PUSH (live_data_latest)
+      const pushData = await fetchFromPushData();
+
+      if (pushData) {
+        setData(pushData);
+        setSource('push');
+        setLoading(false);
+        return;
       }
 
       // Aucune source disponible
