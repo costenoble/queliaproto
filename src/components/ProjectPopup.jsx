@@ -47,11 +47,11 @@ const ProjectPopup = ({ poi }) => {
     : null;
 
   return (
-    <div className="w-64 bg-white overflow-hidden font-sans rounded-lg shadow-sm">
+    <div className="w-72 bg-white overflow-hidden font-sans rounded-lg shadow-sm">
       {/* Barre de couleur */}
-      <div className="h-1.5 w-full" style={{ backgroundColor: typeColor }} />
+      <div className="h-2 w-full" style={{ backgroundColor: typeColor }} />
 
-      <div className="p-3 space-y-2">
+      <div className="p-4 space-y-2.5">
         {/* En-tête : Badge + Logo */}
         <div className="flex items-start justify-between gap-2">
           <span
