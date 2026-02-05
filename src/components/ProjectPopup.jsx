@@ -104,12 +104,17 @@ const ProjectPopup = ({ poi }) => {
           </span>
         </div>
 
-        {/* Coordonnées GPS */}
+        {/* Coordonnées GPS - cliquables vers Google Maps */}
         {poi.lat && poi.lng && (
-          <div className="flex items-center text-[10px] text-gray-500">
+          <a
+            href={`https://www.google.com/maps?q=${poi.lat},${poi.lng}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center text-[10px] text-gray-500 hover:text-indigo-600 transition-colors"
+          >
             <MapPin className="w-3 h-3 mr-1 text-gray-400 flex-shrink-0" />
-            <span>{poi.lat.toFixed(5)}, {poi.lng.toFixed(5)}</span>
-          </div>
+            <span className="hover:underline">{poi.lat.toFixed(5)}, {poi.lng.toFixed(5)}</span>
+          </a>
         )}
 
         {/* Séparateur */}

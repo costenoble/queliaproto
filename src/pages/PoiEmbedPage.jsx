@@ -179,12 +179,17 @@ const PoiEmbedPage = () => {
                   ))}
                 </div>
               )}
-              {/* Coordonnées GPS */}
+              {/* Coordonnées GPS - cliquables vers Google Maps */}
               {poi.lat && poi.lng && (
-                <div className="flex items-center text-sm text-gray-500 mt-2">
+                <a
+                  href={`https://www.google.com/maps?q=${poi.lat},${poi.lng}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center text-sm text-gray-500 mt-2 hover:text-indigo-600 transition-colors"
+                >
                   <MapPin className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
-                  <span>{poi.lat.toFixed(5)}, {poi.lng.toFixed(5)}</span>
-                </div>
+                  <span className="hover:underline">{poi.lat.toFixed(5)}, {poi.lng.toFixed(5)}</span>
+                </a>
               )}
             </div>
 
