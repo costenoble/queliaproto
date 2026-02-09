@@ -14,6 +14,10 @@ import {
   Loader2,
   Car,
   MapPin,
+  Calendar,
+  Zap,
+  Leaf,
+  Home,
 } from 'lucide-react';
 import useHybridLiveData from '@/hooks/useHybridLiveData';
 
@@ -61,6 +65,14 @@ const ProjectPopup = ({ poi }) => {
     poi.description?.length > 120
       ? poi.description.slice(0, 120) + '…'
       : poi.description;
+
+  // Formatage de la date de mise en exploitation
+  const commissioningDate = poi.commissioning_date
+    ? new Date(poi.commissioning_date).toLocaleDateString('fr-FR', {
+        year: 'numeric',
+        month: 'long'
+      })
+    : null;
 
   /* ---- Rendu live power ---- */
   const renderLivePower = () => {
@@ -115,6 +127,14 @@ const ProjectPopup = ({ poi }) => {
             </span>
           )}
         </div>
+
+        {/* Date de mise en exploitation */}
+        {commissioningDate && (
+          <div className="flex items-center gap-1 text-[11px] text-gray-500">
+            <Calendar className="w-3 h-3 flex-shrink-0" />
+            <span>Mise en service : {commissioningDate}</span>
+          </div>
+        )}
 
         <Divider />
 
@@ -191,12 +211,43 @@ const ProjectPopup = ({ poi }) => {
           </div>
         </div>
 
-        {/* ---- Équivalent voitures ---- */}
-        {carsCount != null && (
-          <div className="flex items-center justify-center gap-1 text-[11px] bg-blue-50 rounded-md py-1.5 border border-blue-100 text-blue-700">
-            <Car className="w-3 h-3 flex-shrink-0" />
-            ≈ <strong>{carsCount.toLocaleString('fr-FR')}</strong> voitures à 100 km/h
+        {/* ---- Équivalents ---- */}
+        {(carsCount != null || poi.households_equivalent) && (
+          <div className="grid grid-cols-2 gap-2">
+            {carsCount != null && (
+              <div className="flex items-center justify-center gap-1 text-[11px] bg-blue-50 rounded-md py-1.5 border border-blue-100 text-blue-700">
+                <Car className="w-3 h-3 flex-shrink-0" />
+                <span>≈ <strong>{carsCount.toLocaleString('fr-FR')}</strong></span>
+              </div>
+            )}
+            {poi.households_equivalent && (
+              <div className="flex items-center justify-center gap-1 text-[11px] bg-amber-50 rounded-md py-1.5 border border-amber-100 text-amber-700">
+                <Home className="w-3 h-3 flex-shrink-0" />
+                <span>≈ <strong>{poi.households_equivalent.toLocaleString('fr-FR')}</strong> foyers</span>
+              </div>
+            )}
           </div>
+        )}
+
+        {/* ---- Impact environnemental ---- */}
+        {(poi.annual_production_mwh || poi.co2_avoided_tons) && (
+          <>
+            <Divider />
+            <div className="space-y-1.5">
+              {poi.annual_production_mwh && (
+                <div className="flex items-center gap-1.5 text-[11px] text-gray-700">
+                  <Zap className="w-3 h-3 flex-shrink-0 text-indigo-500" />
+                  <span>Productible annuel : <strong>{poi.annual_production_mwh.toLocaleString('fr-FR')} MWh/an</strong></span>
+                </div>
+              )}
+              {poi.co2_avoided_tons && (
+                <div className="flex items-center gap-1.5 text-[11px] text-gray-700">
+                  <Leaf className="w-3 h-3 flex-shrink-0 text-green-500" />
+                  <span>CO₂ évité : <strong>{poi.co2_avoided_tons.toLocaleString('fr-FR')} tonnes/an</strong></span>
+                </div>
+              )}
+            </div>
+          </>
         )}
 
         {/* ---- Description ---- */}

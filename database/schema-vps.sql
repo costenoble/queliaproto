@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS projects (
     -- Statut
     status VARCHAR(50) DEFAULT 'en etude',
     commissioning_year INTEGER,
+    commissioning_date DATE,
 
     -- Localisation
     city VARCHAR(255),
@@ -80,6 +81,11 @@ CREATE TABLE IF NOT EXISTS projects (
     actual_power DECIMAL(10, 2),
     actual_power_unit VARCHAR(20) DEFAULT 'MW',
     equivalent_display TEXT,
+
+    -- Impact et équivalents
+    annual_production_mwh DECIMAL(12, 2),
+    co2_avoided_tons DECIMAL(12, 2),
+    households_equivalent INTEGER,
 
     -- Donnees temps reel
     live_data_url TEXT,
