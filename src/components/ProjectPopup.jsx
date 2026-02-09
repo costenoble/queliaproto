@@ -29,6 +29,8 @@ const ProjectPopup = ({ poi }) => {
   const { data: liveData, error: liveError, loading: liveLoading, source } =
     useHybridLiveData(poi?.id, 5000);
 
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = React.useState(false);
+
   if (!poi) return null;
 
   /* ---- Données dérivées ---- */
@@ -106,10 +108,12 @@ const ProjectPopup = ({ poi }) => {
 
   const co2AvoidedTons = poi.co2_avoided_tons || calculateCO2Avoided();
 
-  const description =
-    poi.description?.length > 120
-      ? poi.description.slice(0, 120) + '…'
-      : poi.description;
+  // Gestion de la description avec "Lire plus"
+  const descriptionMaxLength = 120;
+  const hasLongDescription = poi.description?.length > descriptionMaxLength;
+  const displayedDescription = hasLongDescription && !isDescriptionExpanded
+    ? poi.description.slice(0, descriptionMaxLength) + '…'
+    : poi.description;
 
   // Formatage de la date/année de mise en exploitation
   const commissioningDate = poi.commissioning_date
@@ -298,10 +302,20 @@ const ProjectPopup = ({ poi }) => {
         )}
 
         {/* ---- Description ---- */}
-        {description && (
+        {displayedDescription && (
           <>
             <Divider />
-            <p className="text-xs text-gray-600 leading-relaxed">{description}</p>
+            <div>
+              <p className="text-xs text-gray-600 leading-relaxed">{displayedDescription}</p>
+              {hasLongDescription && (
+                <button
+                  onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                  className="text-[11px] text-indigo-600 hover:text-indigo-800 hover:underline mt-1 font-medium"
+                >
+                  {isDescriptionExpanded ? 'Lire moins' : 'Lire plus'}
+                </button>
+              )}
+            </div>
           </>
         )}
 
