@@ -99,6 +99,21 @@ const ProjectPopup = ({ poi }) => {
           )}
         </div>
 
+        {/* Site web du client */}
+        {poi.project_url && (
+          <div className="text-[10px] text-gray-500">
+            notre site web{' '}
+            <a
+              href={poi.project_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-indigo-600 hover:underline font-medium"
+            >
+              Site web
+            </a>
+          </div>
+        )}
+
         {/* ---- Titre ---- */}
         <h3 className="text-[15px] font-bold text-gray-900 leading-tight">
           {poi.display_name || poi.name}
