@@ -196,7 +196,7 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
   };
 
   return (
-    <div className={`relative w-full transition-all duration-300 ${isFullscreen ? 'fixed inset-0 z-[100] bg-white' : 'h-full flex flex-col md:flex-row gap-4 p-4'}`}>
+    <div className={`relative w-full transition-all duration-300 ${isFullscreen ? 'fixed inset-0 z-[100] bg-white' : 'h-full flex flex-col md:flex-row gap-4 p-4 md:max-h-[calc(100vh-80px)]'}`}>
       
       {/* Filters */}
       <div className={`${isFullscreen ? 'absolute left-4 top-4 z-[101] max-w-xs' : 'w-full md:w-1/4 h-auto md:h-full z-10'}`}>
@@ -212,7 +212,7 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
       </div>
 
       {/* Map Area */}
-      <div className={`main-map w-full relative rounded-xl overflow-hidden shadow-md border border-gray-200 ${isFullscreen ? 'h-full rounded-none border-0' : 'md:w-3/4 h-[600px] md:h-full min-h-[500px]'}`}>
+      <div className={`main-map w-full relative rounded-xl overflow-hidden shadow-md border border-gray-200 ${isFullscreen ? 'h-full rounded-none border-0' : 'md:w-3/4 md:flex-1 h-[600px] md:h-auto min-h-[500px]'}`}>
         
         {/* Fullscreen Toggle */}
         <Button
