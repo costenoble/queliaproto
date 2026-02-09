@@ -61,6 +61,51 @@ const ProjectPopup = ({ poi }) => {
 
   const carsCount = livePowerMW ? Math.round(livePowerMW * CARS_PER_MW) : null;
 
+  // Calcul automatique du CO2 évité si non renseigné
+  const calculateCO2Avoided = () => {
+    if (!poi.nominal_power) return null;
+
+    const powerMW = poi.nominal_power_unit === 'kW'
+      ? poi.nominal_power / 1000
+      : poi.nominal_power;
+
+    // Facteurs de charge typiques par type d'énergie
+    const loadFactors = {
+      'éolien_onshore': 0.25,
+      'éolien_offshore': 0.40,
+      'solaire': 0.14,
+      'hydroélectricité': 0.45,
+      'biométhane': 0.85,
+      'méthanisation': 0.85,
+      'cogénération': 0.70,
+    };
+
+    let loadFactor = 0.25; // par défaut éolien onshore
+
+    const energyTypeLower = energyType?.toLowerCase() || '';
+
+    if (energyTypeLower.includes('éolien')) {
+      loadFactor = energyTypeLower.includes('off shore') || energyTypeLower.includes('offshore')
+        ? loadFactors.éolien_offshore
+        : loadFactors.éolien_onshore;
+    } else if (energyTypeLower.includes('solaire')) {
+      loadFactor = loadFactors.solaire;
+    } else if (energyTypeLower.includes('hydro')) {
+      loadFactor = loadFactors.hydroélectricité;
+    } else if (energyTypeLower.includes('biométhane') || energyTypeLower.includes('méthanisation')) {
+      loadFactor = loadFactors.méthanisation;
+    } else if (energyTypeLower.includes('cogénération')) {
+      loadFactor = loadFactors.cogénération;
+    }
+
+    // Calcul : Puissance (MW) × 8760 h/an × Facteur de charge × Émissions évitées (0.35 t CO2/MWh)
+    const co2Avoided = powerMW * 8760 * loadFactor * 0.35;
+
+    return Math.round(co2Avoided);
+  };
+
+  const co2AvoidedTons = poi.co2_avoided_tons || calculateCO2Avoided();
+
   const description =
     poi.description?.length > 120
       ? poi.description.slice(0, 120) + '…'
@@ -232,7 +277,7 @@ const ProjectPopup = ({ poi }) => {
         )}
 
         {/* ---- Impact environnemental ---- */}
-        {(poi.annual_production_mwh || poi.co2_avoided_tons) && (
+        {(poi.annual_production_mwh || co2AvoidedTons) && (
           <>
             <Divider />
             <div className="space-y-1.5">
@@ -242,10 +287,10 @@ const ProjectPopup = ({ poi }) => {
                   <span>Productible annuel : <strong>{poi.annual_production_mwh.toLocaleString('fr-FR')} MWh/an</strong></span>
                 </div>
               )}
-              {poi.co2_avoided_tons && (
+              {co2AvoidedTons && (
                 <div className="flex items-center gap-1.5 text-[11px] text-gray-700">
                   <Leaf className="w-3 h-3 flex-shrink-0 text-green-500" />
-                  <span>CO₂ évité : <strong>{poi.co2_avoided_tons.toLocaleString('fr-FR')} tonnes/an</strong></span>
+                  <span>CO₂ évité : <strong>{co2AvoidedTons.toLocaleString('fr-FR')} tonnes/an</strong>{!poi.co2_avoided_tons && ' (estimé)'}</span>
                 </div>
               )}
             </div>
