@@ -8,6 +8,7 @@ import {
 } from '@/utils/mapUtils.jsx';
 import {
   Building,
+  ExternalLink,
   Mic,
   Mail,
   Loader2,
@@ -97,21 +98,6 @@ const ProjectPopup = ({ poi }) => {
             />
           )}
         </div>
-
-        {/* Site web du client */}
-        {poi.project_url && (
-          <div className="text-[10px] text-gray-500">
-            notre site web{' '}
-            <a
-              href={poi.project_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-indigo-600 hover:underline font-medium"
-            >
-              Site web
-            </a>
-          </div>
-        )}
 
         {/* ---- Titre ---- */}
         <h3 className="text-[15px] font-bold text-gray-900 leading-tight">
@@ -223,6 +209,19 @@ const ProjectPopup = ({ poi }) => {
 
         {/* ---- Footer ---- */}
         <Divider />
+
+        {/* Site web */}
+        {poi.project_url && (
+          <a
+            href={poi.project_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-xs text-indigo-600 hover:underline"
+          >
+            <ExternalLink className="w-3 h-3" />
+            Site web
+          </a>
+        )}
 
         {/* Signalement */}
         <div className="flex items-center gap-1.5 text-xs text-gray-600">
