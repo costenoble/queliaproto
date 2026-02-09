@@ -66,12 +66,14 @@ const ProjectPopup = ({ poi }) => {
       ? poi.description.slice(0, 120) + '…'
       : poi.description;
 
-  // Formatage de la date de mise en exploitation
+  // Formatage de la date/année de mise en exploitation
   const commissioningDate = poi.commissioning_date
     ? new Date(poi.commissioning_date).toLocaleDateString('fr-FR', {
         year: 'numeric',
         month: 'long'
       })
+    : poi.commissioning_year
+    ? `${poi.commissioning_year}`
     : null;
 
   /* ---- Rendu live power ---- */
