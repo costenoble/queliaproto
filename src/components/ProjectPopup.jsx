@@ -209,34 +209,45 @@ const ProjectPopup = ({ poi }) => {
 
         {/* ---- Footer ---- */}
         <Divider />
-        <div className="flex items-center justify-between">
-          {poi.project_url ? (
-            <a
-              href={poi.project_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-xs text-indigo-600 hover:underline"
-            >
-              <ExternalLink className="w-3 h-3" />
-              Site web
-            </a>
-          ) : (
-            <span />
-          )}
 
-          <div className="flex items-center gap-2">
-            <a href={`mailto:${poi.contact_email || 'contact@quelia.fr'}`}>
-              <Mail className="w-3.5 h-3.5 text-indigo-600 hover:text-indigo-800" />
-            </a>
-            <a
-              href="https://app.ekoo.co/capture"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Mic className="w-3.5 h-3.5 text-indigo-600 hover:text-indigo-800" />
-            </a>
-          </div>
+        {/* Site web */}
+        {poi.project_url && (
+          <a
+            href={poi.project_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-xs text-indigo-600 hover:underline"
+          >
+            <ExternalLink className="w-3 h-3" />
+            Site web
+          </a>
+        )}
+
+        {/* Signalement */}
+        <div className="flex items-center gap-1.5 text-xs text-gray-600">
+          <span>Signalement ?</span>
+          <a href={`mailto:${poi.contact_email || 'contact@quelia.fr'}`} title="Par email">
+            <Mail className="w-3.5 h-3.5 text-indigo-600 hover:text-indigo-800" />
+          </a>
+          <a
+            href="https://app.ekoo.co/capture"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Par vocal"
+          >
+            <Mic className="w-3.5 h-3.5 text-indigo-600 hover:text-indigo-800" />
+          </a>
         </div>
+
+        {/* Liste de diffusion */}
+        <a
+          href="https://5e8e3e74.sibforms.com/serve/MUIFALMeowQ2_u9o7ZKghaSGt2q9gF_F-AO4Y5fae_qGmH8pdDoAqnohFKAnKsmwVbOMFr09VMIFCHrBqsmEuCNMltlAMGRhPBovsl2K6RkzPGoF94tkDj5p-hVijehAvVKums-TslaUnqRPKSwbNIC7EpxzK8oasGbFwNJQqKXPc-3wqQz4wUUz9Uj-SN6d4Eod8ROpEMl6jdaI"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-indigo-600 hover:underline"
+        >
+          Liste de diffusion ? votre mail
+        </a>
       </div>
     </div>
   );
