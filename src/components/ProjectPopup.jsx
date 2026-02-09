@@ -71,8 +71,6 @@ const ProjectPopup = ({ poi }) => {
         sm:w-[420px]
         lg:w-[460px]
         max-w-[95vw]
-        max-h-[80vh]
-        overflow-y-auto
         bg-white
         rounded-2xl
         shadow-xl
@@ -80,7 +78,7 @@ const ProjectPopup = ({ poi }) => {
       "
     >
       {/* Barre couleur */}
-      <div className="h-1.5 w-full" style={{ backgroundColor: typeColor }} />
+      <div className="h-1.5 w-full rounded-t-2xl" style={{ backgroundColor: typeColor }} />
 
       <div className="p-5 space-y-4">
         {/* Header */}
@@ -127,7 +125,7 @@ const ProjectPopup = ({ poi }) => {
 
         {/* Localisation */}
         <div className="flex items-center text-xs text-gray-600">
-          <Building className="w-3.5 h-3.5 mr-1.5 text-gray-400" />
+          <Building className="w-3.5 h-3.5 mr-1.5 flex-shrink-0 text-gray-400" />
           <span className="truncate">
             {poi.city && (
               <Link
@@ -157,7 +155,7 @@ const ProjectPopup = ({ poi }) => {
             rel="noopener noreferrer"
             className="flex items-center text-[11px] text-gray-500 hover:text-indigo-600"
           >
-            <MapPin className="w-3.5 h-3.5 mr-1.5 text-gray-400" />
+            <MapPin className="w-3.5 h-3.5 mr-1.5 flex-shrink-0 text-gray-400" />
             {poi.lat.toFixed(5)}, {poi.lng.toFixed(5)}
           </a>
         )}
