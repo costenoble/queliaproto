@@ -16,8 +16,8 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Legal Link */}
-          <div className="text-center md:text-right">
+          {/* Legal Links */}
+          <div className="text-center md:text-right flex flex-col gap-2">
             <a
               href="https://quelia.fr/mentions-legales/"
               target="_blank"
@@ -25,6 +25,14 @@ const Footer = () => {
               className="text-gray-400 hover:text-white transition-colors text-sm"
             >
               Mentions légales
+            </a>
+            <a
+              href="https://quelia.fr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-400 hover:text-white transition-colors text-sm"
+            >
+              Contact
             </a>
           </div>
         </div>
