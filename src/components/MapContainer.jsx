@@ -187,6 +187,7 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
   }, [map]);
 
   const handleSelectCity = useCallback((city) => {
+    setSearchSelectedPoiId(null);
     if (map) map.closePopup();
     setTimeout(() => {
       const poisInCity = pois.filter(p => p.city === city && p.lat && p.lng);
@@ -195,8 +196,7 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
   }, [map, pois, fitBoundsToPois]);
 
   const handleSelectRegion = useCallback((region) => {
-    // Fermer le popup d'abord, puis zoomer après un court délai
-    // (le closePopup démonte le composant React, il faut attendre)
+    setSearchSelectedPoiId(null);
     if (map) map.closePopup();
     setFilters(prev => ({
       ...prev,
