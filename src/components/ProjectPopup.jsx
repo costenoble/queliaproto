@@ -324,29 +324,39 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion }) => {
           </a>
         )}
 
-        {/* Signalement + Liste de diffusion */}
-        <div className="flex items-center gap-3 text-xs text-gray-600">
-          <span className="text-gray-500">Signalement ?</span>
-          <a href={`mailto:${poi.contact_email || 'contact@quelia.fr'}`} title="Par email">
-            <Mail className="w-5 h-5 text-indigo-600 hover:text-indigo-800" />
-          </a>
-          <a
-            href="https://app.ekoo.co/capture"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Par vocal"
-          >
-            <Mic className="w-5 h-5 text-indigo-600 hover:text-indigo-800" />
-          </a>
-          <a
-            href="https://5e8e3e74.sibforms.com/serve/MUIFALMeowQ2_u9o7ZKghaSGt2q9gF_F-AO4Y5fae_qGmH8pdDoAqnohFKAnKsmwVbOMFr09VMIFCHrBqsmEuCNMltlAMGRhPBovsl2K6RkzPGoF94tkDj5p-hVijehAvVKums-TslaUnqRPKSwbNIC7EpxzK8oasGbFwNJQqKXPc-3wqQz4wUUz9Uj-SN6d4Eod8ROpEMl6jdaI"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="L'actu du parc par email"
-          >
-            <Info className="w-5 h-5 text-indigo-600 hover:text-indigo-800" />
-          </a>
-        </div>
+        {/* Signalement + Liste de diffusion (conditionnel) */}
+        {(poi.show_email_report !== false || poi.show_voice_report !== false || poi.show_newsletter !== false) && (
+          <div className="flex items-center gap-3 text-xs text-gray-600">
+            {(poi.show_email_report !== false || poi.show_voice_report !== false) && (
+              <span className="text-gray-500">Signalement ?</span>
+            )}
+            {poi.show_email_report !== false && (
+              <a href={`mailto:${poi.contact_email || 'contact@quelia.fr'}`} title="Par email">
+                <Mail className="w-5 h-5 text-indigo-600 hover:text-indigo-800" />
+              </a>
+            )}
+            {poi.show_voice_report !== false && (
+              <a
+                href="https://app.ekoo.co/capture"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Par vocal"
+              >
+                <Mic className="w-5 h-5 text-indigo-600 hover:text-indigo-800" />
+              </a>
+            )}
+            {poi.show_newsletter !== false && (
+              <a
+                href="https://5e8e3e74.sibforms.com/serve/MUIFALMeowQ2_u9o7ZKghaSGt2q9gF_F-AO4Y5fae_qGmH8pdDoAqnohFKAnKsmwVbOMFr09VMIFCHrBqsmEuCNMltlAMGRhPBovsl2K6RkzPGoF94tkDj5p-hVijehAvVKums-TslaUnqRPKSwbNIC7EpxzK8oasGbFwNJQqKXPc-3wqQz4wUUz9Uj-SN6d4Eod8ROpEMl6jdaI"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="L'actu du parc par email"
+              >
+                <Info className="w-5 h-5 text-indigo-600 hover:text-indigo-800" />
+              </a>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

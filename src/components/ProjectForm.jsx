@@ -5,7 +5,7 @@ import { supabase } from '@/lib/customSupabaseClient';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import {
   AlertCircle, Calendar, MapPin, Save, Zap, Building, Flag, AlignLeft,
-  Globe, Link as LinkIcon, Loader2, User, Mail, Image, Hash,
+  Globe, Link as LinkIcon, Loader2, User, Mail, Mic, Info, Image, Hash,
   Map as MapIcon, Home, X, Plus
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
@@ -133,7 +133,11 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
     // Other
     description: '',
     urlType: 'Website URL',
-    projectUrl: ''
+    projectUrl: '',
+    // Display options
+    showEmailReport: true,
+    showVoiceReport: true,
+    showNewsletter: true
   });
 
   // Map position state
@@ -171,7 +175,10 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
         liveDataPath: project.live_data_path || 'current_power',
         description: project.description || '',
         urlType: project.url_type || 'Website URL',
-        projectUrl: project.project_url || ''
+        projectUrl: project.project_url || '',
+        showEmailReport: project.show_email_report !== false,
+        showVoiceReport: project.show_voice_report !== false,
+        showNewsletter: project.show_newsletter !== false
       });
       if (project.latitude && project.longitude) {
         setMapPosition({ lat: project.latitude, lng: project.longitude });
@@ -315,6 +322,9 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
         description: formData.description,
         url_type: formData.urlType,
         project_url: formData.projectUrl,
+        show_email_report: formData.showEmailReport,
+        show_voice_report: formData.showVoiceReport,
+        show_newsletter: formData.showNewsletter,
         client_id: finalClientId,
         updated_at: new Date()
       };
@@ -827,6 +837,46 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
               className={inputClass}
               placeholder="Détails supplémentaires sur le projet..."
             />
+          </div>
+
+          {/* Display Options */}
+          <div className={sectionClass}>
+            <h3 className={sectionTitleClass}>
+              <Flag className="w-4 h-4" /> Options d'affichage
+            </h3>
+            <p className="text-xs text-gray-500 -mt-2 mb-3">Choisissez les éléments visibles dans le popup du POI.</p>
+            <div className="space-y-3">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.showEmailReport}
+                  onChange={(e) => setFormData(prev => ({ ...prev, showEmailReport: e.target.checked }))}
+                  className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                />
+                <Mail className="w-4 h-4 text-gray-500" />
+                <span className="text-sm text-gray-700">Signalement par email</span>
+              </label>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.showVoiceReport}
+                  onChange={(e) => setFormData(prev => ({ ...prev, showVoiceReport: e.target.checked }))}
+                  className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                />
+                <Mic className="w-4 h-4 text-gray-500" />
+                <span className="text-sm text-gray-700">Signalement vocal</span>
+              </label>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.showNewsletter}
+                  onChange={(e) => setFormData(prev => ({ ...prev, showNewsletter: e.target.checked }))}
+                  className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                />
+                <Info className="w-4 h-4 text-gray-500" />
+                <span className="text-sm text-gray-700">Newsletter / Actu du parc</span>
+              </label>
+            </div>
           </div>
         </div>
 
