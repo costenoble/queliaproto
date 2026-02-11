@@ -1,9 +1,10 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import LeafletMap from '@/components/LeafletMap.jsx';
 import ProjectLegend from '@/components/ProjectLegend.jsx';
 import ProjectFilter from '@/components/ProjectFilter.jsx';
+import MapSearchBar from '@/components/MapSearchBar.jsx';
 import { parsePOIData } from '@/utils/mapUtils.jsx';
 import { AlertCircle, Maximize2, Minimize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
@@ -191,6 +192,46 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
     });
   }, [pois, filters]);
 
+  // Search handlers
+  const [searchSelectedPoiId, setSearchSelectedPoiId] = useState(null);
+
+  const handleSelectProject = useCallback((poi) => {
+    if (map && poi.lat && poi.lng) {
+      map.flyTo([poi.lat, poi.lng], 14, { duration: 1 });
+      setSearchSelectedPoiId(poi.id);
+    }
+  }, [map]);
+
+  const handleSelectCity = useCallback((city) => {
+    setFilters(prev => ({
+      ...prev,
+      cities: [city],
+      regions: [],
+      communes: [],
+      intercommunalites: []
+    }));
+    // Zoom sur la première POI de cette ville
+    const poiInCity = pois.find(p => p.city === city);
+    if (map && poiInCity?.lat && poiInCity?.lng) {
+      map.flyTo([poiInCity.lat, poiInCity.lng], 11, { duration: 1 });
+    }
+  }, [map, pois]);
+
+  const handleSelectRegion = useCallback((region) => {
+    setFilters(prev => ({
+      ...prev,
+      regions: [region],
+      cities: [],
+      communes: [],
+      intercommunalites: []
+    }));
+    // Zoom sur la première POI de cette région
+    const poiInRegion = pois.find(p => p.region === region);
+    if (map && poiInRegion?.lat && poiInRegion?.lng) {
+      map.flyTo([poiInRegion.lat, poiInRegion.lng], 8, { duration: 1 });
+    }
+  }, [map, pois]);
+
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
   };
@@ -213,7 +254,15 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
 
       {/* Map Area */}
       <div className={`main-map w-full relative rounded-xl overflow-hidden shadow-md border border-gray-200 ${isFullscreen ? 'h-full rounded-none border-0' : 'md:w-3/4 md:flex-1 h-[600px] md:h-auto min-h-[500px]'}`}>
-        
+
+        {/* Search Bar */}
+        <MapSearchBar
+          pois={pois}
+          onSelectProject={handleSelectProject}
+          onSelectCity={handleSelectCity}
+          onSelectRegion={handleSelectRegion}
+        />
+
         {/* Fullscreen Toggle */}
         <Button
           variant="secondary"
@@ -230,7 +279,7 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
           zoom={config?.mapZoom || 6}
           onMapLoad={setMap}
           pois={filteredPois}
-          selectedPoiId={selectedPoiId}
+          selectedPoiId={searchSelectedPoiId || selectedPoiId}
         />
         
         <ProjectLegend />
