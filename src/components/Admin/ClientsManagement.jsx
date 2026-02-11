@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { Building2, Plus, Edit2, Trash2, Users, MapPin, Loader2, Upload } from 'lucide-react';
+import { Building2, Plus, Edit2, Trash2, Users, MapPin, Loader2, Upload, Map } from 'lucide-react';
 
 const ClientsManagement = () => {
   const { toast } = useToast();
@@ -279,17 +279,28 @@ const ClientsManagement = () => {
               <p className="text-sm text-gray-600 mb-4 line-clamp-2">{client.description}</p>
             )}
 
-            <div className="flex items-center gap-4 text-sm text-gray-500">
-              <div className="flex items-center gap-1">
-                <MapPin className="w-4 h-4" />
-                <span>{clientStats[client.id] || 0} POI</span>
-              </div>
-              {client.contact_email && (
+            <div className="flex items-center justify-between text-sm text-gray-500">
+              <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1">
-                  <Users className="w-4 h-4" />
-                  <span className="truncate max-w-[120px]">{client.contact_email}</span>
+                  <MapPin className="w-4 h-4" />
+                  <span>{clientStats[client.id] || 0} POI</span>
                 </div>
-              )}
+                {client.contact_email && (
+                  <div className="flex items-center gap-1">
+                    <Users className="w-4 h-4" />
+                    <span className="truncate max-w-[120px]">{client.contact_email}</span>
+                  </div>
+                )}
+              </div>
+              <a
+                href={`/carte/${client.slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+              >
+                <Map className="w-3.5 h-3.5" />
+                Voir carte
+              </a>
             </div>
           </div>
         ))}

@@ -93,23 +93,15 @@ const ClientMapPage = () => {
       </Helmet>
 
       <div className="flex flex-col min-h-screen bg-gray-50">
-        {/* Header avec branding client */}
+        {/* Header avec branding client (sans logo) */}
         <header
-          className="py-4 px-6 shadow-sm"
+          className="py-3 px-6 shadow-sm"
           style={{ backgroundColor: client?.primary_color || '#4f46e5' }}
         >
-          <div className="max-w-7xl mx-auto flex items-center gap-4">
-            {client?.logo_url ? (
-              <img
-                src={client.logo_url}
-                alt={client.name}
-                className="h-10 w-auto object-contain bg-white rounded-lg p-1"
-              />
-            ) : (
-              <h1 className="text-xl font-bold text-white">
-                {client?.name || 'Carte des projets'}
-              </h1>
-            )}
+          <div className="max-w-7xl mx-auto">
+            <h1 className="text-lg font-bold text-white">
+              {client?.name || 'Carte des projets'}
+            </h1>
           </div>
         </header>
 
