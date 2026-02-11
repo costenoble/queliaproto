@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Edit, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Link2, Square } from 'lucide-react';
+import { Edit, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Link2, Square, Map } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getStatusColorClass } from '@/utils/mapUtils';
 import { useToast } from '@/components/ui/use-toast';
@@ -183,16 +183,29 @@ const ProjectsTable = ({ projects, onEdit, onDelete, sortConfig, onSort, showCli
                   <td className="px-6 py-4 text-right overflow-visible">
                     <div className="flex justify-end gap-1 items-center">
                       {project.client?.slug && (
-                        <SimpleTooltip text="Lien carte">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => copyPoiLink(project)}
-                            className="h-8 w-8 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-full transition-all duration-200 hover:scale-110 hover:shadow-md"
-                          >
-                            <Link2 className="w-4 h-4" />
-                          </Button>
-                        </SimpleTooltip>
+                        <>
+                          <SimpleTooltip text="Voir carte client">
+                            <a
+                              href={`/carte/${project.client.slug}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center justify-center h-8 w-8 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all duration-200 hover:scale-110 hover:shadow-md"
+                            >
+                              <Map className="w-4 h-4" />
+                            </a>
+                          </SimpleTooltip>
+
+                          <SimpleTooltip text="Lien carte">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => copyPoiLink(project)}
+                              className="h-8 w-8 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-full transition-all duration-200 hover:scale-110 hover:shadow-md"
+                            >
+                              <Link2 className="w-4 h-4" />
+                            </Button>
+                          </SimpleTooltip>
+                        </>
                       )}
 
                       <SimpleTooltip text="Lien fiche POI">
