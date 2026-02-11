@@ -192,13 +192,14 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
   }, [pois, fitBoundsToPois]);
 
   const handleSelectRegion = useCallback((region) => {
+    if (map) map.closePopup();
     setFilters(prev => ({
       ...prev,
       regions: [region]
     }));
     const poisInRegion = pois.filter(p => p.region === region && p.lat && p.lng);
     fitBoundsToPois(poisInRegion);
-  }, [pois, fitBoundsToPois]);
+  }, [map, pois, fitBoundsToPois]);
 
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
