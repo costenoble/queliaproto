@@ -173,25 +173,32 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
     }
   }, [map]);
 
-  const handleSelectCity = useCallback((city) => {
-    // Zoom sur la première POI de cette ville
-    const poiInCity = pois.find(p => p.city === city);
-    if (map && poiInCity?.lat && poiInCity?.lng) {
-      map.flyTo([poiInCity.lat, poiInCity.lng], 11, { duration: 1 });
+  // Zoom sur les bounds d'un ensemble de POIs
+  const fitBoundsToPois = useCallback((matchingPois) => {
+    if (!map || matchingPois.length === 0) return;
+    if (matchingPois.length === 1) {
+      map.flyTo([matchingPois[0].lat, matchingPois[0].lng], 12, { duration: 1 });
+      return;
     }
-  }, [map, pois]);
+    const L = window.L;
+    if (!L) return;
+    const bounds = L.latLngBounds(matchingPois.map(p => [p.lat, p.lng]));
+    map.flyToBounds(bounds, { padding: [40, 40], duration: 1 });
+  }, [map]);
+
+  const handleSelectCity = useCallback((city) => {
+    const poisInCity = pois.filter(p => p.city === city && p.lat && p.lng);
+    fitBoundsToPois(poisInCity);
+  }, [pois, fitBoundsToPois]);
 
   const handleSelectRegion = useCallback((region) => {
     setFilters(prev => ({
       ...prev,
       regions: [region]
     }));
-    // Zoom sur la première POI de cette région
-    const poiInRegion = pois.find(p => p.region === region);
-    if (map && poiInRegion?.lat && poiInRegion?.lng) {
-      map.flyTo([poiInRegion.lat, poiInRegion.lng], 8, { duration: 1 });
-    }
-  }, [map, pois]);
+    const poisInRegion = pois.filter(p => p.region === region && p.lat && p.lng);
+    fitBoundsToPois(poisInRegion);
+  }, [pois, fitBoundsToPois]);
 
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);

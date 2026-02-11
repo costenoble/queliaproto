@@ -13,7 +13,7 @@ import {
   Mail,
   Loader2,
   Car,
-  MapPin,
+  Navigation,
   Calendar,
   Zap,
   Leaf,
@@ -216,13 +216,13 @@ const ProjectPopup = ({ poi }) => {
 
         {poi.lat != null && poi.lng != null && (
           <a
-            href={`https://www.google.com/maps?q=${poi.lat},${poi.lng}`}
+            href={`https://www.google.com/maps/dir/?api=1&destination=${poi.lat},${poi.lng}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1 text-[11px] text-gray-400 hover:text-indigo-600"
+            className="inline-flex items-center gap-1 text-[11px] text-indigo-600 hover:text-indigo-800 hover:underline font-medium"
           >
-            <MapPin className="w-3 h-3 flex-shrink-0" />
-            {poi.lat.toFixed(5)}, {poi.lng.toFixed(5)}
+            <Navigation className="w-3 h-3 flex-shrink-0" />
+            Itinéraire
           </a>
         )}
 
