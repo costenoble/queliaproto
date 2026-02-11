@@ -5,7 +5,7 @@ import L from 'leaflet';
 import { getMarkerColor, getMarkerIconSvg } from '@/utils/mapUtils.jsx';
 import ProjectPopup from '@/components/ProjectPopup.jsx';
 
-const PointOfInterest = ({ poi, isSelected = false }) => {
+const PointOfInterest = ({ poi, isSelected = false, onSelectCity, onSelectRegion }) => {
   const markerRef = useRef(null);
 
   useEffect(() => {
@@ -51,7 +51,7 @@ const PointOfInterest = ({ poi, isSelected = false }) => {
   return (
     <Marker ref={markerRef} position={[poi.lat, poi.lng]} icon={customIcon}>
       <Popup className="project-popup-wrapper" maxWidth={320} closeButton={true}>
-        <ProjectPopup poi={poi} />
+        <ProjectPopup poi={poi} onSelectCity={onSelectCity} onSelectRegion={onSelectRegion} />
       </Popup>
     </Marker>
   );

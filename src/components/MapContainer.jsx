@@ -245,6 +245,8 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
           onMapLoad={setMap}
           pois={filteredPois}
           selectedPoiId={searchSelectedPoiId || selectedPoiId}
+          onSelectCity={handleSelectCity}
+          onSelectRegion={handleSelectRegion}
         />
         
         <ProjectLegend />

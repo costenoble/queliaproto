@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import {
   getStatusColorClass,
   getMarkerColor,
@@ -25,7 +24,7 @@ const CARS_PER_MW = 67;
 
 const Divider = () => <div className="border-t border-gray-100 my-2" />;
 
-const ProjectPopup = ({ poi }) => {
+const ProjectPopup = ({ poi, onSelectCity, onSelectRegion }) => {
   const { data: liveData, error: liveError, loading: liveLoading, source } =
     useHybridLiveData(poi?.id, 5000);
 
@@ -194,21 +193,21 @@ const ProjectPopup = ({ poi }) => {
           <Building className="w-3 h-3 flex-shrink-0 text-gray-400" />
           <span className="truncate">
             {poi.city ? (
-              <Link
-                to={`/map?city=${encodeURIComponent(poi.city)}`}
-                className="hover:underline hover:text-indigo-600 font-medium"
+              <button
+                onClick={() => onSelectCity?.(poi.city)}
+                className="hover:underline hover:text-indigo-600 font-medium cursor-pointer"
               >
                 {poi.city}
-              </Link>
+              </button>
             ) : null}
             {poi.city && poi.region ? ' · ' : null}
             {poi.region ? (
-              <Link
-                to={`/map?region=${encodeURIComponent(poi.region)}`}
-                className="hover:underline hover:text-indigo-600"
+              <button
+                onClick={() => onSelectRegion?.(poi.region)}
+                className="hover:underline hover:text-indigo-600 cursor-pointer"
               >
                 {poi.region}
-              </Link>
+              </button>
             ) : null}
             {!poi.city && !poi.region ? 'Non spécifiée' : null}
           </span>
