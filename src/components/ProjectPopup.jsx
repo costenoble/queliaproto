@@ -26,7 +26,7 @@ const CARS_PER_MW = 67;
 const Divider = () => <div className="border-t border-gray-100 my-2" />;
 
 const ProjectPopup = ({ poi, onSelectCity, onSelectRegion }) => {
-  const { data: liveData, error: liveError, loading: liveLoading, source } =
+  const { data: liveData, error: liveError, loading: liveLoading } =
     useHybridLiveData(poi?.id, 5000);
 
   const [isDescriptionExpanded, setIsDescriptionExpanded] = React.useState(false);
@@ -239,16 +239,11 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion }) => {
           <div className="space-y-2">
             <div className="bg-green-50 rounded-md px-2.5 py-2 border border-green-200">
               <div className="flex items-center gap-1 mb-1">
-                <span className="text-[10px] text-gray-500 leading-none">Temps réel</span>
+                <span className="text-[10px] text-gray-500 leading-none">Production en temps réel</span>
                 {liveData?.value != null && (
                   <span className="relative flex h-1.5 w-1.5">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-green-500" />
-                  </span>
-                )}
-                {source && (
-                  <span className="text-[7px] bg-green-600 text-white px-0.5 rounded leading-none">
-                    {source.toUpperCase()}
                   </span>
                 )}
               </div>
