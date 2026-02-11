@@ -10,6 +10,7 @@ import {
   ExternalLink,
   Mic,
   Mail,
+  Info,
   Loader2,
   Car,
   Navigation,
@@ -45,10 +46,6 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion }) => {
     }
     return poi.type || 'Énergie';
   })();
-
-  const terrainLabel = poi.energy_subtype?.toLowerCase().includes('off shore')
-    ? 'Maritime'
-    : 'Terrestre';
 
   const livePowerMW = (() => {
     if (liveData?.value != null)
@@ -166,17 +163,16 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion }) => {
           {poi.display_name || poi.name}
         </h3>
 
-        {/* ---- Terrain + Statut ---- */}
-        <div className="flex items-center gap-1.5 text-xs text-gray-500">
-          <span>{terrainLabel}</span>
-          {poi.status && (
+        {/* ---- Statut ---- */}
+        {poi.status && (
+          <div className="flex items-center gap-1.5 text-xs text-gray-500">
             <span
               className={`text-[10px] px-1.5 py-px rounded-full border font-medium leading-none ${getStatusColorClass(poi.status)}`}
             >
               {poi.status}
             </span>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Date de mise en exploitation */}
         {commissioningDate && (
@@ -227,7 +223,7 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion }) => {
 
         <Divider />
 
-        {/* ---- Puissance : nominale + temps réel ---- */}
+        {/* ---- Puissance : nominale + temps réel + voitures ---- */}
         <div className="grid grid-cols-2 gap-2">
           {/* Nominale */}
           <div className="bg-gray-50 rounded-md px-2.5 py-2">
@@ -239,43 +235,42 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion }) => {
             </div>
           </div>
 
-          {/* Temps réel */}
-          <div className="bg-green-50 rounded-md px-2.5 py-2 border border-green-200">
-            <div className="flex items-center gap-1 mb-1">
-              <span className="text-[10px] text-gray-500 leading-none">Temps réel</span>
-              {liveData?.value != null && (
-                <span className="relative flex h-1.5 w-1.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-green-500" />
-                </span>
-              )}
-              {source && (
-                <span className="text-[7px] bg-green-600 text-white px-0.5 rounded leading-none">
-                  {source.toUpperCase()}
-                </span>
-              )}
+          {/* Temps réel + voitures en dessous */}
+          <div className="space-y-2">
+            <div className="bg-green-50 rounded-md px-2.5 py-2 border border-green-200">
+              <div className="flex items-center gap-1 mb-1">
+                <span className="text-[10px] text-gray-500 leading-none">Temps réel</span>
+                {liveData?.value != null && (
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-green-500" />
+                  </span>
+                )}
+                {source && (
+                  <span className="text-[7px] bg-green-600 text-white px-0.5 rounded leading-none">
+                    {source.toUpperCase()}
+                  </span>
+                )}
+              </div>
+              <div className="text-sm font-bold text-green-700 leading-none">
+                {renderLivePower()}
+              </div>
             </div>
-            <div className="text-sm font-bold text-green-700 leading-none">
-              {renderLivePower()}
-            </div>
+
+            {carsCount != null && (
+              <div className="flex items-center justify-center gap-1.5 text-[11px] bg-blue-50 rounded-md py-1.5 border border-blue-100 text-blue-700">
+                <Car className="w-4 h-4 flex-shrink-0" />
+                <span>= <strong>{carsCount.toLocaleString('fr-FR')}</strong> voitures</span>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* ---- Équivalents ---- */}
-        {(carsCount != null || poi.households_equivalent) && (
-          <div className="grid grid-cols-2 gap-2">
-            {carsCount != null && (
-              <div className="flex items-center justify-center gap-1 text-[11px] bg-blue-50 rounded-md py-1.5 border border-blue-100 text-blue-700">
-                <Car className="w-3 h-3 flex-shrink-0" />
-                <span>≈ <strong>{carsCount.toLocaleString('fr-FR')}</strong></span>
-              </div>
-            )}
-            {poi.households_equivalent && (
-              <div className="flex items-center justify-center gap-1 text-[11px] bg-amber-50 rounded-md py-1.5 border border-amber-100 text-amber-700">
-                <Home className="w-3 h-3 flex-shrink-0" />
-                <span>≈ <strong>{poi.households_equivalent.toLocaleString('fr-FR')}</strong> foyers</span>
-              </div>
-            )}
+        {/* ---- Foyers alimentés ---- */}
+        {poi.households_equivalent && (
+          <div className="flex items-center justify-center gap-1.5 text-[11px] bg-amber-50 rounded-md py-1.5 border border-amber-100 text-amber-700">
+            <Home className="w-4 h-4 flex-shrink-0" />
+            <span>≈ <strong>{poi.households_equivalent.toLocaleString('fr-FR')}</strong> foyers</span>
           </div>
         )}
 
@@ -334,11 +329,11 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion }) => {
           </a>
         )}
 
-        {/* Signalement */}
-        <div className="flex items-center gap-1.5 text-xs text-gray-600">
-          <span>Signalement ?</span>
+        {/* Signalement + Liste de diffusion */}
+        <div className="flex items-center gap-3 text-xs text-gray-600">
+          <span className="text-gray-500">Signalement ?</span>
           <a href={`mailto:${poi.contact_email || 'contact@quelia.fr'}`} title="Par email">
-            <Mail className="w-3.5 h-3.5 text-indigo-600 hover:text-indigo-800" />
+            <Mail className="w-5 h-5 text-indigo-600 hover:text-indigo-800" />
           </a>
           <a
             href="https://app.ekoo.co/capture"
@@ -346,19 +341,17 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion }) => {
             rel="noopener noreferrer"
             title="Par vocal"
           >
-            <Mic className="w-3.5 h-3.5 text-indigo-600 hover:text-indigo-800" />
+            <Mic className="w-5 h-5 text-indigo-600 hover:text-indigo-800" />
+          </a>
+          <a
+            href="https://5e8e3e74.sibforms.com/serve/MUIFALMeowQ2_u9o7ZKghaSGt2q9gF_F-AO4Y5fae_qGmH8pdDoAqnohFKAnKsmwVbOMFr09VMIFCHrBqsmEuCNMltlAMGRhPBovsl2K6RkzPGoF94tkDj5p-hVijehAvVKums-TslaUnqRPKSwbNIC7EpxzK8oasGbFwNJQqKXPc-3wqQz4wUUz9Uj-SN6d4Eod8ROpEMl6jdaI"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="L'actu du parc par email"
+          >
+            <Info className="w-5 h-5 text-indigo-600 hover:text-indigo-800" />
           </a>
         </div>
-
-        {/* Liste de diffusion */}
-        <a
-          href="https://5e8e3e74.sibforms.com/serve/MUIFALMeowQ2_u9o7ZKghaSGt2q9gF_F-AO4Y5fae_qGmH8pdDoAqnohFKAnKsmwVbOMFr09VMIFCHrBqsmEuCNMltlAMGRhPBovsl2K6RkzPGoF94tkDj5p-hVijehAvVKums-TslaUnqRPKSwbNIC7EpxzK8oasGbFwNJQqKXPc-3wqQz4wUUz9Uj-SN6d4Eod8ROpEMl6jdaI"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-indigo-600 hover:underline"
-        >
-          Liste de diffusion ? votre mail
-        </a>
       </div>
     </div>
   );
