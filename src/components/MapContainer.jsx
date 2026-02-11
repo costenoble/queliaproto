@@ -187,18 +187,25 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
   }, [map]);
 
   const handleSelectCity = useCallback((city) => {
-    const poisInCity = pois.filter(p => p.city === city && p.lat && p.lng);
-    fitBoundsToPois(poisInCity);
-  }, [pois, fitBoundsToPois]);
+    if (map) map.closePopup();
+    setTimeout(() => {
+      const poisInCity = pois.filter(p => p.city === city && p.lat && p.lng);
+      fitBoundsToPois(poisInCity);
+    }, 150);
+  }, [map, pois, fitBoundsToPois]);
 
   const handleSelectRegion = useCallback((region) => {
+    // Fermer le popup d'abord, puis zoomer après un court délai
+    // (le closePopup démonte le composant React, il faut attendre)
     if (map) map.closePopup();
     setFilters(prev => ({
       ...prev,
       regions: [region]
     }));
-    const poisInRegion = pois.filter(p => p.region === region && p.lat && p.lng);
-    fitBoundsToPois(poisInRegion);
+    setTimeout(() => {
+      const poisInRegion = pois.filter(p => p.region === region && p.lat && p.lng);
+      fitBoundsToPois(poisInRegion);
+    }, 150);
   }, [map, pois, fitBoundsToPois]);
 
   const toggleFullscreen = () => {
