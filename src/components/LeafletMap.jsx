@@ -20,19 +20,26 @@ const MapController = ({ center, zoom }) => {
 };
 
 // Component to handle auto-opening a selected POI
+// Uses a ref for pois to avoid re-triggering when filtered list changes
 const SelectedPoiHandler = ({ pois, selectedPoiId }) => {
   const map = useMap();
+  const poisRef = useRef(pois);
+  poisRef.current = pois;
 
   useEffect(() => {
-    if (!selectedPoiId || !pois.length) return;
+    if (!selectedPoiId) return;
 
-    const selectedPoi = pois.find(p => p.id === selectedPoiId);
-    if (selectedPoi && selectedPoi.lat && selectedPoi.lng) {
-      setTimeout(() => {
+    const timer = setTimeout(() => {
+      const currentPois = poisRef.current;
+      if (!currentPois.length) return;
+      const selectedPoi = currentPois.find(p => p.id === selectedPoiId);
+      if (selectedPoi && selectedPoi.lat && selectedPoi.lng) {
         map.flyTo([selectedPoi.lat, selectedPoi.lng], 14, { duration: 1 });
-      }, 500);
-    }
-  }, [selectedPoiId, pois, map]);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [selectedPoiId, map]);
 
   return null;
 };

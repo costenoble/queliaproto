@@ -174,16 +174,17 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
   }, [map]);
 
   // Zoom sur les bounds d'un ensemble de POIs
-  const fitBoundsToPois = useCallback((matchingPois) => {
+  // maxZoom contrôle le zoom max (utile pour régions avec peu de POIs)
+  const fitBoundsToPois = useCallback((matchingPois, maxZoom = 14) => {
     if (!map || matchingPois.length === 0) return;
     if (matchingPois.length === 1) {
-      map.flyTo([matchingPois[0].lat, matchingPois[0].lng], 12, { duration: 1 });
+      map.flyTo([matchingPois[0].lat, matchingPois[0].lng], Math.min(12, maxZoom), { duration: 1 });
       return;
     }
     const L = window.L;
     if (!L) return;
     const bounds = L.latLngBounds(matchingPois.map(p => [p.lat, p.lng]));
-    map.flyToBounds(bounds, { padding: [40, 40], duration: 1 });
+    map.flyToBounds(bounds, { padding: [40, 40], maxZoom, duration: 1 });
   }, [map]);
 
   const handleSelectCity = useCallback((city) => {
@@ -204,8 +205,8 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
     }));
     setTimeout(() => {
       const poisInRegion = pois.filter(p => p.region === region && p.lat && p.lng);
-      fitBoundsToPois(poisInRegion);
-    }, 150);
+      fitBoundsToPois(poisInRegion, 10);
+    }, 300);
   }, [map, pois, fitBoundsToPois]);
 
   const toggleFullscreen = () => {
