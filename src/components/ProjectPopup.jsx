@@ -209,6 +209,14 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion }) => {
           </span>
         </div>
 
+        {poi.intercommunalites && (
+          <div className="text-[11px] text-gray-500 pl-4">
+            {Array.isArray(poi.intercommunalites)
+              ? poi.intercommunalites.join(', ')
+              : poi.intercommunalites}
+          </div>
+        )}
+
         {poi.lat != null && poi.lng != null && (
           <a
             href={`https://www.google.com/maps/dir/?api=1&destination=${poi.lat},${poi.lng}`}

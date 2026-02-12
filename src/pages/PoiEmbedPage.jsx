@@ -11,7 +11,6 @@ import {
   Info,
   Loader2,
   Car,
-  MapPin,
   Navigation,
   Calendar,
   Zap,
@@ -254,18 +253,6 @@ const PoiEmbedPage = () => {
                     </span>
                   ))}
                 </div>
-              )}
-              {/* Coordonnées GPS - cliquables vers Google Maps */}
-              {poi.latitude != null && poi.longitude != null && (
-                <a
-                  href={`https://www.google.com/maps?q=${poi.latitude},${poi.longitude}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center text-sm text-gray-500 mt-2 hover:text-indigo-600 transition-colors"
-                >
-                  <MapPin className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
-                  <span className="hover:underline">{poi.latitude.toFixed(5)}, {poi.longitude.toFixed(5)}</span>
-                </a>
               )}
               {/* Itinéraire */}
               {poi.latitude != null && poi.longitude != null && (
