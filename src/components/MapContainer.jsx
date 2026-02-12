@@ -205,7 +205,7 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
     }));
     setTimeout(() => {
       const poisInRegion = pois.filter(p => p.region === region && p.lat && p.lng);
-      fitBoundsToPois(poisInRegion, 10);
+      fitBoundsToPois(poisInRegion, 8);
     }, 300);
   }, [map, pois, fitBoundsToPois]);
 
