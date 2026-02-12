@@ -168,6 +168,9 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
 
   const handleSelectProject = useCallback((poi) => {
     if (map && poi.lat && poi.lng) {
+      // Réinitialiser les filtres pour que le POI soit visible
+      setFilters({ types: [], status: [], regions: [] });
+      map.closePopup();
       map.flyTo([poi.lat, poi.lng], 14, { duration: 1 });
       setSearchSelectedPoiId(poi.id);
     }
