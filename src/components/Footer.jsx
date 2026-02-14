@@ -12,7 +12,7 @@ const Footer = () => {
           <div className="text-center md:text-left">
             <h3 className="text-lg font-semibold mb-2 text-white">Quelia</h3>
             <p className="text-gray-400 text-sm">
-              Expertise en concertation et ingénierie sociale pour les énergies renouvelables.
+              Concertation pour la transition écologique.
             </p>
           </div>
 

@@ -50,7 +50,14 @@ const PointOfInterest = ({ poi, isSelected = false, onSelectCity, onSelectRegion
 
   return (
     <Marker ref={markerRef} position={[poi.lat, poi.lng]} icon={customIcon}>
-      <Popup className="project-popup-wrapper" maxWidth={320} closeButton={true}>
+      <Popup
+        className="project-popup-wrapper"
+        maxWidth={320}
+        closeButton={true}
+        autoPan={true}
+        autoPanPadding={[20, 20]}
+        autoPanPaddingTopLeft={[20, 80]}
+      >
         <ProjectPopup poi={poi} onSelectCity={onSelectCity} onSelectRegion={onSelectRegion} />
       </Popup>
     </Marker>

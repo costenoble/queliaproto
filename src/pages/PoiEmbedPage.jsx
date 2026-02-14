@@ -14,7 +14,6 @@ import {
   Navigation,
   Calendar,
   Zap,
-  Leaf,
 } from 'lucide-react';
 import useHybridLiveData from '@/hooks/useHybridLiveData';
 
@@ -113,47 +112,6 @@ const PoiEmbedPage = () => {
   const livePowerMW = getLivePowerMW();
   const carsCount = livePowerMW ? Math.round(livePowerMW * CARS_PER_MW) : null;
 
-  // Calcul automatique du CO2 évité si non renseigné
-  const calculateCO2Avoided = () => {
-    if (!poi.nominal_power) return null;
-
-    const powerMW = poi.nominal_power_unit === 'kW'
-      ? poi.nominal_power / 1000
-      : poi.nominal_power;
-
-    const loadFactors = {
-      'éolien_onshore': 0.25,
-      'éolien_offshore': 0.40,
-      'solaire': 0.14,
-      'hydroélectricité': 0.45,
-      'biométhane': 0.85,
-      'méthanisation': 0.85,
-      'cogénération': 0.70,
-    };
-
-    let loadFactor = 0.25;
-    const energyTypeLower = energyType?.toLowerCase() || '';
-
-    if (energyTypeLower.includes('éolien')) {
-      loadFactor = energyTypeLower.includes('off shore') || energyTypeLower.includes('offshore')
-        ? loadFactors.éolien_offshore
-        : loadFactors.éolien_onshore;
-    } else if (energyTypeLower.includes('solaire')) {
-      loadFactor = loadFactors.solaire;
-    } else if (energyTypeLower.includes('hydro')) {
-      loadFactor = loadFactors.hydroélectricité;
-    } else if (energyTypeLower.includes('biométhane') || energyTypeLower.includes('méthanisation')) {
-      loadFactor = loadFactors.méthanisation;
-    } else if (energyTypeLower.includes('cogénération')) {
-      loadFactor = loadFactors.cogénération;
-    }
-
-    const co2Avoided = powerMW * 8760 * loadFactor * 0.35;
-    return Math.round(co2Avoided);
-  };
-
-  const co2AvoidedTons = poi.co2_avoided_tons || calculateCO2Avoided();
-
   // Description avec "Lire plus/moins"
   const descriptionMaxLength = 200;
   const hasLongDescription = poi.description?.length > descriptionMaxLength;
@@ -169,23 +127,26 @@ const PoiEmbedPage = () => {
           <div className="h-3 w-full" style={{ backgroundColor: typeColor }} />
 
           <div className="p-8">
-            {/* Badge type d'énergie (gauche) + Logo (haut à droite) */}
-            <div className="flex items-start justify-between gap-3 mb-3">
+            {/* Logo client en haut */}
+            {poi.poi_logo_url && (
+              <div className="flex justify-center mb-4">
+                <img
+                  src={poi.poi_logo_url}
+                  alt={poi.name}
+                  className="h-14 w-auto object-contain"
+                />
+              </div>
+            )}
+
+            {/* Badge type d'énergie */}
+            <div className="mb-3">
               <span
-                className="text-sm font-bold px-3 py-1.5 rounded-lg uppercase tracking-wider text-white flex items-center shadow-sm"
+                className="text-sm font-bold px-3 py-1.5 rounded-lg uppercase tracking-wider text-white inline-flex items-center shadow-sm"
                 style={{ backgroundColor: typeColor }}
               >
                 {TypeIcon}
                 {getEnergyLabel()}
               </span>
-              {poi.poi_logo_url && (
-                <img
-                  src={poi.poi_logo_url}
-                  alt={poi.name}
-                  className="h-18 w-auto object-contain rounded-lg border border-gray-100 shadow-sm flex-shrink-0"
-                  style={{ maxHeight: '4.5rem' }}
-                />
-              )}
             </div>
 
             {/* Nom du parc */}
@@ -315,7 +276,8 @@ const PoiEmbedPage = () => {
                 {carsCount != null && (
                   <div className="flex items-center justify-center gap-1.5 text-sm bg-blue-50 rounded-lg py-2 border border-blue-100 text-blue-700">
                     <Car className="w-5 h-5 flex-shrink-0" />
-                    <span>= <strong>{carsCount.toLocaleString('fr-FR')}</strong> voitures</span>
+                    <span>= <strong>{carsCount.toLocaleString('fr-FR')}</strong> voitures roulant a 100 km/h</span>
+                    <span className="text-[10px] text-blue-400 block">(consommation d'electricite)</span>
                   </div>
                 )}
               </div>
@@ -329,21 +291,13 @@ const PoiEmbedPage = () => {
               </div>
             )}
 
-            {/* Impact environnemental */}
-            {(poi.annual_production_mwh || co2AvoidedTons) && (
-              <div className="border-t border-gray-100 pt-4 mt-3 space-y-2">
-                {poi.annual_production_mwh && (
-                  <div className="flex items-center gap-2 text-sm text-gray-700">
-                    <Zap className="w-4 h-4 flex-shrink-0 text-indigo-500" />
-                    <span>Productible annuel : <strong>{poi.annual_production_mwh.toLocaleString('fr-FR')} MWh/an</strong></span>
-                  </div>
-                )}
-                {co2AvoidedTons && (
-                  <div className="flex items-center gap-2 text-sm text-gray-700">
-                    <Leaf className="w-4 h-4 flex-shrink-0 text-green-500" />
-                    <span>CO₂ évité : <strong>{co2AvoidedTons.toLocaleString('fr-FR')} tonnes/an</strong>{!poi.co2_avoided_tons && ' (estimé)'}</span>
-                  </div>
-                )}
+            {/* Production annuelle */}
+            {poi.annual_production_mwh && (
+              <div className="border-t border-gray-100 pt-4 mt-3">
+                <div className="flex items-center gap-2 text-sm text-gray-700">
+                  <Zap className="w-4 h-4 flex-shrink-0 text-indigo-500" />
+                  <span>Productible annuel : <strong>{poi.annual_production_mwh.toLocaleString('fr-FR')} MWh/an</strong></span>
+                </div>
               </div>
             )}
 
@@ -379,13 +333,11 @@ const PoiEmbedPage = () => {
               </div>
             )}
 
-            {/* Signalement + Newsletter (conditionnel) */}
-            {(poi.show_email_report !== false || poi.show_voice_report !== false || poi.show_newsletter !== false) && (
-              <div className="border-t border-gray-100 pt-4 mt-3 space-y-3">
+            {/* Signalement (mail + micro) */}
+            {(poi.show_email_report !== false || poi.show_voice_report !== false) && (
+              <div className="border-t border-gray-100 pt-4 mt-3">
                 <div className="flex items-center gap-3 text-base text-gray-600">
-                  {(poi.show_email_report !== false || poi.show_voice_report !== false) && (
-                    <span className="text-gray-500">Signalement ?</span>
-                  )}
+                  <span className="text-gray-500">Signalement ?</span>
                   {poi.show_email_report !== false && (
                     <a
                       href={`mailto:${poi.contact_email || 'contact@quelia.fr'}`}
@@ -406,17 +358,22 @@ const PoiEmbedPage = () => {
                       <Mic className="w-6 h-6" />
                     </a>
                   )}
-                  {poi.show_newsletter !== false && (
-                    <a
-                      href="https://5e8e3e74.sibforms.com/serve/MUIFALMeowQ2_u9o7ZKghaSGt2q9gF_F-AO4Y5fae_qGmH8pdDoAqnohFKAnKsmwVbOMFr09VMIFCHrBqsmEuCNMltlAMGRhPBovsl2K6RkzPGoF94tkDj5p-hVijehAvVKums-TslaUnqRPKSwbNIC7EpxzK8oasGbFwNJQqKXPc-3wqQz4wUUz9Uj-SN6d4Eod8ROpEMl6jdaI"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title="L'actu du parc par email"
-                    >
-                      <Info className="w-6 h-6 text-indigo-600 hover:text-indigo-800" />
-                    </a>
-                  )}
                 </div>
+              </div>
+            )}
+
+            {/* Newsletter — séparée du signalement */}
+            {poi.show_newsletter !== false && (
+              <div className="mt-3">
+                <a
+                  href="https://5e8e3e74.sibforms.com/serve/MUIFALMeowQ2_u9o7ZKghaSGt2q9gF_F-AO4Y5fae_qGmH8pdDoAqnohFKAnKsmwVbOMFr09VMIFCHrBqsmEuCNMltlAMGRhPBovsl2K6RkzPGoF94tkDj5p-hVijehAvVKums-TslaUnqRPKSwbNIC7EpxzK8oasGbFwNJQqKXPc-3wqQz4wUUz9Uj-SN6d4Eod8ROpEMl6jdaI"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-base text-indigo-600 hover:text-indigo-800 transition-colors"
+                >
+                  <Info className="w-6 h-6 flex-shrink-0" />
+                  <span>L'actu du parc par email</span>
+                </a>
               </div>
             )}
 
