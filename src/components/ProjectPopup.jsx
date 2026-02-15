@@ -104,7 +104,7 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion }) => {
 
   /* ============================================================== */
   return (
-    <div className="min-w-0 max-w-[340px] text-sm font-sans">
+    <div className="min-w-0 max-w-[340px] mx-auto text-sm font-sans">
       {/* Barre couleur haute */}
       <div className="h-1.5 w-full -mt-[1px] rounded-t" style={{ backgroundColor: typeColor }} />
 
