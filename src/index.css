@@ -174,3 +174,7 @@ html, body {
 .animate-slide-up {
   animation: slideUp 0.3s ease-out forwards;
 }
+
+/* Hide scrollbar for chip bars */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

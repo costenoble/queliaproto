@@ -5,9 +5,9 @@ import LeafletMap from '@/components/LeafletMap.jsx';
 import ProjectLegend from '@/components/ProjectLegend.jsx';
 import ProjectFilter from '@/components/ProjectFilter.jsx';
 import MapSearchBar from '@/components/MapSearchBar.jsx';
-import { parsePOIData } from '@/utils/mapUtils.jsx';
+import { parsePOIData, getMarkerColor, ENERGY_CATEGORIES } from '@/utils/mapUtils.jsx';
 import ProjectPopup from '@/components/ProjectPopup.jsx';
-import { AlertCircle, Filter, Maximize2, Minimize2, X } from 'lucide-react';
+import { AlertCircle, Filter, Maximize2, Minimize2, SlidersHorizontal, X } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
 import { supabase } from '@/lib/customSupabaseClient';
 import mockData from '@/data/mockPOIData.json';
@@ -224,6 +224,25 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
     (filters.status?.length > 0) ||
     (filters.regions?.length > 0);
 
+  // Energy chips for inline mobile bar
+  const energyChips = useMemo(() =>
+    Object.entries(ENERGY_CATEGORIES).map(([key, cat]) => ({
+      id: key,
+      label: cat.label,
+      color: getMarkerColor(key),
+    })),
+  []);
+
+  const toggleTypeFilter = useCallback((typeId) => {
+    setFilters(prev => {
+      const current = prev.types || [];
+      const next = current.includes(typeId)
+        ? current.filter(t => t !== typeId)
+        : [...current, typeId];
+      return { ...prev, types: next };
+    });
+  }, []);
+
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
   };
@@ -244,19 +263,50 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
       {/* Map Area */}
       <div className={`main-map w-full relative overflow-hidden shadow-md border-gray-200 ${isFullscreen ? 'h-full border-0' : 'md:w-3/4 md:flex-1 h-[calc(100vh-64px)] md:h-auto min-h-[500px] md:rounded-xl md:border'}`}>
 
-        {/* Mobile: floating filter pill */}
-        <button
-          onClick={() => setIsMobileFilterOpen(true)}
-          className="md:hidden absolute top-3 left-3 z-[1001] flex items-center gap-1.5 bg-white/95 backdrop-blur-sm shadow-lg rounded-full px-3 py-2 border border-gray-200 text-sm font-medium text-gray-700 active:scale-95 transition-transform"
-        >
-          <Filter className="w-4 h-4 text-indigo-600" />
-          Filtres
-          {hasActiveFilters && (
-            <span className="bg-indigo-600 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
-              {(filters.types?.length || 0) + (filters.status?.length || 0) + (filters.regions?.length || 0)}
-            </span>
-          )}
-        </button>
+        {/* Mobile: inline filter chips bar */}
+        <div className="md:hidden absolute top-3 left-0 right-0 z-[1001] px-3">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+            {/* More filters button */}
+            <button
+              onClick={() => setIsMobileFilterOpen(true)}
+              className={`flex-shrink-0 flex items-center gap-1 bg-white/95 backdrop-blur-sm shadow-md rounded-full px-2.5 py-1.5 border text-xs font-medium active:scale-95 transition-all ${
+                (filters.status?.length > 0 || filters.regions?.length > 0)
+                  ? 'border-indigo-300 bg-indigo-50 text-indigo-700'
+                  : 'border-gray-200 text-gray-600'
+              }`}
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              {(filters.status?.length || 0) + (filters.regions?.length || 0) > 0 && (
+                <span className="bg-indigo-600 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                  {(filters.status?.length || 0) + (filters.regions?.length || 0)}
+                </span>
+              )}
+            </button>
+
+            {/* Energy type chips */}
+            {energyChips.map((chip) => {
+              const active = filters.types?.includes(chip.id);
+              return (
+                <button
+                  key={chip.id}
+                  onClick={() => toggleTypeFilter(chip.id)}
+                  className={`flex-shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium border shadow-sm active:scale-95 transition-all ${
+                    active
+                      ? 'text-white border-transparent'
+                      : 'bg-white/95 backdrop-blur-sm text-gray-700 border-gray-200'
+                  }`}
+                  style={active ? { backgroundColor: chip.color } : {}}
+                >
+                  <span
+                    className="w-2 h-2 rounded-full flex-shrink-0"
+                    style={{ backgroundColor: active ? 'white' : chip.color }}
+                  />
+                  {chip.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
         {/* Mobile: filter drawer */}
         {isMobileFilterOpen && (
