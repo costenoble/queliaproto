@@ -6,7 +6,8 @@ import ProjectLegend from '@/components/ProjectLegend.jsx';
 import ProjectFilter from '@/components/ProjectFilter.jsx';
 import MapSearchBar from '@/components/MapSearchBar.jsx';
 import { parsePOIData } from '@/utils/mapUtils.jsx';
-import { AlertCircle, Maximize2, Minimize2 } from 'lucide-react';
+import ProjectPopup from '@/components/ProjectPopup.jsx';
+import { AlertCircle, Maximize2, Minimize2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
 import { supabase } from '@/lib/customSupabaseClient';
 import mockData from '@/data/mockPOIData.json';
@@ -163,6 +164,9 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
     });
   }, [pois, filters]);
 
+  // Bottom sheet POI
+  const [activePoi, setActivePoi] = useState(null);
+
   // Search handlers
   const [searchSelectedPoiId, setSearchSelectedPoiId] = useState(null);
 
@@ -170,7 +174,7 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
     if (map && poi.lat && poi.lng) {
       // Réinitialiser les filtres pour que le POI soit visible
       setFilters({ types: [], status: [], regions: [] });
-      map.closePopup();
+      setActivePoi(null);
       map.flyTo([poi.lat, poi.lng], 14, { duration: 1 });
       setSearchSelectedPoiId(poi.id);
     }
@@ -192,7 +196,7 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
 
   const handleSelectCity = useCallback((city) => {
     setSearchSelectedPoiId(null);
-    if (map) map.closePopup();
+    setActivePoi(null);
     setTimeout(() => {
       const poisInCity = pois.filter(p => p.city === city && p.lat && p.lng);
       fitBoundsToPois(poisInCity);
@@ -201,7 +205,7 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
 
   const handleSelectRegion = useCallback((region) => {
     setSearchSelectedPoiId(null);
-    if (map) map.closePopup();
+    setActivePoi(null);
     setFilters(prev => ({
       ...prev,
       regions: [region]
@@ -259,9 +263,43 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
           selectedPoiId={searchSelectedPoiId || selectedPoiId}
           onSelectCity={handleSelectCity}
           onSelectRegion={handleSelectRegion}
+          onSelectPoi={setActivePoi}
         />
-        
+
         <ProjectLegend />
+
+        {/* Bottom Sheet POI */}
+        {activePoi && (
+          <div className="absolute inset-0 z-[1001] pointer-events-none">
+            {/* Backdrop */}
+            <div
+              className="absolute inset-0 bg-black/20 pointer-events-auto"
+              onClick={() => setActivePoi(null)}
+            />
+            {/* Sheet */}
+            <div className="absolute bottom-0 left-0 right-0 pointer-events-auto animate-slide-up">
+              <div className="bg-white rounded-t-2xl shadow-2xl max-h-[70vh] overflow-y-auto relative">
+                {/* Drag handle */}
+                <div className="sticky top-0 z-10 bg-white rounded-t-2xl pt-2 pb-1 flex justify-center">
+                  <div className="w-10 h-1 bg-gray-300 rounded-full" />
+                </div>
+                {/* Close button */}
+                <button
+                  onClick={() => setActivePoi(null)}
+                  className="absolute top-2 right-3 z-10 w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                >
+                  <X className="w-4 h-4 text-gray-600" />
+                </button>
+                {/* Content */}
+                <ProjectPopup
+                  poi={activePoi}
+                  onSelectCity={(city) => { setActivePoi(null); handleSelectCity(city); }}
+                  onSelectRegion={(region) => { setActivePoi(null); handleSelectRegion(region); }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Loading / Error States */}
         {isLoading && (
