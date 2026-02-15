@@ -79,6 +79,26 @@ html, body {
   overflow-x: hidden;
 }
 
+/* Mobile: popup scrollable si trop grand */
+@media (max-width: 640px) {
+  .leaflet-popup-content {
+    max-height: 70vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .leaflet-popup-content::-webkit-scrollbar {
+    width: 3px;
+  }
+  .leaflet-popup-content::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 2px;
+  }
+  /* Empêcher le popup de se fermer en bloquant l'autoPan agressif */
+  .leaflet-popup-content-wrapper {
+    max-height: 75vh;
+  }
+}
+
 .leaflet-popup-tip {
   background: white;
 }

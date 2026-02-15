@@ -20,14 +20,22 @@ import useHybridLiveData from '@/hooks/useHybridLiveData';
 // Ratio voitures compactes à 100 km/h : puissance MW × 67
 const CARS_PER_MW = 67;
 
+const Divider = () => <div className="border-t border-gray-100 my-3" />;
+
 const PoiEmbedPage = () => {
   const { poiId } = useParams();
   const [poi, setPoi] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   const { data: liveData, error: liveError, loading: liveLoading } = useHybridLiveData(poiId, 5000);
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 60000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const fetchPoi = async () => {
@@ -88,7 +96,6 @@ const PoiEmbedPage = () => {
     return poi.type || 'Énergie';
   };
 
-  // Formatage de la date/année de mise en exploitation
   const commissioningDate = poi.commissioning_date
     ? new Date(poi.commissioning_date).toLocaleDateString('fr-FR', {
         year: 'numeric',
@@ -98,7 +105,6 @@ const PoiEmbedPage = () => {
     ? `${poi.commissioning_year}`
     : null;
 
-  // Calcul voitures basé sur la puissance LIVE (pas nominale)
   const getLivePowerMW = () => {
     if (liveData?.value !== null && liveData?.value !== undefined) {
       const unit = liveData.unit || 'MW';
@@ -112,12 +118,31 @@ const PoiEmbedPage = () => {
   const livePowerMW = getLivePowerMW();
   const carsCount = livePowerMW ? Math.round(livePowerMW * CARS_PER_MW) : null;
 
-  // Description avec "Lire plus/moins"
   const descriptionMaxLength = 200;
   const hasLongDescription = poi.description?.length > descriptionMaxLength;
   const descriptionDisplayed = hasLongDescription && !isDescriptionExpanded
     ? poi.description.slice(0, descriptionMaxLength) + '…'
     : poi.description;
+
+  const renderLiveValue = () => {
+    if (liveError) return <span className="text-red-500 text-base">Erreur</span>;
+    if (liveLoading) return <Loader2 className="w-6 h-6 animate-spin text-green-600" />;
+    if (liveData?.value != null)
+      return (
+        <>
+          <span className="text-2xl font-extrabold text-green-700">{liveData.value.toFixed(1)}</span>
+          <span className="text-sm text-green-500 ml-1">{liveData.unit || 'MW'}</span>
+        </>
+      );
+    if (poi.actual_power)
+      return (
+        <>
+          <span className="text-2xl font-extrabold text-green-700">{poi.actual_power}</span>
+          <span className="text-sm text-green-500 ml-1">{poi.actual_power_unit || 'MW'}</span>
+        </>
+      );
+    return <span className="text-2xl font-extrabold text-gray-300">—</span>;
+  };
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-4">
@@ -126,20 +151,9 @@ const PoiEmbedPage = () => {
           {/* Barre de couleur */}
           <div className="h-3 w-full" style={{ backgroundColor: typeColor }} />
 
-          <div className="p-8">
-            {/* Logo client en haut */}
-            {poi.poi_logo_url && (
-              <div className="flex justify-center mb-4">
-                <img
-                  src={poi.poi_logo_url}
-                  alt={poi.name}
-                  className="h-14 w-auto object-contain"
-                />
-              </div>
-            )}
-
-            {/* Badge type d'énergie */}
-            <div className="mb-3">
+          <div className="p-6 sm:p-8">
+            {/* En-tête : badge énergie (gauche) + logo client (droite) */}
+            <div className="flex items-start justify-between gap-3 mb-3">
               <span
                 className="text-sm font-bold px-3 py-1.5 rounded-lg uppercase tracking-wider text-white inline-flex items-center shadow-sm"
                 style={{ backgroundColor: typeColor }}
@@ -147,41 +161,48 @@ const PoiEmbedPage = () => {
                 {TypeIcon}
                 {getEnergyLabel()}
               </span>
+              {poi.poi_logo_url && (
+                <img
+                  src={poi.poi_logo_url}
+                  alt={poi.name}
+                  className="h-10 w-auto object-contain flex-shrink-0"
+                />
+              )}
             </div>
 
             {/* Nom du parc */}
-            <h1 className="text-3xl font-bold text-gray-900 leading-tight mb-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight mb-1">
               {poi.display_name || poi.name}
             </h1>
 
-            {/* Statut */}
-            {poi.status && (
-              <div className="flex items-center gap-2 mb-2 mt-1">
-                <span className={`text-sm px-3 py-0.5 rounded-full border font-medium ${getStatusColorClass(poi.status)} capitalize`}>
+            {/* Statut + Date inline */}
+            <div className="flex items-center gap-2 flex-wrap mb-1">
+              {poi.status && (
+                <span className={`text-xs px-2.5 py-0.5 rounded-full border font-medium ${getStatusColorClass(poi.status)} capitalize`}>
                   {poi.status}
                 </span>
-              </div>
-            )}
+              )}
+              {commissioningDate && (
+                <span className="inline-flex items-center gap-1 text-sm text-gray-400">
+                  <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
+                  {commissioningDate}
+                </span>
+              )}
+            </div>
 
-            {/* Date de mise en service */}
-            {commissioningDate && (
-              <div className="flex items-center gap-1.5 text-sm text-gray-500 mb-4">
-                <Calendar className="w-4 h-4 flex-shrink-0" />
-                <span>Mise en service : {commissioningDate}</span>
-              </div>
-            )}
+            <Divider />
 
-            {/* Ville / Agglomération — cliquables vers la carte */}
-            <div className="mb-5">
-              <div className="flex items-center text-base text-gray-600">
-                <Building className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
+            {/* Localisation */}
+            <div className="space-y-1.5 mb-1">
+              <div className="flex items-center text-base text-gray-600 gap-1.5">
+                <Building className="w-4 h-4 flex-shrink-0 text-gray-400" />
                 <span>
                   {poi.city && (
-                    <Link to={`/map?city=${encodeURIComponent(poi.city)}`} className="hover:text-indigo-600 hover:underline">
+                    <Link to={`/map?city=${encodeURIComponent(poi.city)}`} className="hover:text-indigo-600 hover:underline font-medium">
                       {poi.city}
                     </Link>
                   )}
-                  {poi.city && poi.region && ' • '}
+                  {poi.city && poi.region && ' · '}
                   {poi.region && (
                     <Link to={`/map?region=${encodeURIComponent(poi.region)}`} className="hover:text-indigo-600 hover:underline">
                       {poi.region}
@@ -191,7 +212,7 @@ const PoiEmbedPage = () => {
                 </span>
               </div>
               {poi.intercommunalites?.length > 0 && (
-                <div className="text-sm text-gray-500 mt-0.5 pl-6 flex flex-wrap gap-x-1">
+                <div className="text-sm text-gray-400 pl-5.5 truncate">
                   {poi.intercommunalites.map((interco, i) => (
                     <span key={interco}>
                       <Link to={`/map?intercommunalite=${encodeURIComponent(interco)}`} className="hover:text-indigo-600 hover:underline">
@@ -202,26 +223,12 @@ const PoiEmbedPage = () => {
                   ))}
                 </div>
               )}
-              {poi.communes?.length > 0 && (
-                <div className="flex items-center text-sm text-gray-500 mt-0.5 pl-5 flex-wrap gap-x-1">
-                  <Home className="w-3.5 h-3.5 mr-1.5 text-gray-400" />
-                  {poi.communes.map((commune, i) => (
-                    <span key={commune}>
-                      <Link to={`/map?commune=${encodeURIComponent(commune)}`} className="hover:text-indigo-600 hover:underline">
-                        {commune}
-                      </Link>
-                      {i < poi.communes.length - 1 && ', '}
-                    </span>
-                  ))}
-                </div>
-              )}
-              {/* Itinéraire */}
               {poi.latitude != null && poi.longitude != null && (
                 <a
                   href={`https://www.google.com/maps/dir/?api=1&destination=${poi.latitude},${poi.longitude}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800 hover:underline font-medium mt-1"
+                  className="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800 hover:underline font-medium pl-5"
                 >
                   <Navigation className="w-4 h-4 flex-shrink-0" />
                   Itinéraire
@@ -229,152 +236,146 @@ const PoiEmbedPage = () => {
               )}
             </div>
 
-            {/* Puissance : Capacité (gauche) | Production en temps réel + voitures (droite) */}
-            <div className="grid grid-cols-2 gap-6 mb-1">
-              {/* Capacité */}
-              <div className="bg-gray-50 rounded-lg px-4 py-3">
-                <span className="block text-sm text-gray-500 mb-1">Capacité</span>
+            <Divider />
+
+            {/* ---- CARDS DATA : grid 2 colonnes (comme le popup) ---- */}
+            <div className="grid grid-cols-2 gap-3">
+              {/* Card Capacité */}
+              <div className="bg-gray-50 rounded-xl px-4 py-3">
+                <div className="text-xs uppercase tracking-wide text-gray-400 mb-1">Capacité</div>
                 {poi.nominal_power ? (
-                  <span className="text-xl font-bold text-gray-900">
-                    {poi.nominal_power} <span className="text-base font-medium">{poi.nominal_power_unit || 'MW'}</span>
-                  </span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-2xl font-extrabold text-gray-800">{poi.nominal_power}</span>
+                    <span className="text-sm text-gray-400">{poi.nominal_power_unit || 'MW'}</span>
+                  </div>
                 ) : (
-                  <span className="text-base text-gray-400">—</span>
+                  <span className="text-2xl font-extrabold text-gray-300">—</span>
                 )}
               </div>
 
-              {/* Production en temps réel + voitures en dessous */}
-              <div className="space-y-2">
-                <div className="bg-green-50 rounded-lg px-4 py-3 border border-green-200">
-                  <div className="flex items-center gap-1.5 mb-1">
-                    <span className="text-sm text-gray-500">Production en temps réel</span>
-                    {liveData?.value != null && (
-                      <span className="relative flex h-2 w-2">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-                        <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
-                      </span>
-                    )}
-                  </div>
-                  {liveError ? (
-                    <span className="text-sm text-red-600">Erreur</span>
-                  ) : liveLoading ? (
-                    <Loader2 className="w-5 h-5 animate-spin text-green-600" />
-                  ) : liveData?.value != null ? (
-                    <span className="text-xl font-bold text-green-700">
-                      {typeof liveData.value === 'number' ? liveData.value.toFixed(1) : liveData.value}{' '}
-                      <span className="text-base font-medium">{liveData.unit || 'MW'}</span>
+              {/* Card Production live */}
+              <div className="bg-green-50 rounded-xl px-4 py-3 border border-green-200">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span className="text-xs uppercase tracking-wide text-gray-500">Temps réel</span>
+                  {liveData?.value != null && (
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
                     </span>
-                  ) : poi.actual_power ? (
-                    <span className="text-xl font-bold text-green-700">
-                      {poi.actual_power} <span className="text-base font-medium">{poi.actual_power_unit || 'MW'}</span>
-                    </span>
-                  ) : (
-                    <span className="text-base text-gray-400">—</span>
                   )}
+                  <span className="text-xs text-gray-400 ml-auto">
+                    {currentTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                  </span>
                 </div>
-
-                {carsCount != null && (
-                  <div className="flex items-center justify-center gap-1.5 text-sm bg-blue-50 rounded-lg py-2 border border-blue-100 text-blue-700">
-                    <Car className="w-5 h-5 flex-shrink-0" />
-                    <span>= <strong>{carsCount.toLocaleString('fr-FR')}</strong> voitures roulant a 100 km/h</span>
-                    <span className="text-[10px] text-blue-400 block">(consommation d'electricite)</span>
-                  </div>
-                )}
+                <div className="flex items-baseline gap-0.5">
+                  {renderLiveValue()}
+                </div>
               </div>
             </div>
 
-            {/* Foyers alimentés */}
-            {poi.households_equivalent && (
-              <div className="flex items-center justify-center gap-1.5 text-sm bg-amber-50 rounded-lg py-2 border border-amber-100 text-amber-700 mt-2">
-                <Home className="w-5 h-5 flex-shrink-0" />
-                <span>≈ <strong>{poi.households_equivalent.toLocaleString('fr-FR')}</strong> foyers</span>
+            {/* Cards équivalences : foyers (gauche) + voitures (droite, sous temps réel) */}
+            {(carsCount != null || poi.households_equivalent) && (
+              <div className="grid grid-cols-2 gap-3 mt-3">
+                {poi.households_equivalent && (
+                  <div className="bg-amber-50 rounded-xl px-4 py-3 border border-amber-100 text-center">
+                    <Home className="w-5 h-5 text-amber-500 mx-auto mb-1" />
+                    <div className="text-lg font-bold text-amber-700">{poi.households_equivalent.toLocaleString('fr-FR')}</div>
+                    <div className="text-xs text-amber-400">foyers</div>
+                  </div>
+                )}
+                {carsCount != null && (
+                  <div className={`bg-blue-50 rounded-xl px-4 py-3 border border-blue-100 text-center${poi.households_equivalent ? '' : ' col-start-2'}`}>
+                    <Car className="w-5 h-5 text-blue-500 mx-auto mb-1" />
+                    <div className="text-lg font-bold text-blue-700">= {carsCount.toLocaleString('fr-FR')}</div>
+                    <div className="text-xs text-blue-400">voitures roulant</div>
+                    <div className="text-[10px] text-blue-300">a 100 km/h (conso. elec.)</div>
+                  </div>
+                )}
               </div>
             )}
 
             {/* Production annuelle */}
             {poi.annual_production_mwh && (
-              <div className="border-t border-gray-100 pt-4 mt-3">
-                <div className="flex items-center gap-2 text-sm text-gray-700">
-                  <Zap className="w-4 h-4 flex-shrink-0 text-indigo-500" />
-                  <span>Productible annuel : <strong>{poi.annual_production_mwh.toLocaleString('fr-FR')} MWh/an</strong></span>
-                </div>
+              <div className="bg-indigo-50 rounded-xl px-4 py-3 border border-indigo-100 text-center mt-3">
+                <Zap className="w-5 h-5 text-indigo-500 mx-auto mb-1" />
+                <div className="text-lg font-bold text-indigo-700">{poi.annual_production_mwh.toLocaleString('fr-FR')}</div>
+                <div className="text-xs text-indigo-400">MWh/an</div>
               </div>
             )}
 
             {/* Description */}
             {poi.description && (
-              <div className="border-t border-b border-gray-100 py-4 mb-4 mt-3">
-                <p className="text-base text-gray-600 leading-relaxed">
-                  {descriptionDisplayed}
-                </p>
-                {hasLongDescription && (
-                  <button
-                    onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                    className="text-sm text-indigo-600 hover:text-indigo-800 hover:underline mt-2 font-medium"
-                  >
-                    {isDescriptionExpanded ? 'Lire moins' : 'Lire plus'}
-                  </button>
-                )}
-              </div>
+              <>
+                <Divider />
+                <div>
+                  <p className="text-base text-gray-600 leading-relaxed">
+                    {descriptionDisplayed}
+                  </p>
+                  {hasLongDescription && (
+                    <button
+                      onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                      className="text-sm text-indigo-600 hover:text-indigo-800 hover:underline mt-2 font-medium"
+                    >
+                      {isDescriptionExpanded ? 'Lire moins' : 'Lire plus'}
+                    </button>
+                  )}
+                </div>
+              </>
             )}
+
+            <Divider />
 
             {/* Lien site web */}
             {poi.project_url && (
-              <div className="mb-4">
-                <a
-                  href={poi.project_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center text-base text-indigo-600 hover:text-indigo-800 font-medium"
-                >
-                  <ExternalLink className="w-5 h-5 mr-2" />
-                  Voir le site web
-                </a>
-              </div>
+              <a
+                href={poi.project_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-base text-indigo-600 hover:text-indigo-800 font-medium mb-3"
+              >
+                <ExternalLink className="w-4 h-4" />
+                Site web
+              </a>
             )}
 
             {/* Signalement (mail + micro) */}
             {(poi.show_email_report !== false || poi.show_voice_report !== false) && (
-              <div className="border-t border-gray-100 pt-4 mt-3">
-                <div className="flex items-center gap-3 text-base text-gray-600">
-                  <span className="text-gray-500">Signalement ?</span>
-                  {poi.show_email_report !== false && (
-                    <a
-                      href={`mailto:${poi.contact_email || 'contact@quelia.fr'}`}
-                      className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 transition-colors"
-                      title="Par email"
-                    >
-                      <Mail className="w-6 h-6" />
-                    </a>
-                  )}
-                  {poi.show_voice_report !== false && (
-                    <a
-                      href={poi.voice_report_url || "https://app.ekoo.co/capture"}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 transition-colors"
-                      title="Par vocal"
-                    >
-                      <Mic className="w-6 h-6" />
-                    </a>
-                  )}
-                </div>
+              <div className="flex items-center gap-3 text-base text-gray-600 mb-3">
+                <span className="text-gray-500">Signalement ?</span>
+                {poi.show_email_report !== false && (
+                  <a
+                    href={`mailto:${poi.contact_email || 'contact@quelia.fr'}`}
+                    className="text-indigo-600 hover:text-indigo-800 transition-colors"
+                    title="Par email"
+                  >
+                    <Mail className="w-6 h-6" />
+                  </a>
+                )}
+                {poi.show_voice_report !== false && (
+                  <a
+                    href={poi.voice_report_url || "https://app.ekoo.co/capture"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-indigo-600 hover:text-indigo-800 transition-colors"
+                    title="Par vocal"
+                  >
+                    <Mic className="w-6 h-6" />
+                  </a>
+                )}
               </div>
             )}
 
-            {/* Newsletter — séparée du signalement */}
+            {/* Newsletter */}
             {poi.show_newsletter !== false && (
-              <div className="mt-3">
-                <a
-                  href={poi.newsletter_url || "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-base text-indigo-600 hover:text-indigo-800 transition-colors"
-                >
-                  <Info className="w-6 h-6 flex-shrink-0" />
-                  <span>L'actu du parc par email</span>
-                </a>
-              </div>
+              <a
+                href={poi.newsletter_url || "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-base text-indigo-600 hover:text-indigo-800 transition-colors mb-3"
+              >
+                <Info className="w-6 h-6 flex-shrink-0" />
+                <span>L'actu du parc par email</span>
+              </a>
             )}
 
             {/* Propulsé par Quelia */}
@@ -382,7 +383,7 @@ const PoiEmbedPage = () => {
               href="https://quelia.fr"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center text-sm text-gray-400 hover:text-indigo-500 transition-colors pt-3 mt-3 border-t border-gray-100"
+              className="flex items-center justify-center text-sm text-gray-400 hover:text-indigo-500 transition-colors pt-3 mt-1 border-t border-gray-100"
             >
               Propulsé par <span className="font-semibold ml-1 text-gray-600">Quelia</span>
             </a>
