@@ -314,18 +314,20 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
             />
             {/* Sheet */}
             <div className="absolute bottom-0 left-0 right-0 pointer-events-auto animate-slide-up">
-              <div className="bg-white rounded-t-2xl shadow-2xl max-h-[70vh] overflow-y-auto relative">
-                {/* Drag handle */}
-                <div className="sticky top-0 z-10 bg-white rounded-t-2xl pt-2 pb-1 flex justify-center">
+              <div className="bg-white rounded-t-2xl shadow-2xl max-h-[70vh] overflow-y-auto">
+                {/* Drag handle + close */}
+                <div className="sticky top-0 z-10 bg-white rounded-t-2xl pt-2 pb-1 px-3 flex items-center">
+                  <div className="flex-1" />
                   <div className="w-10 h-1 bg-gray-300 rounded-full" />
+                  <div className="flex-1 flex justify-end">
+                    <button
+                      onClick={() => setActivePoi(null)}
+                      className="w-6 h-6 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
-                {/* Close button */}
-                <button
-                  onClick={() => setActivePoi(null)}
-                  className="absolute top-2 right-3 z-10 w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-                >
-                  <X className="w-4 h-4 text-gray-600" />
-                </button>
                 {/* Content */}
                 <ProjectPopup
                   poi={activePoi}
