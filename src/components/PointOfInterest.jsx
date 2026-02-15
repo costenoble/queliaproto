@@ -1,30 +1,48 @@
 
 import React, { useRef, useEffect } from 'react';
-import { Marker, Popup } from 'react-leaflet';
+import { Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { getMarkerColor, getMarkerIconSvg } from '@/utils/mapUtils.jsx';
 import ProjectPopup from '@/components/ProjectPopup.jsx';
 
 const PointOfInterest = ({ poi, isSelected = false, onSelectCity, onSelectRegion }) => {
   const markerRef = useRef(null);
+  const map = useMap();
 
   useEffect(() => {
     if (isSelected && markerRef.current) {
-      // Delay to ensure the map has finished flying to the location
       setTimeout(() => {
         markerRef.current.openPopup();
       }, 1500);
     }
   }, [isSelected]);
 
+  // Au clic sur le marker : centrer la carte d'abord, puis ouvrir le popup
+  const handleClick = () => {
+    if (!markerRef.current) return;
+    const marker = markerRef.current;
+    const latlng = marker.getLatLng();
+
+    // Centrer la carte sur le marker avec un offset vers le bas
+    // pour que le popup (au-dessus) soit bien visible
+    const point = map.latLngToContainerPoint(latlng);
+    const offsetPoint = L.point(point.x, point.y + 120);
+    const offsetLatLng = map.containerPointToLatLng(offsetPoint);
+
+    map.panTo(offsetLatLng, { animate: true, duration: 0.3 });
+
+    // Ouvrir le popup après le pan
+    setTimeout(() => {
+      marker.openPopup();
+    }, 350);
+  };
+
   if (!poi || !poi.lat || !poi.lng) return null;
 
-  // Use energy_category for color/icon, fallback to legacy type
   const energyType = poi.energy_category || poi.type;
   const color = getMarkerColor(energyType);
   const svgIcon = getMarkerIconSvg(energyType, 'white');
 
-  // Create a custom DivIcon that mimics the previous CSS styling
   const customIcon = L.divIcon({
     className: 'custom-poi-marker',
     html: `
@@ -49,15 +67,17 @@ const PointOfInterest = ({ poi, isSelected = false, onSelectCity, onSelectRegion
   });
 
   return (
-    <Marker ref={markerRef} position={[poi.lat, poi.lng]} icon={customIcon}>
+    <Marker
+      ref={markerRef}
+      position={[poi.lat, poi.lng]}
+      icon={customIcon}
+      eventHandlers={{ click: handleClick }}
+    >
       <Popup
         className="project-popup-wrapper"
         maxWidth={320}
         closeButton={true}
-        autoPan={true}
-        keepInView={true}
-        autoPanPadding={[10, 10]}
-        autoPanPaddingTopLeft={[10, 60]}
+        autoPan={false}
       >
         <ProjectPopup poi={poi} onSelectCity={onSelectCity} onSelectRegion={onSelectRegion} />
       </Popup>
