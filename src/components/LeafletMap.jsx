@@ -104,7 +104,7 @@ const LeafletMap = ({ center, zoom, onMapLoad, pois = [], selectedPoiId = null, 
         zoom={mapZoom}
         style={{ height: '100%', width: '100%', zIndex: 0 }}
         scrollWheelZoom={true}
-        closePopupOnClick={true}
+        closePopupOnClick={false}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -121,7 +121,7 @@ const LeafletMap = ({ center, zoom, onMapLoad, pois = [], selectedPoiId = null, 
           showCoverageOnHover={false}
         >
           {pois.map((poi) => (
-            <PointOfInterest key={poi.id} poi={poi} isSelected={poi.id === selectedPoiId} onSelectPoi={onSelectPoi} />
+            <PointOfInterest key={poi.id} poi={poi} isSelected={poi.id === selectedPoiId} onSelectPoi={onSelectPoi} onSelectCity={onSelectCity} onSelectRegion={onSelectRegion} />
           ))}
         </MarkerClusterGroup>
       </MapContainer>

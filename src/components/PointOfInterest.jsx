@@ -1,19 +1,27 @@
 
 import { useRef, useEffect } from 'react';
-import { Marker } from 'react-leaflet';
+import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { getMarkerColor, getMarkerIconSvg } from '@/utils/mapUtils.jsx';
+import ProjectPopup from '@/components/ProjectPopup.jsx';
 
-const PointOfInterest = ({ poi, isSelected = false, onSelectPoi }) => {
+const MOBILE_BREAKPOINT = 768;
+
+const PointOfInterest = ({ poi, isSelected = false, onSelectPoi, onSelectCity, onSelectRegion }) => {
   const markerRef = useRef(null);
 
+  const isMobile = () => window.innerWidth < MOBILE_BREAKPOINT;
+
   useEffect(() => {
-    if (isSelected && onSelectPoi) {
-      // Delay pour laisser le flyTo se terminer
-      setTimeout(() => {
-        onSelectPoi(poi);
-      }, 1500);
-    }
+    if (!isSelected) return;
+    // Delay pour laisser le flyTo se terminer
+    setTimeout(() => {
+      if (isMobile()) {
+        onSelectPoi?.(poi);
+      } else if (markerRef.current) {
+        markerRef.current.openPopup();
+      }
+    }, 1500);
   }, [isSelected]);
 
   if (!poi || !poi.lat || !poi.lng) return null;
@@ -46,7 +54,11 @@ const PointOfInterest = ({ poi, isSelected = false, onSelectPoi }) => {
   });
 
   const handleClick = () => {
-    onSelectPoi?.(poi);
+    if (isMobile()) {
+      // Mobile : bottom sheet via MapContainer
+      onSelectPoi?.(poi);
+    }
+    // Desktop : le Popup Leaflet s'ouvre naturellement
   };
 
   return (
@@ -55,7 +67,15 @@ const PointOfInterest = ({ poi, isSelected = false, onSelectPoi }) => {
       position={[poi.lat, poi.lng]}
       icon={customIcon}
       eventHandlers={{ click: handleClick }}
-    />
+    >
+      <Popup
+        className="project-popup-wrapper"
+        maxWidth={320}
+        closeButton={true}
+      >
+        <ProjectPopup poi={poi} onSelectCity={onSelectCity} onSelectRegion={onSelectRegion} />
+      </Popup>
+    </Marker>
   );
 };
 
