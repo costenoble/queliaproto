@@ -389,20 +389,6 @@ const PoiEmbedPage = () => {
             </a>
           </div>
 
-          {/* Footer with client branding */}
-          {poi.client && (
-            <div className="bg-gray-50 px-8 py-4 border-t border-gray-100 flex items-center justify-between">
-              {poi.client.logo_url ? (
-                <img
-                  src={poi.client.logo_url}
-                  alt={poi.client.name}
-                  className="h-8 w-auto object-contain"
-                />
-              ) : (
-                <span className="text-sm font-medium text-gray-600">{poi.client.name}</span>
-              )}
-            </div>
-          )}
         </div>
       </div>
     </div>
