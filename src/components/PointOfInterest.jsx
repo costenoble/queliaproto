@@ -55,8 +55,9 @@ const PointOfInterest = ({ poi, isSelected = false, onSelectPoi, onSelectCity, o
 
   const handleClick = () => {
     if (isMobile()) {
-      // Mobile : bottom sheet via MapContainer
+      // Mobile : bottom sheet via MapContainer, fermer le popup Leaflet
       onSelectPoi?.(poi);
+      setTimeout(() => markerRef.current?.closePopup(), 0);
     }
     // Desktop : le Popup Leaflet s'ouvre naturellement
   };
