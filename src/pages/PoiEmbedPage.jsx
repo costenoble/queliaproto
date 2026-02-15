@@ -349,7 +349,7 @@ const PoiEmbedPage = () => {
                   )}
                   {poi.show_voice_report !== false && (
                     <a
-                      href="https://app.ekoo.co/capture"
+                      href={poi.voice_report_url || "https://app.ekoo.co/capture"}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 transition-colors"
@@ -366,7 +366,7 @@ const PoiEmbedPage = () => {
             {poi.show_newsletter !== false && (
               <div className="mt-3">
                 <a
-                  href="https://5e8e3e74.sibforms.com/serve/MUIFALMeowQ2_u9o7ZKghaSGt2q9gF_F-AO4Y5fae_qGmH8pdDoAqnohFKAnKsmwVbOMFr09VMIFCHrBqsmEuCNMltlAMGRhPBovsl2K6RkzPGoF94tkDj5p-hVijehAvVKums-TslaUnqRPKSwbNIC7EpxzK8oasGbFwNJQqKXPc-3wqQz4wUUz9Uj-SN6d4Eod8ROpEMl6jdaI"
+                  href={poi.newsletter_url || "#"}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-base text-indigo-600 hover:text-indigo-800 transition-colors"

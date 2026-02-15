@@ -29,6 +29,12 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion }) => {
     useHybridLiveData(poi?.id, 5000);
 
   const [isDescriptionExpanded, setIsDescriptionExpanded] = React.useState(false);
+  const [currentTime, setCurrentTime] = React.useState(new Date());
+
+  React.useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 60000);
+    return () => clearInterval(timer);
+  }, []);
 
   if (!poi) return null;
 
@@ -197,7 +203,7 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion }) => {
         {/* ---- CARDS DATA : grid 2 colonnes ---- */}
         <div className="grid grid-cols-2 gap-2 min-w-0">
           {/* Card Capacité */}
-          <div className="bg-gray-50 rounded-lg px-3 py-2.5 min-w-0">
+          <div className="bg-gray-50 rounded-xl px-3 py-2.5 min-w-0">
             <div className="text-[10px] uppercase tracking-wide text-gray-400 mb-1">Capacité</div>
             {poi.nominal_power ? (
               <div className="flex items-baseline gap-0.5">
@@ -210,7 +216,7 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion }) => {
           </div>
 
           {/* Card Production live */}
-          <div className="bg-green-50 rounded-lg px-3 py-2.5 border border-green-200 min-w-0">
+          <div className="bg-green-50 rounded-xl px-3 py-2.5 border border-green-200 min-w-0">
             <div className="flex items-center gap-1 mb-1">
               <span className="text-[10px] uppercase tracking-wide text-gray-500">Temps réel</span>
               {liveData?.value != null && (
@@ -219,6 +225,9 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion }) => {
                   <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-green-500" />
                 </span>
               )}
+              <span className="text-[10px] text-gray-400 ml-auto">
+                {currentTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+              </span>
             </div>
             <div className="flex items-baseline gap-0.5">
               {renderLiveValue()}
@@ -226,22 +235,22 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion }) => {
           </div>
         </div>
 
-        {/* ---- Cards équivalences : voitures + foyers côte à côte ---- */}
+        {/* ---- Cards équivalences : foyers (gauche) + voitures (droite, sous temps réel) ---- */}
         {(carsCount != null || poi.households_equivalent) && (
           <div className="grid grid-cols-2 gap-2 min-w-0">
+            {poi.households_equivalent && (
+              <div className="bg-amber-50 rounded-xl px-3 py-2 border border-amber-100 min-w-0 text-center">
+                <Home className="w-4 h-4 text-amber-500 mx-auto mb-0.5" />
+                <div className="text-sm font-bold text-amber-700">{poi.households_equivalent.toLocaleString('fr-FR')}</div>
+                <div className="text-[9px] text-amber-400">foyers</div>
+              </div>
+            )}
             {carsCount != null && (
-              <div className="bg-blue-50 rounded-lg px-3 py-2 border border-blue-100 min-w-0 text-center">
+              <div className={`bg-blue-50 rounded-xl px-3 py-2 border border-blue-100 min-w-0 text-center${poi.households_equivalent ? '' : ' col-start-2'}`}>
                 <Car className="w-4 h-4 text-blue-500 mx-auto mb-0.5" />
                 <div className="text-sm font-bold text-blue-700">= {carsCount.toLocaleString('fr-FR')}</div>
                 <div className="text-[9px] text-blue-400">voitures roulant</div>
                 <div className="text-[8px] text-blue-300">a 100 km/h (conso. elec.)</div>
-              </div>
-            )}
-            {poi.households_equivalent && (
-              <div className="bg-amber-50 rounded-lg px-3 py-2 border border-amber-100 min-w-0 text-center">
-                <Home className="w-4 h-4 text-amber-500 mx-auto mb-0.5" />
-                <div className="text-sm font-bold text-amber-700">{poi.households_equivalent.toLocaleString('fr-FR')}</div>
-                <div className="text-[9px] text-amber-400">foyers</div>
               </div>
             )}
           </div>
@@ -249,7 +258,7 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion }) => {
 
         {/* ---- Production annuelle ---- */}
         {poi.annual_production_mwh && (
-          <div className="bg-indigo-50 rounded-lg px-3 py-2 border border-indigo-100 min-w-0 text-center">
+          <div className="bg-indigo-50 rounded-xl px-3 py-2 border border-indigo-100 min-w-0 text-center">
             <Zap className="w-4 h-4 text-indigo-500 mx-auto mb-0.5" />
             <div className="text-sm font-bold text-indigo-700">{poi.annual_production_mwh.toLocaleString('fr-FR')}</div>
             <div className="text-[9px] text-indigo-400">MWh/an</div>
@@ -301,7 +310,7 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion }) => {
             )}
             {poi.show_voice_report !== false && (
               <a
-                href="https://app.ekoo.co/capture"
+                href={poi.voice_report_url || "https://app.ekoo.co/capture"}
                 target="_blank"
                 rel="noopener noreferrer"
                 title="Par vocal"
@@ -315,7 +324,7 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion }) => {
         {/* Newsletter — séparée du signalement */}
         {poi.show_newsletter !== false && (
           <a
-            href="https://5e8e3e74.sibforms.com/serve/MUIFALMeowQ2_u9o7ZKghaSGt2q9gF_F-AO4Y5fae_qGmH8pdDoAqnohFKAnKsmwVbOMFr09VMIFCHrBqsmEuCNMltlAMGRhPBovsl2K6RkzPGoF94tkDj5p-hVijehAvVKums-TslaUnqRPKSwbNIC7EpxzK8oasGbFwNJQqKXPc-3wqQz4wUUz9Uj-SN6d4Eod8ROpEMl6jdaI"
+            href={poi.newsletter_url || "#"}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 text-xs text-indigo-600 hover:text-indigo-800"

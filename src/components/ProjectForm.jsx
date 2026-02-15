@@ -137,7 +137,10 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
     // Display options
     showEmailReport: true,
     showVoiceReport: true,
-    showNewsletter: true
+    showNewsletter: true,
+    // URLs personnalisables
+    voiceReportUrl: '',
+    newsletterUrl: ''
   });
 
   // Map position state
@@ -178,7 +181,9 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
         projectUrl: project.project_url || '',
         showEmailReport: project.show_email_report !== false,
         showVoiceReport: project.show_voice_report !== false,
-        showNewsletter: project.show_newsletter !== false
+        showNewsletter: project.show_newsletter !== false,
+        voiceReportUrl: project.voice_report_url || '',
+        newsletterUrl: project.newsletter_url || ''
       });
       if (project.latitude && project.longitude) {
         setMapPosition({ lat: project.latitude, lng: project.longitude });
@@ -325,6 +330,8 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
         show_email_report: formData.showEmailReport,
         show_voice_report: formData.showVoiceReport,
         show_newsletter: formData.showNewsletter,
+        voice_report_url: formData.voiceReportUrl || null,
+        newsletter_url: formData.newsletterUrl || null,
         client_id: finalClientId,
         updated_at: new Date()
       };
@@ -866,6 +873,19 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
                 <Mic className="w-4 h-4 text-gray-500" />
                 <span className="text-sm text-gray-700">Signalement vocal</span>
               </label>
+              {formData.showVoiceReport && (
+                <div className="pl-11">
+                  <input
+                    type="url"
+                    name="voiceReportUrl"
+                    value={formData.voiceReportUrl}
+                    onChange={handleChange}
+                    className={inputClass}
+                    placeholder="https://app.ekoo.co/capture (par défaut)"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">Lien vers le service de signalement vocal</p>
+                </div>
+              )}
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
@@ -876,6 +896,19 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
                 <Info className="w-4 h-4 text-gray-500" />
                 <span className="text-sm text-gray-700">Newsletter / Actu du parc</span>
               </label>
+              {formData.showNewsletter && (
+                <div className="pl-11">
+                  <input
+                    type="url"
+                    name="newsletterUrl"
+                    value={formData.newsletterUrl}
+                    onChange={handleChange}
+                    className={inputClass}
+                    placeholder="https://... (lien d'inscription newsletter)"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">Lien vers le formulaire d'inscription newsletter</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
