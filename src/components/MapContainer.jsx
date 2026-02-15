@@ -7,7 +7,7 @@ import ProjectFilter from '@/components/ProjectFilter.jsx';
 import MapSearchBar from '@/components/MapSearchBar.jsx';
 import { parsePOIData } from '@/utils/mapUtils.jsx';
 import ProjectPopup from '@/components/ProjectPopup.jsx';
-import { AlertCircle, Maximize2, Minimize2, X } from 'lucide-react';
+import { AlertCircle, Filter, Maximize2, Minimize2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button.jsx';
 import { supabase } from '@/lib/customSupabaseClient';
 import mockData from '@/data/mockPOIData.json';
@@ -216,15 +216,23 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
     }, 300);
   }, [map, pois, fitBoundsToPois]);
 
+  // Mobile filter drawer state (lifted from ProjectFilter for mobile floating button)
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+
+  const hasActiveFilters =
+    (filters.types?.length > 0) ||
+    (filters.status?.length > 0) ||
+    (filters.regions?.length > 0);
+
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
   };
 
   return (
-    <div className={`relative w-full transition-all duration-300 ${isFullscreen ? 'fixed inset-0 z-[100] bg-white' : 'h-full flex flex-col md:flex-row gap-4 p-4 md:max-h-[calc(100vh-80px)]'}`}>
-      
-      {/* Filters */}
-      <div className={`${isFullscreen ? 'absolute left-4 top-4 z-[101] max-w-xs' : 'w-full md:w-1/4 h-auto md:h-full z-10'}`}>
+    <div className={`relative w-full transition-all duration-300 ${isFullscreen ? 'fixed inset-0 z-[100] bg-white' : 'h-full flex flex-col md:flex-row md:gap-4 md:p-4 md:max-h-[calc(100vh-80px)]'}`}>
+
+      {/* Filters — desktop sidebar only */}
+      <div className={`hidden ${isFullscreen ? 'md:block absolute left-4 top-4 z-[101] max-w-xs' : 'md:block md:w-1/4 md:h-full z-10'}`}>
         <ProjectFilter
           filters={filters}
           onFilterChange={setFilters}
@@ -234,7 +242,35 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
       </div>
 
       {/* Map Area */}
-      <div className={`main-map w-full relative rounded-xl overflow-hidden shadow-md border border-gray-200 ${isFullscreen ? 'h-full rounded-none border-0' : 'md:w-3/4 md:flex-1 h-[600px] md:h-auto min-h-[500px]'}`}>
+      <div className={`main-map w-full relative overflow-hidden shadow-md border-gray-200 ${isFullscreen ? 'h-full border-0' : 'md:w-3/4 md:flex-1 h-[calc(100vh-64px)] md:h-auto min-h-[500px] md:rounded-xl md:border'}`}>
+
+        {/* Mobile: floating filter pill */}
+        <button
+          onClick={() => setIsMobileFilterOpen(true)}
+          className="md:hidden absolute top-3 left-3 z-[1001] flex items-center gap-1.5 bg-white/95 backdrop-blur-sm shadow-lg rounded-full px-3 py-2 border border-gray-200 text-sm font-medium text-gray-700 active:scale-95 transition-transform"
+        >
+          <Filter className="w-4 h-4 text-indigo-600" />
+          Filtres
+          {hasActiveFilters && (
+            <span className="bg-indigo-600 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+              {(filters.types?.length || 0) + (filters.status?.length || 0) + (filters.regions?.length || 0)}
+            </span>
+          )}
+        </button>
+
+        {/* Mobile: filter drawer */}
+        {isMobileFilterOpen && (
+          <div className="md:hidden fixed inset-0 z-[1002]">
+            <ProjectFilter
+              filters={filters}
+              onFilterChange={setFilters}
+              resultCount={filteredPois.length}
+              regions={availableRegions}
+              mobileOpen={true}
+              onMobileClose={() => setIsMobileFilterOpen(false)}
+            />
+          </div>
+        )}
 
         {/* Search Bar */}
         <MapSearchBar

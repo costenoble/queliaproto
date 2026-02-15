@@ -5,14 +5,14 @@ import { ChevronDown, ChevronUp, Wind, Sun, Factory, Users, Droplet, CircleDot }
 import { Button } from '@/components/ui/button.jsx';
 
 const LegendItem = ({ color, label, icon: Icon }) => (
-  <div className="flex items-center space-x-2 mb-2 last:mb-0">
+  <div className="flex items-center space-x-1.5 md:space-x-2 mb-1.5 md:mb-2 last:mb-0">
     <div
-      className="w-8 h-8 rounded-full flex items-center justify-center border-2 border-white shadow-sm flex-shrink-0"
+      className="w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center border-2 border-white shadow-sm flex-shrink-0"
       style={{ backgroundColor: color }}
     >
-      <Icon className="w-4 h-4 text-white" />
+      <Icon className="w-3 h-3 md:w-4 md:h-4 text-white" />
     </div>
-    <span className="text-sm text-gray-700 font-medium">{label}</span>
+    <span className="text-xs md:text-sm text-gray-700 font-medium">{label}</span>
   </div>
 );
 
@@ -29,13 +29,13 @@ const ProjectLegend = () => {
   };
 
   return (
-    <div className="absolute bottom-8 right-4 z-10 max-w-[200px] w-full">
+    <div className="absolute bottom-8 right-2 md:right-4 z-10 max-w-[180px] md:max-w-[200px] w-full">
       <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 overflow-hidden">
         <div
-          className="flex items-center justify-between p-3 bg-gray-50 border-b border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors"
+          className="flex items-center justify-between p-2 md:p-3 bg-gray-50 border-b border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors"
           onClick={() => setIsOpen(!isOpen)}
         >
-          <h4 className="text-sm font-bold text-gray-900">Légende</h4>
+          <h4 className="text-xs md:text-sm font-bold text-gray-900">Légende</h4>
           <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-gray-200">
             {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
           </Button>

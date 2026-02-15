@@ -4,8 +4,12 @@ import { Filter, Check, RotateCcw, ChevronDown, ChevronUp, Zap, Activity, X, Glo
 import { Button } from '@/components/ui/button.jsx';
 import { getMarkerColor, ENERGY_CATEGORIES } from '@/utils/mapUtils.jsx';
 
-const ProjectFilter = ({ filters, onFilterChange, resultCount, regions = [] }) => {
+const ProjectFilter = ({ filters, onFilterChange, resultCount, regions = [], mobileOpen = false, onMobileClose }) => {
   const [isOpenMobile, setIsOpenMobile] = useState(false);
+
+  // Si mobileOpen est contrôlé depuis le parent, on l'utilise
+  const isMobileDrawerOpen = onMobileClose ? mobileOpen : isOpenMobile;
+  const closeMobileDrawer = onMobileClose || (() => setIsOpenMobile(false));
 
   const [collapsedSections, setCollapsedSections] = useState({
     types: false,
@@ -221,29 +225,31 @@ const ProjectFilter = ({ filters, onFilterChange, resultCount, regions = [] }) =
 
   return (
     <>
-      {/* Mobile Toggle Button */}
-      <div className="md:hidden mb-4">
-        <Button 
-          onClick={() => setIsOpenMobile(true)} 
-          className="w-full bg-white text-gray-800 border border-gray-300 shadow-sm hover:bg-gray-50 flex justify-between items-center py-6"
-        >
-          <span className="flex items-center text-base">
-            <Filter className="w-5 h-5 mr-2 text-indigo-600" />
-            Filtres ({resultCount} résultats)
-          </span>
-          <ChevronDown className="w-5 h-5" />
-        </Button>
-      </div>
+      {/* Mobile Toggle Button — only shown when NOT controlled by parent */}
+      {!onMobileClose && (
+        <div className="md:hidden mb-4">
+          <Button
+            onClick={() => setIsOpenMobile(true)}
+            className="w-full bg-white text-gray-800 border border-gray-300 shadow-sm hover:bg-gray-50 flex justify-between items-center py-6"
+          >
+            <span className="flex items-center text-base">
+              <Filter className="w-5 h-5 mr-2 text-indigo-600" />
+              Filtres ({resultCount} résultats)
+            </span>
+            <ChevronDown className="w-5 h-5" />
+          </Button>
+        </div>
+      )}
 
       {/* Mobile Drawer */}
-      {isOpenMobile && (
+      {isMobileDrawerOpen && (
         <div className="fixed inset-0 z-[1001] md:hidden">
           {/* Backdrop */}
-          <div 
+          <div
             className="absolute inset-0 bg-black bg-opacity-50"
-            onClick={() => setIsOpenMobile(false)}
+            onClick={closeMobileDrawer}
           ></div>
-          
+
           {/* Drawer Content */}
           <div className="absolute inset-y-0 right-0 w-full max-w-xs bg-white shadow-xl flex flex-col h-full animate-in slide-in-from-right duration-200">
             <div className="flex items-center justify-between p-4 border-b border-gray-100">
@@ -251,14 +257,14 @@ const ProjectFilter = ({ filters, onFilterChange, resultCount, regions = [] }) =
                 <Filter className="w-5 h-5 mr-2 text-indigo-600" />
                 Filtres
               </h2>
-              <button 
-                onClick={() => setIsOpenMobile(false)}
+              <button
+                onClick={closeMobileDrawer}
                 className="p-2 -mr-2 text-gray-400 hover:text-gray-600 min-w-[44px] min-h-[44px]"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
-            
+
             <div className="flex-1 overflow-y-auto p-4">
               {renderFilterContent()}
             </div>
@@ -266,8 +272,8 @@ const ProjectFilter = ({ filters, onFilterChange, resultCount, regions = [] }) =
             <div className="p-4 border-t border-gray-100 bg-gray-50">
               <div className="flex gap-3">
                  {hasActiveFilters && (
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       onClick={resetFilters}
                       className="flex-1 text-red-600 border-red-200 hover:bg-red-50 min-h-[44px]"
                     >
@@ -275,9 +281,9 @@ const ProjectFilter = ({ filters, onFilterChange, resultCount, regions = [] }) =
                       Réinitialiser
                     </Button>
                   )}
-                  <Button 
+                  <Button
                     className="flex-1 min-h-[44px]"
-                    onClick={() => setIsOpenMobile(false)}
+                    onClick={closeMobileDrawer}
                   >
                     Voir {resultCount} sites
                   </Button>

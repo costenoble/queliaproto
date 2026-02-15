@@ -64,7 +64,7 @@ const MapSearchBar = ({ pois, onSelectProject, onSelectCity, onSelectRegion }) =
   };
 
   return (
-    <div ref={containerRef} className="absolute top-3 left-1/2 -translate-x-1/2 z-[1001] w-[90%] max-w-md">
+    <div ref={containerRef} className="absolute top-3 left-[120px] right-3 md:left-1/2 md:right-auto md:-translate-x-1/2 z-[1001] md:w-[90%] max-w-md">
       {/* Input */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
