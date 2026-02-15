@@ -55,8 +55,9 @@ const PointOfInterest = ({ poi, isSelected = false, onSelectCity, onSelectRegion
         maxWidth={320}
         closeButton={true}
         autoPan={true}
-        autoPanPadding={[20, 20]}
-        autoPanPaddingTopLeft={[20, 80]}
+        keepInView={true}
+        autoPanPadding={[10, 10]}
+        autoPanPaddingTopLeft={[10, 60]}
       >
         <ProjectPopup poi={poi} onSelectCity={onSelectCity} onSelectRegion={onSelectRegion} />
       </Popup>

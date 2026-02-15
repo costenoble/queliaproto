@@ -104,6 +104,7 @@ const LeafletMap = ({ center, zoom, onMapLoad, pois = [], selectedPoiId = null, 
         zoom={mapZoom}
         style={{ height: '100%', width: '100%', zIndex: 0 }}
         scrollWheelZoom={true}
+        closePopupOnClick={false}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
