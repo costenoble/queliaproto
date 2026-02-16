@@ -54,7 +54,7 @@ const MapRefSetter = ({ mapRef, onMapLoad }) => {
   return null;
 };
 
-const LeafletMap = ({ center, zoom, onMapLoad, pois = [], selectedPoiId = null, onSelectCity, onSelectRegion, onSelectPoi }) => {
+const LeafletMap = ({ center, zoom, onMapLoad, pois = [], selectedPoiId = null, onSelectCity, onSelectRegion, onSelectIntercommunalite, onSelectPoi }) => {
   const mapRef = useRef(null);
   const [geoLoading, setGeoLoading] = useState(false);
   const [geoError, setGeoError] = useState(false);
@@ -122,7 +122,7 @@ const LeafletMap = ({ center, zoom, onMapLoad, pois = [], selectedPoiId = null, 
           showCoverageOnHover={false}
         >
           {pois.map((poi) => (
-            <PointOfInterest key={poi.id} poi={poi} isSelected={poi.id === selectedPoiId} onSelectPoi={onSelectPoi} onSelectCity={onSelectCity} onSelectRegion={onSelectRegion} />
+            <PointOfInterest key={poi.id} poi={poi} isSelected={poi.id === selectedPoiId} onSelectPoi={onSelectPoi} onSelectCity={onSelectCity} onSelectRegion={onSelectRegion} onSelectIntercommunalite={onSelectIntercommunalite} />
           ))}
         </MarkerClusterGroup>
       </MapContainer>

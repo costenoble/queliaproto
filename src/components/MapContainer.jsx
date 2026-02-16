@@ -248,6 +248,17 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
     }, 300);
   }, [map, pois, fitBoundsToPois]);
 
+  const handleSelectIntercommunalite = useCallback((interco) => {
+    setSearchSelectedPoiId(null);
+    setActivePoi(null);
+    setTimeout(() => {
+      const poisInInterco = pois.filter(p =>
+        p.intercommunalites?.includes(interco) && p.lat && p.lng
+      );
+      fitBoundsToPois(poisInInterco, 10);
+    }, 150);
+  }, [pois, fitBoundsToPois]);
+
   // Mobile filter drawer state (lifted from ProjectFilter for mobile floating button)
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
@@ -381,6 +392,7 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
           selectedPoiId={searchSelectedPoiId || selectedPoiId}
           onSelectCity={handleSelectCity}
           onSelectRegion={handleSelectRegion}
+          onSelectIntercommunalite={handleSelectIntercommunalite}
           onSelectPoi={setActivePoi}
         />
 
@@ -415,6 +427,7 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
                   poi={activePoi}
                   onSelectCity={(city) => { setActivePoi(null); handleSelectCity(city); }}
                   onSelectRegion={(region) => { setActivePoi(null); handleSelectRegion(region); }}
+                  onSelectIntercommunalite={(interco) => { setActivePoi(null); handleSelectIntercommunalite(interco); }}
                 />
               </div>
             </div>

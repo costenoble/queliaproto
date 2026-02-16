@@ -7,7 +7,7 @@ import ProjectPopup from '@/components/ProjectPopup.jsx';
 
 const MOBILE_BREAKPOINT = 768;
 
-const PointOfInterest = ({ poi, isSelected = false, onSelectPoi, onSelectCity, onSelectRegion }) => {
+const PointOfInterest = ({ poi, isSelected = false, onSelectPoi, onSelectCity, onSelectRegion, onSelectIntercommunalite }) => {
   const markerRef = useRef(null);
 
   const isMobile = () => window.innerWidth < MOBILE_BREAKPOINT;
@@ -74,7 +74,7 @@ const PointOfInterest = ({ poi, isSelected = false, onSelectPoi, onSelectCity, o
         maxWidth={320}
         closeButton={true}
       >
-        <ProjectPopup poi={poi} onSelectCity={onSelectCity} onSelectRegion={onSelectRegion} />
+        <ProjectPopup poi={poi} onSelectCity={onSelectCity} onSelectRegion={onSelectRegion} onSelectIntercommunalite={onSelectIntercommunalite} />
       </Popup>
     </Marker>
   );

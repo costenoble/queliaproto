@@ -24,7 +24,7 @@ const CARS_PER_MW = 67;
 
 const Divider = () => <div className="border-t border-gray-100 my-2" />;
 
-const ProjectPopup = ({ poi, onSelectCity, onSelectRegion }) => {
+const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunalite }) => {
   const { data: liveData, error: liveError, loading: liveLoading } =
     useHybridLiveData(poi?.id, 5000);
 
@@ -181,8 +181,24 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion }) => {
           {poi.intercommunalites && (
             <div className="text-[11px] text-gray-400 pl-4 truncate">
               {Array.isArray(poi.intercommunalites)
-                ? poi.intercommunalites.join(', ')
-                : poi.intercommunalites}
+                ? poi.intercommunalites.map((interco, i) => (
+                    <span key={interco}>
+                      <button
+                        onClick={() => onSelectIntercommunalite?.(interco)}
+                        className="hover:underline hover:text-indigo-600 cursor-pointer"
+                      >
+                        {interco}
+                      </button>
+                      {i < poi.intercommunalites.length - 1 && ', '}
+                    </span>
+                  ))
+                : <button
+                    onClick={() => onSelectIntercommunalite?.(poi.intercommunalites)}
+                    className="hover:underline hover:text-indigo-600 cursor-pointer"
+                  >
+                    {poi.intercommunalites}
+                  </button>
+              }
             </div>
           )}
           {poi.lat != null && poi.lng != null && (
