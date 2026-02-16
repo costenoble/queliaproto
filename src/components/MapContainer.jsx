@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import LeafletMap from '@/components/LeafletMap.jsx';
 import ProjectLegend from '@/components/ProjectLegend.jsx';
@@ -42,13 +42,17 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
     }
   }, [searchParams]);
 
-  // Zoom to city/region/intercommunalite from URL params once POIs + map are ready
+  // Zoom to city/region/intercommunalite from URL params — once only on first load
+  const hasHandledUrlZoom = useRef(false);
   useEffect(() => {
-    if (!map || pois.length === 0 || isLoading) return;
+    if (!map || pois.length === 0 || isLoading || hasHandledUrlZoom.current) return;
 
     const city = searchParams.get('city');
     const region = searchParams.get('region');
     const interco = searchParams.get('intercommunalite');
+
+    if (!city && !region && !interco) return;
+    hasHandledUrlZoom.current = true;
 
     if (city) {
       const poisInCity = pois.filter(p => p.city === city && p.lat && p.lng);
