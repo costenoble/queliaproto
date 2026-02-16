@@ -229,7 +229,7 @@ const ClientsManagement = () => {
           <h2 className="text-xl font-bold text-gray-900">Gestion des Clients</h2>
           <p className="text-sm text-gray-500">{clients.length} client(s) enregistr\u00e9(s)</p>
         </div>
-        <Button onClick={handleCreate} className="bg-indigo-600 hover:bg-indigo-700">
+        <Button onClick={handleCreate} className="bg-white text-black border border-gray-300 hover:bg-gray-50 rounded-[5px]">
           <Plus className="w-4 h-4 mr-2" />
           Nouveau Client
         </Button>
