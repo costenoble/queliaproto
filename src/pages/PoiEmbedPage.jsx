@@ -198,13 +198,13 @@ const PoiEmbedPage = () => {
                 <Building className="w-4 h-4 flex-shrink-0 text-gray-400" />
                 <span>
                   {poi.city && (
-                    <Link to={`/map?city=${encodeURIComponent(poi.city)}`} className="hover:text-indigo-600 hover:underline font-medium">
+                    <Link to={`/?city=${encodeURIComponent(poi.city)}`} className="hover:text-indigo-600 hover:underline font-medium">
                       {poi.city}
                     </Link>
                   )}
                   {poi.city && poi.region && ' · '}
                   {poi.region && (
-                    <Link to={`/map?region=${encodeURIComponent(poi.region)}`} className="hover:text-indigo-600 hover:underline">
+                    <Link to={`/?region=${encodeURIComponent(poi.region)}`} className="hover:text-indigo-600 hover:underline">
                       {poi.region}
                     </Link>
                   )}
@@ -215,7 +215,7 @@ const PoiEmbedPage = () => {
                 <div className="text-sm text-gray-400 pl-5.5 truncate">
                   {poi.intercommunalites.map((interco, i) => (
                     <span key={interco}>
-                      <Link to={`/map?intercommunalite=${encodeURIComponent(interco)}`} className="hover:text-indigo-600 hover:underline">
+                      <Link to={`/?intercommunalite=${encodeURIComponent(interco)}`} className="hover:text-indigo-600 hover:underline">
                         {interco}
                       </Link>
                       {i < poi.intercommunalites.length - 1 && ', '}
