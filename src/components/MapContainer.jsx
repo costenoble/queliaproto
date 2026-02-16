@@ -42,38 +42,6 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
     }
   }, [searchParams]);
 
-  // Zoom to city/region/intercommunalite from URL params — once only on first load
-  const hasHandledUrlZoom = useRef(false);
-  useEffect(() => {
-    if (!map || pois.length === 0 || isLoading || hasHandledUrlZoom.current) return;
-
-    const city = searchParams.get('city');
-    const region = searchParams.get('region');
-    const interco = searchParams.get('intercommunalite');
-
-    if (!city && !region && !interco) return;
-    hasHandledUrlZoom.current = true;
-
-    if (city) {
-      const poisInCity = pois.filter(p => p.city === city && p.lat && p.lng);
-      if (poisInCity.length > 0) {
-        setTimeout(() => fitBoundsToPois(poisInCity), 300);
-      }
-    } else if (interco) {
-      const poisInInterco = pois.filter(p =>
-        p.intercommunalites?.includes(interco) && p.lat && p.lng
-      );
-      if (poisInInterco.length > 0) {
-        setTimeout(() => fitBoundsToPois(poisInInterco, 10), 300);
-      }
-    } else if (region) {
-      const poisInRegion = pois.filter(p => p.region === region && p.lat && p.lng);
-      if (poisInRegion.length > 0) {
-        setTimeout(() => fitBoundsToPois(poisInRegion, 8), 300);
-      }
-    }
-  }, [map, pois, isLoading, searchParams, fitBoundsToPois]);
-
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -225,6 +193,38 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
     const bounds = L.latLngBounds(matchingPois.map(p => [p.lat, p.lng]));
     map.flyToBounds(bounds, { padding: [40, 40], maxZoom, duration: 1 });
   }, [map]);
+
+  // Zoom to city/region/intercommunalite from URL params — once only on first load
+  const hasHandledUrlZoom = useRef(false);
+  useEffect(() => {
+    if (!map || pois.length === 0 || isLoading || hasHandledUrlZoom.current) return;
+
+    const city = searchParams.get('city');
+    const region = searchParams.get('region');
+    const interco = searchParams.get('intercommunalite');
+
+    if (!city && !region && !interco) return;
+    hasHandledUrlZoom.current = true;
+
+    if (city) {
+      const poisInCity = pois.filter(p => p.city === city && p.lat && p.lng);
+      if (poisInCity.length > 0) {
+        setTimeout(() => fitBoundsToPois(poisInCity), 300);
+      }
+    } else if (interco) {
+      const poisInInterco = pois.filter(p =>
+        p.intercommunalites?.includes(interco) && p.lat && p.lng
+      );
+      if (poisInInterco.length > 0) {
+        setTimeout(() => fitBoundsToPois(poisInInterco, 10), 300);
+      }
+    } else if (region) {
+      const poisInRegion = pois.filter(p => p.region === region && p.lat && p.lng);
+      if (poisInRegion.length > 0) {
+        setTimeout(() => fitBoundsToPois(poisInRegion, 8), 300);
+      }
+    }
+  }, [map, pois, isLoading, searchParams, fitBoundsToPois]);
 
   const handleSelectCity = useCallback((city) => {
     setSearchSelectedPoiId(null);
