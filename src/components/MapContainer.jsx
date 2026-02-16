@@ -27,6 +27,7 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
   // Filters State
   const [filters, setFilters] = useState({
     types: [],
+    subtypes: [],
     status: [],
     regions: []
   });
@@ -153,6 +154,17 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
       const poiEnergyType = poi.energy_category || poi.type;
       const typeMatch = filters.types.length === 0 || filters.types.includes(poiEnergyType);
 
+      // Subtype filtering: only applies if the POI's type is selected AND subtypes are active for that type
+      let subtypeMatch = true;
+      if (typeMatch && filters.subtypes.length > 0 && filters.types.includes(poiEnergyType)) {
+        // Check if any selected subtype belongs to this POI's category
+        const categorySubtypes = ENERGY_CATEGORIES[poiEnergyType]?.subtypes?.map(s => s.value) || [];
+        const activeSubtypesForCategory = filters.subtypes.filter(s => categorySubtypes.includes(s));
+        if (activeSubtypesForCategory.length > 0) {
+          subtypeMatch = activeSubtypesForCategory.includes(poi.energy_subtype);
+        }
+      }
+
       let statusMatch = filters.status.length === 0;
       if (!statusMatch && poi.status) {
          statusMatch = filters.status.includes(poi.status);
@@ -160,7 +172,7 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
 
       const regionMatch = filters.regions.length === 0 || (poi.region && filters.regions.includes(poi.region));
 
-      return typeMatch && statusMatch && regionMatch;
+      return typeMatch && subtypeMatch && statusMatch && regionMatch;
     });
   }, [pois, filters]);
 
@@ -173,7 +185,7 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
   const handleSelectProject = useCallback((poi) => {
     if (map && poi.lat && poi.lng) {
       // Réinitialiser les filtres pour que le POI soit visible
-      setFilters({ types: [], status: [], regions: [] });
+      setFilters({ types: [], subtypes: [], status: [], regions: [] });
       setActivePoi(null);
       map.flyTo([poi.lat, poi.lng], 14, { duration: 1 });
       setSearchSelectedPoiId(poi.id);
@@ -279,12 +291,48 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
   const toggleTypeFilter = useCallback((typeId) => {
     setFilters(prev => {
       const current = prev.types || [];
-      const next = current.includes(typeId)
+      const isRemoving = current.includes(typeId);
+      const next = isRemoving
         ? current.filter(t => t !== typeId)
         : [...current, typeId];
-      return { ...prev, types: next };
+      // Clear subtypes for this category when deselecting it
+      let nextSubtypes = prev.subtypes || [];
+      if (isRemoving) {
+        const categorySubtypes = ENERGY_CATEGORIES[typeId]?.subtypes?.map(s => s.value) || [];
+        nextSubtypes = nextSubtypes.filter(s => !categorySubtypes.includes(s));
+      }
+      return { ...prev, types: next, subtypes: nextSubtypes };
     });
   }, []);
+
+  const toggleSubtypeFilter = useCallback((subtypeValue) => {
+    setFilters(prev => {
+      const current = prev.subtypes || [];
+      const next = current.includes(subtypeValue)
+        ? current.filter(s => s !== subtypeValue)
+        : [...current, subtypeValue];
+      return { ...prev, subtypes: next };
+    });
+  }, []);
+
+  // Get active subtypes chips for selected types that have subtypes
+  const activeSubtypeChips = useMemo(() => {
+    const chips = [];
+    (filters.types || []).forEach(typeId => {
+      const cat = ENERGY_CATEGORIES[typeId];
+      if (cat?.subtypes?.length > 0) {
+        cat.subtypes.forEach(sub => {
+          chips.push({
+            value: sub.value,
+            label: sub.label,
+            color: getMarkerColor(typeId),
+            parentId: typeId,
+          });
+        });
+      }
+    });
+    return chips;
+  }, [filters.types]);
 
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
@@ -349,6 +397,29 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
               );
             })}
           </div>
+
+          {/* Subtype chips row — appears when a type with subtypes is selected */}
+          {activeSubtypeChips.length > 0 && (
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar mt-2">
+              {activeSubtypeChips.map((chip) => {
+                const active = filters.subtypes?.includes(chip.value);
+                return (
+                  <button
+                    key={chip.value}
+                    onClick={() => toggleSubtypeFilter(chip.value)}
+                    className={`flex-shrink-0 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium border shadow-sm active:scale-95 transition-all ${
+                      active
+                        ? 'text-white border-transparent'
+                        : 'bg-white/95 backdrop-blur-sm text-gray-600 border-gray-200'
+                    }`}
+                    style={active ? { backgroundColor: chip.color } : {}}
+                  >
+                    {chip.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Mobile: filter drawer */}
@@ -448,7 +519,7 @@ const MapContainer = ({ config, clientSlug = null, selectedPoiId = null }) => {
              <h3 className="text-lg font-bold text-gray-900 mb-1">Aucun résultat</h3>
              <p className="text-gray-600 mb-4">Aucun projet ne correspond à vos filtres actuels.</p>
              <Button 
-               onClick={() => setFilters({ types: [], status: [], regions: [] })}
+               onClick={() => setFilters({ types: [], subtypes: [], status: [], regions: [] })}
                variant="outline"
              >
                Réinitialiser les filtres

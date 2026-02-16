@@ -43,29 +43,56 @@ const ProjectFilter = ({ filters, onFilterChange, resultCount, regions = [], mob
   const toggleSelection = (category, id) => {
     const currentSelection = filters[category] || [];
     let newSelection;
-    
-    if (currentSelection.includes(id)) {
+    const isRemoving = currentSelection.includes(id);
+
+    if (isRemoving) {
       newSelection = currentSelection.filter(item => item !== id);
     } else {
       newSelection = [...currentSelection, id];
     }
-    
+
+    // Clean up subtypes when deselecting a type
+    let newSubtypes = filters.subtypes || [];
+    if (category === 'types' && isRemoving) {
+      const categorySubtypes = ENERGY_CATEGORIES[id]?.subtypes?.map(s => s.value) || [];
+      newSubtypes = newSubtypes.filter(s => !categorySubtypes.includes(s));
+    }
+
     onFilterChange({
       ...filters,
-      [category]: newSelection
+      [category]: newSelection,
+      subtypes: newSubtypes
     });
   };
 
   const resetFilters = () => {
     onFilterChange({
       types: [],
+      subtypes: [],
       status: [],
       regions: []
     });
   };
 
+  const toggleSubtype = (subtypeValue, parentTypeId) => {
+    const currentSubtypes = filters.subtypes || [];
+    let newSubtypes;
+    if (currentSubtypes.includes(subtypeValue)) {
+      newSubtypes = currentSubtypes.filter(s => s !== subtypeValue);
+    } else {
+      newSubtypes = [...currentSubtypes, subtypeValue];
+    }
+    // Auto-select parent type if not already selected
+    const currentTypes = filters.types || [];
+    const newTypes = currentTypes.includes(parentTypeId)
+      ? currentTypes
+      : [...currentTypes, parentTypeId];
+    onFilterChange({ ...filters, types: newTypes, subtypes: newSubtypes });
+  };
+
   const hasActiveFilters =
     (filters.types && filters.types.length > 0) ||
+    (filters.subtypes && filters.subtypes.length > 0) ||
     (filters.status && filters.status.length > 0) ||
     (filters.regions && filters.regions.length > 0);
 
@@ -92,34 +119,72 @@ const ProjectFilter = ({ filters, onFilterChange, resultCount, regions = [], mob
           
           {!collapsedSections.types && (
             <div className="p-3 space-y-2 bg-white">
-              {energyTypes.map((type) => (
-                <div 
-                  key={type.id}
-                  onClick={() => toggleSelection('types', type.id)}
-                  className={`
-                    flex items-center p-3 rounded-md cursor-pointer transition-all border min-h-[44px]
-                    ${isSelected('types', type.id) 
-                      ? 'bg-indigo-50 border-indigo-200' 
-                      : 'hover:bg-gray-50 border-transparent hover:border-gray-100'
-                    }
-                  `}
-                >
-                  <div 
-                    className={`w-5 h-5 rounded border flex items-center justify-center mr-3 transition-colors ${
-                      isSelected('types', type.id) ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300 bg-white'
-                    }`}
-                  >
-                    {isSelected('types', type.id) && <Check className="w-3 h-3 text-white" />}
+              {energyTypes.map((type) => {
+                const subtypes = ENERGY_CATEGORIES[type.id]?.subtypes || [];
+                const typeSelected = isSelected('types', type.id);
+                return (
+                  <div key={type.id}>
+                    <div
+                      onClick={() => toggleSelection('types', type.id)}
+                      className={`
+                        flex items-center p-3 rounded-md cursor-pointer transition-all border min-h-[44px]
+                        ${typeSelected
+                          ? 'bg-indigo-50 border-indigo-200'
+                          : 'hover:bg-gray-50 border-transparent hover:border-gray-100'
+                        }
+                      `}
+                    >
+                      <div
+                        className={`w-5 h-5 rounded border flex items-center justify-center mr-3 transition-colors ${
+                          typeSelected ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300 bg-white'
+                        }`}
+                      >
+                        {typeSelected && <Check className="w-3 h-3 text-white" />}
+                      </div>
+                      <div
+                        className="w-3 h-3 rounded-full mr-2"
+                        style={{ backgroundColor: type.color }}
+                      ></div>
+                      <span className={`text-base ${typeSelected ? 'font-medium text-gray-900' : 'text-gray-600'}`}>
+                        {type.label}
+                      </span>
+                    </div>
+                    {/* Subtypes — shown when parent type is selected */}
+                    {typeSelected && subtypes.length > 0 && (
+                      <div className="ml-8 mt-1 mb-1 space-y-1">
+                        {subtypes.map((sub) => {
+                          const subSelected = (filters.subtypes || []).includes(sub.value);
+                          return (
+                            <div
+                              key={sub.value}
+                              onClick={() => toggleSubtype(sub.value, type.id)}
+                              className={`
+                                flex items-center p-2 pl-3 rounded-md cursor-pointer transition-all border min-h-[36px] text-sm
+                                ${subSelected
+                                  ? 'bg-indigo-50/70 border-indigo-200'
+                                  : 'hover:bg-gray-50 border-transparent hover:border-gray-100'
+                                }
+                              `}
+                            >
+                              <div
+                                className={`w-4 h-4 rounded border flex items-center justify-center mr-2 transition-colors ${
+                                  subSelected ? 'border-transparent' : 'border-gray-300 bg-white'
+                                }`}
+                                style={subSelected ? { backgroundColor: type.color } : {}}
+                              >
+                                {subSelected && <Check className="w-2.5 h-2.5 text-white" />}
+                              </div>
+                              <span className={subSelected ? 'font-medium text-gray-900' : 'text-gray-500'}>
+                                {sub.label}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
-                  <div 
-                    className="w-3 h-3 rounded-full mr-2" 
-                    style={{ backgroundColor: type.color }}
-                  ></div>
-                  <span className={`text-base ${isSelected('types', type.id) ? 'font-medium text-gray-900' : 'text-gray-600'}`}>
-                    {type.label}
-                  </span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -304,6 +369,33 @@ const ProjectFilter = ({ filters, onFilterChange, resultCount, regions = [], mob
                       </button>
                     ))}
                   </div>
+                  {/* Subtype chips — appear under energy chips when a type with subtypes is selected */}
+                  {energyTypes.some(t => isSelected('types', t.id) && (ENERGY_CATEGORIES[t.id]?.subtypes?.length > 0)) && (
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {energyTypes
+                        .filter(t => isSelected('types', t.id) && (ENERGY_CATEGORIES[t.id]?.subtypes?.length > 0))
+                        .flatMap(t =>
+                          ENERGY_CATEGORIES[t.id].subtypes.map(sub => ({ ...sub, color: t.color, parentId: t.id }))
+                        )
+                        .map((sub) => {
+                          const active = (filters.subtypes || []).includes(sub.value);
+                          return (
+                            <button
+                              key={sub.value}
+                              onClick={() => toggleSubtype(sub.value, sub.parentId)}
+                              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border transition-all active:scale-95 ${
+                                active
+                                  ? 'text-white border-transparent shadow-sm'
+                                  : 'bg-white text-gray-600 border-gray-200'
+                              }`}
+                              style={active ? { backgroundColor: sub.color } : {}}
+                            >
+                              {sub.label}
+                            </button>
+                          );
+                        })}
+                    </div>
+                  )}
                 </div>
 
                 {/* Statut — chips */}
