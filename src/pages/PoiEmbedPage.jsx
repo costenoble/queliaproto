@@ -303,7 +303,58 @@ const PoiEmbedPage = () => {
               </div>
             )}
 
-            {/* Description */}
+            {/* ---- Actions : grid 2×2 ---- */}
+            <Divider />
+            <div className="grid grid-cols-2 gap-3">
+              {poi.show_email_report !== false && (
+                <a
+                  href={`mailto:${poi.contact_email || 'contact@quelia.fr'}`}
+                  className="bg-gray-50 rounded-xl px-4 py-4 flex items-center gap-3 hover:bg-indigo-50 transition-colors"
+                  title="Signaler par email"
+                >
+                  <Mail className="w-6 h-6 text-indigo-600 flex-shrink-0" />
+                  <span className="text-sm text-gray-600 leading-tight">Signaler par email</span>
+                </a>
+              )}
+              {poi.show_voice_report !== false && (
+                <a
+                  href={poi.voice_report_url || "https://app.ekoo.co/capture"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-gray-50 rounded-xl px-4 py-4 flex items-center gap-3 hover:bg-indigo-50 transition-colors"
+                  title="Signaler par vocal"
+                >
+                  <Mic className="w-6 h-6 text-indigo-600 flex-shrink-0" />
+                  <span className="text-sm text-gray-600 leading-tight">Signaler par vocal</span>
+                </a>
+              )}
+              {poi.show_newsletter !== false && (
+                <a
+                  href={poi.newsletter_url || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-gray-50 rounded-xl px-4 py-4 flex items-center gap-3 hover:bg-indigo-50 transition-colors"
+                  title="L'actu du parc par email"
+                >
+                  <Info className="w-6 h-6 text-indigo-600 flex-shrink-0" />
+                  <span className="text-sm text-gray-600 leading-tight">L'actu du parc par email</span>
+                </a>
+              )}
+              {poi.project_url && (
+                <a
+                  href={poi.project_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-gray-50 rounded-xl px-4 py-4 flex items-center gap-3 hover:bg-indigo-50 transition-colors"
+                  title="Site web du projet"
+                >
+                  <ExternalLink className="w-6 h-6 text-indigo-600 flex-shrink-0" />
+                  <span className="text-sm text-gray-600 leading-tight">Site web</span>
+                </a>
+              )}
+            </div>
+
+            {/* Description (en bas) */}
             {poi.description && (
               <>
                 <Divider />
@@ -321,61 +372,6 @@ const PoiEmbedPage = () => {
                   )}
                 </div>
               </>
-            )}
-
-            <Divider />
-
-            {/* Lien site web */}
-            {poi.project_url && (
-              <a
-                href={poi.project_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-base text-indigo-600 hover:text-indigo-800 font-medium mb-3"
-              >
-                <ExternalLink className="w-4 h-4" />
-                Site web
-              </a>
-            )}
-
-            {/* Signalement (mail + micro) */}
-            {(poi.show_email_report !== false || poi.show_voice_report !== false) && (
-              <div className="flex items-center gap-3 text-base text-gray-600 mb-3">
-                <span className="text-gray-500">Signalement ?</span>
-                {poi.show_email_report !== false && (
-                  <a
-                    href={`mailto:${poi.contact_email || 'contact@quelia.fr'}`}
-                    className="text-indigo-600 hover:text-indigo-800 transition-colors"
-                    title="Par email"
-                  >
-                    <Mail className="w-6 h-6" />
-                  </a>
-                )}
-                {poi.show_voice_report !== false && (
-                  <a
-                    href={poi.voice_report_url || "https://app.ekoo.co/capture"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-indigo-600 hover:text-indigo-800 transition-colors"
-                    title="Par vocal"
-                  >
-                    <Mic className="w-6 h-6" />
-                  </a>
-                )}
-              </div>
-            )}
-
-            {/* Newsletter */}
-            {poi.show_newsletter !== false && (
-              <a
-                href={poi.newsletter_url || "#"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-base text-indigo-600 hover:text-indigo-800 transition-colors mb-3"
-              >
-                <Info className="w-6 h-6 flex-shrink-0" />
-                <span>L'actu du parc par email</span>
-              </a>
             )}
 
             {/* Propulsé par Quelia */}
