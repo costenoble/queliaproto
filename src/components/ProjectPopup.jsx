@@ -157,7 +157,8 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunal
         <Divider />
 
         {/* ---- Localisation ---- */}
-        <div className="space-y-1 min-w-0">
+        <div className="space-y-0.5 min-w-0">
+          {/* Ligne 1 : Commune · Intercommunalité */}
           <div className="flex items-center text-xs text-gray-600 gap-1 min-w-0">
             <Building className="w-3 h-3 flex-shrink-0 text-gray-400" />
             <span className="truncate min-w-0">
@@ -190,18 +191,20 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunal
                       {poi.intercommunalites}
                     </button>
               ) : null}
-              {(poi.city || poi.intercommunalites) && poi.region ? ' · ' : null}
-              {poi.region ? (
-                <button
-                  onClick={() => onSelectRegion?.(poi.region)}
-                  className="hover:underline hover:text-indigo-600 cursor-pointer"
-                >
-                  {poi.region}
-                </button>
-              ) : null}
-              {!poi.city && !poi.intercommunalites && !poi.region ? 'Non spécifiée' : null}
+              {!poi.city && !poi.intercommunalites ? 'Non spécifiée' : null}
             </span>
           </div>
+          {/* Ligne 2 : Région (plus petit) */}
+          {poi.region && (
+            <div className="text-[11px] text-gray-400 pl-4">
+              <button
+                onClick={() => onSelectRegion?.(poi.region)}
+                className="hover:underline hover:text-indigo-600 cursor-pointer"
+              >
+                {poi.region}
+              </button>
+            </div>
+          )}
           {poi.lat != null && poi.lng != null && (
             <a
               href={`https://www.google.com/maps/dir/?api=1&destination=${poi.lat},${poi.lng}`}
@@ -221,7 +224,7 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunal
         {(poi.show_capacity !== false || (poi.co2_avoided_tons && poi.show_co2 !== false)) && (
           <div className="grid grid-cols-2 gap-2 min-w-0">
             {poi.show_capacity !== false && (
-              <div className="bg-gray-50 rounded-xl px-3 py-2.5 min-w-0">
+              <div className="bg-gray-50 rounded-xl px-3 py-2.5 min-w-0 flex flex-col justify-center h-[72px]">
                 <div className="text-[10px] uppercase tracking-wide text-gray-400 mb-1">Capacité</div>
                 {poi.nominal_power ? (
                   <div className="flex items-baseline gap-0.5">
@@ -234,8 +237,8 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunal
               </div>
             )}
             {poi.co2_avoided_tons && poi.show_co2 !== false && (
-              <div className="bg-emerald-50 rounded-xl px-3 py-2.5 border border-emerald-100 min-w-0 text-center">
-                <Leaf className="w-4 h-4 text-emerald-500 mx-auto mb-0.5" />
+              <div className="bg-emerald-50 rounded-xl px-3 py-2.5 border border-emerald-100 min-w-0 flex flex-col items-center justify-center h-[72px]">
+                <Leaf className="w-4 h-4 text-emerald-500 mb-0.5" />
                 <div className="text-sm font-bold text-emerald-700">{Number(poi.co2_avoided_tons).toLocaleString('fr-FR')}</div>
                 <div className="text-[9px] text-emerald-400">tonnes CO2/an évitées</div>
               </div>
@@ -247,7 +250,7 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunal
         {(poi.show_realtime !== false || (carsCount != null && poi.show_cars !== false)) && (
           <div className="grid grid-cols-2 gap-2 min-w-0">
             {poi.show_realtime !== false && (
-              <div className="bg-green-50 rounded-xl px-3 py-2.5 border border-green-200 min-w-0">
+              <div className="bg-green-50 rounded-xl px-3 py-2.5 border border-green-200 min-w-0 flex flex-col justify-center h-[72px]">
                 <div className="flex items-center gap-1 mb-1">
                   <span className="text-[10px] uppercase tracking-wide text-gray-500">Temps réel</span>
                   {liveData?.value != null && (
@@ -266,8 +269,8 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunal
               </div>
             )}
             {carsCount != null && poi.show_cars !== false && (
-              <div className="bg-blue-50 rounded-xl px-3 py-2 border border-blue-100 min-w-0 text-center">
-                <Car className="w-4 h-4 text-blue-500 mx-auto mb-0.5" />
+              <div className="bg-blue-50 rounded-xl px-3 py-2.5 border border-blue-100 min-w-0 flex flex-col items-center justify-center h-[72px]">
+                <Car className="w-4 h-4 text-blue-500 mb-0.5" />
                 <div className="text-sm font-bold text-blue-700">= {carsCount.toLocaleString('fr-FR')}</div>
                 <div className="text-[9px] text-blue-400">voitures roulant</div>
                 <div className="text-[8px] text-blue-300">a 100 km/h (conso. elec.)</div>

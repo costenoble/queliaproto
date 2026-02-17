@@ -195,7 +195,8 @@ const PoiEmbedPage = () => {
             <Divider />
 
             {/* Localisation */}
-            <div className="space-y-1.5 mb-1">
+            <div className="space-y-1 mb-1">
+              {/* Ligne 1 : Commune · Intercommunalité */}
               <div className="flex items-center text-base text-gray-600 gap-1.5">
                 <Building className="w-4 h-4 flex-shrink-0 text-gray-400" />
                 <span>
@@ -215,15 +216,17 @@ const PoiEmbedPage = () => {
                       </span>
                     ))
                   )}
-                  {(poi.city || poi.intercommunalites?.length > 0) && poi.region && ' · '}
-                  {poi.region && (
-                    <Link to={`/?region=${encodeURIComponent(poi.region)}`} className="hover:text-indigo-600 hover:underline">
-                      {poi.region}
-                    </Link>
-                  )}
-                  {!poi.city && !poi.intercommunalites?.length && !poi.region && 'Localisation non spécifiée'}
+                  {!poi.city && !poi.intercommunalites?.length && 'Localisation non spécifiée'}
                 </span>
               </div>
+              {/* Ligne 2 : Région (plus petit) */}
+              {poi.region && (
+                <div className="text-sm text-gray-400 pl-5.5">
+                  <Link to={`/?region=${encodeURIComponent(poi.region)}`} className="hover:text-indigo-600 hover:underline">
+                    {poi.region}
+                  </Link>
+                </div>
+              )}
               {poi.latitude != null && poi.longitude != null && (
                 <a
                   href={`https://www.google.com/maps/dir/?api=1&destination=${poi.latitude},${poi.longitude}`}
@@ -243,7 +246,7 @@ const PoiEmbedPage = () => {
             {(poi.show_capacity !== false || (poi.co2_avoided_tons && poi.show_co2 !== false)) && (
               <div className="grid grid-cols-2 gap-3">
                 {poi.show_capacity !== false && (
-                  <div className="bg-gray-50 rounded-xl px-4 py-3">
+                  <div className="bg-gray-50 rounded-xl px-4 py-3 flex flex-col justify-center h-[88px]">
                     <div className="text-xs uppercase tracking-wide text-gray-400 mb-1">Capacité</div>
                     {poi.nominal_power ? (
                       <div className="flex items-baseline gap-1">
@@ -256,8 +259,8 @@ const PoiEmbedPage = () => {
                   </div>
                 )}
                 {poi.co2_avoided_tons && poi.show_co2 !== false && (
-                  <div className="bg-emerald-50 rounded-xl px-4 py-3 border border-emerald-100 text-center">
-                    <Leaf className="w-5 h-5 text-emerald-500 mx-auto mb-1" />
+                  <div className="bg-emerald-50 rounded-xl px-4 py-3 border border-emerald-100 flex flex-col items-center justify-center h-[88px]">
+                    <Leaf className="w-5 h-5 text-emerald-500 mb-1" />
                     <div className="text-lg font-bold text-emerald-700">{Number(poi.co2_avoided_tons).toLocaleString('fr-FR')}</div>
                     <div className="text-xs text-emerald-400">tonnes CO2/an évitées</div>
                   </div>
@@ -269,7 +272,7 @@ const PoiEmbedPage = () => {
             {(poi.show_realtime !== false || (carsCount != null && poi.show_cars !== false)) && (
               <div className="grid grid-cols-2 gap-3 mt-3">
                 {poi.show_realtime !== false && (
-                  <div className="bg-green-50 rounded-xl px-4 py-3 border border-green-200">
+                  <div className="bg-green-50 rounded-xl px-4 py-3 border border-green-200 flex flex-col justify-center h-[88px]">
                     <div className="flex items-center gap-1.5 mb-1">
                       <span className="text-xs uppercase tracking-wide text-gray-500">Temps réel</span>
                       {liveData?.value != null && (
@@ -288,8 +291,8 @@ const PoiEmbedPage = () => {
                   </div>
                 )}
                 {carsCount != null && poi.show_cars !== false && (
-                  <div className="bg-blue-50 rounded-xl px-4 py-3 border border-blue-100 text-center">
-                    <Car className="w-5 h-5 text-blue-500 mx-auto mb-1" />
+                  <div className="bg-blue-50 rounded-xl px-4 py-3 border border-blue-100 flex flex-col items-center justify-center h-[88px]">
+                    <Car className="w-5 h-5 text-blue-500 mb-1" />
                     <div className="text-lg font-bold text-blue-700">= {carsCount.toLocaleString('fr-FR')}</div>
                     <div className="text-xs text-blue-400">voitures roulant</div>
                     <div className="text-[10px] text-blue-300">a 100 km/h (conso. elec.)</div>
