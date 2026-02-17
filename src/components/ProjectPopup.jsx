@@ -46,7 +46,11 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunal
     if (poi.energy_category) {
       const cat = ENERGY_CATEGORIES[poi.energy_category];
       const label = cat?.label || poi.energy_category;
-      return poi.energy_subtype ? `${label} – ${poi.energy_subtype}` : label;
+      if (poi.energy_subtype) {
+        const subtypeLabel = cat?.subtypes?.find(s => s.value === poi.energy_subtype)?.label || poi.energy_subtype;
+        return `${label} – ${subtypeLabel}`;
+      }
+      return label;
     }
     return poi.type || 'Énergie';
   })();
@@ -165,7 +169,28 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunal
                   {poi.city}
                 </button>
               ) : null}
-              {poi.city && poi.region ? ' · ' : null}
+              {poi.city && poi.intercommunalites ? ' · ' : null}
+              {poi.intercommunalites ? (
+                Array.isArray(poi.intercommunalites)
+                  ? poi.intercommunalites.map((interco, i) => (
+                      <span key={interco}>
+                        <button
+                          onClick={() => onSelectIntercommunalite?.(interco)}
+                          className="hover:underline hover:text-indigo-600 cursor-pointer"
+                        >
+                          {interco}
+                        </button>
+                        {i < poi.intercommunalites.length - 1 && ', '}
+                      </span>
+                    ))
+                  : <button
+                      onClick={() => onSelectIntercommunalite?.(poi.intercommunalites)}
+                      className="hover:underline hover:text-indigo-600 cursor-pointer"
+                    >
+                      {poi.intercommunalites}
+                    </button>
+              ) : null}
+              {(poi.city || poi.intercommunalites) && poi.region ? ' · ' : null}
               {poi.region ? (
                 <button
                   onClick={() => onSelectRegion?.(poi.region)}
@@ -174,32 +199,9 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunal
                   {poi.region}
                 </button>
               ) : null}
-              {!poi.city && !poi.region ? 'Non spécifiée' : null}
+              {!poi.city && !poi.intercommunalites && !poi.region ? 'Non spécifiée' : null}
             </span>
           </div>
-          {poi.intercommunalites && (
-            <div className="text-[11px] text-gray-400 pl-4 truncate">
-              {Array.isArray(poi.intercommunalites)
-                ? poi.intercommunalites.map((interco, i) => (
-                    <span key={interco}>
-                      <button
-                        onClick={() => onSelectIntercommunalite?.(interco)}
-                        className="hover:underline hover:text-indigo-600 cursor-pointer"
-                      >
-                        {interco}
-                      </button>
-                      {i < poi.intercommunalites.length - 1 && ', '}
-                    </span>
-                  ))
-                : <button
-                    onClick={() => onSelectIntercommunalite?.(poi.intercommunalites)}
-                    className="hover:underline hover:text-indigo-600 cursor-pointer"
-                  >
-                    {poi.intercommunalites}
-                  </button>
-              }
-            </div>
-          )}
           {poi.lat != null && poi.lng != null && (
             <a
               href={`https://www.google.com/maps/dir/?api=1&destination=${poi.lat},${poi.lng}`}
@@ -215,10 +217,9 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunal
 
         <Divider />
 
-        {/* ---- CARDS DATA : grid 2 colonnes ---- */}
-        {(poi.show_capacity !== false || poi.show_realtime !== false) && (
+        {/* ---- Ligne 1 : Capacité + CO2 ---- */}
+        {(poi.show_capacity !== false || (poi.co2_avoided_tons && poi.show_co2 !== false)) && (
           <div className="grid grid-cols-2 gap-2 min-w-0">
-            {/* Card Capacité */}
             {poi.show_capacity !== false && (
               <div className="bg-gray-50 rounded-xl px-3 py-2.5 min-w-0">
                 <div className="text-[10px] uppercase tracking-wide text-gray-400 mb-1">Capacité</div>
@@ -232,8 +233,19 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunal
                 )}
               </div>
             )}
+            {poi.co2_avoided_tons && poi.show_co2 !== false && (
+              <div className="bg-emerald-50 rounded-xl px-3 py-2.5 border border-emerald-100 min-w-0 text-center">
+                <Leaf className="w-4 h-4 text-emerald-500 mx-auto mb-0.5" />
+                <div className="text-sm font-bold text-emerald-700">{Number(poi.co2_avoided_tons).toLocaleString('fr-FR')}</div>
+                <div className="text-[9px] text-emerald-400">tonnes CO2/an évitées</div>
+              </div>
+            )}
+          </div>
+        )}
 
-            {/* Card Production live */}
+        {/* ---- Ligne 2 : Temps réel + Voitures ---- */}
+        {(poi.show_realtime !== false || (carsCount != null && poi.show_cars !== false)) && (
+          <div className="grid grid-cols-2 gap-2 min-w-0">
             {poi.show_realtime !== false && (
               <div className="bg-green-50 rounded-xl px-3 py-2.5 border border-green-200 min-w-0">
                 <div className="flex items-center gap-1 mb-1">
@@ -253,25 +265,12 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunal
                 </div>
               </div>
             )}
-          </div>
-        )}
-
-        {/* ---- Cards équivalences : voitures + CO2 ---- */}
-        {((carsCount != null && poi.show_cars !== false) || (poi.co2_avoided_tons && poi.show_co2 !== false)) && (
-          <div className="grid grid-cols-2 gap-2 min-w-0">
             {carsCount != null && poi.show_cars !== false && (
               <div className="bg-blue-50 rounded-xl px-3 py-2 border border-blue-100 min-w-0 text-center">
                 <Car className="w-4 h-4 text-blue-500 mx-auto mb-0.5" />
                 <div className="text-sm font-bold text-blue-700">= {carsCount.toLocaleString('fr-FR')}</div>
                 <div className="text-[9px] text-blue-400">voitures roulant</div>
                 <div className="text-[8px] text-blue-300">a 100 km/h (conso. elec.)</div>
-              </div>
-            )}
-            {poi.co2_avoided_tons && poi.show_co2 !== false && (
-              <div className="bg-emerald-50 rounded-xl px-3 py-2 border border-emerald-100 min-w-0 text-center">
-                <Leaf className="w-4 h-4 text-emerald-500 mx-auto mb-0.5" />
-                <div className="text-sm font-bold text-emerald-700">{Number(poi.co2_avoided_tons).toLocaleString('fr-FR')}</div>
-                <div className="text-[9px] text-emerald-400">tonnes CO2/an évitées</div>
               </div>
             )}
           </div>
@@ -284,10 +283,10 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunal
             <a
               href={`mailto:${poi.contact_email || 'contact@quelia.fr'}`}
               className="bg-gray-50 rounded-xl px-3 py-3 flex items-center gap-2.5 hover:bg-indigo-50 transition-colors"
-              title="Signaler par email"
+              title="Message par email"
             >
               <Mail className="w-5 h-5 text-indigo-600 flex-shrink-0" />
-              <span className="text-xs text-gray-600 leading-tight">Signaler par email</span>
+              <span className="text-xs text-gray-600 leading-tight">Message par email</span>
             </a>
           )}
           {poi.show_voice_report !== false && (
@@ -296,10 +295,10 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunal
               target="_blank"
               rel="noopener noreferrer"
               className="bg-gray-50 rounded-xl px-3 py-3 flex items-center gap-2.5 hover:bg-indigo-50 transition-colors"
-              title="Signaler par vocal"
+              title="Message par vocal"
             >
               <Mic className="w-5 h-5 text-indigo-600 flex-shrink-0" />
-              <span className="text-xs text-gray-600 leading-tight">Signaler par vocal</span>
+              <span className="text-xs text-gray-600 leading-tight">Message par vocal</span>
             </a>
           )}
           {poi.show_newsletter !== false && (

@@ -89,7 +89,10 @@ const PoiEmbedPage = () => {
     if (poi.energy_category) {
       const category = ENERGY_CATEGORIES[poi.energy_category];
       const categoryLabel = category?.label || poi.energy_category;
-      if (poi.energy_subtype) return `${categoryLabel} - ${poi.energy_subtype}`;
+      if (poi.energy_subtype) {
+        const subtypeLabel = category?.subtypes?.find(s => s.value === poi.energy_subtype)?.label || poi.energy_subtype;
+        return `${categoryLabel} - ${subtypeLabel}`;
+      }
       return categoryLabel;
     }
     return poi.type || 'Énergie';
@@ -201,27 +204,26 @@ const PoiEmbedPage = () => {
                       {poi.city}
                     </Link>
                   )}
-                  {poi.city && poi.region && ' · '}
+                  {poi.city && poi.intercommunalites?.length > 0 && ' · '}
+                  {poi.intercommunalites?.length > 0 && (
+                    poi.intercommunalites.map((interco, i) => (
+                      <span key={interco}>
+                        <Link to={`/?intercommunalite=${encodeURIComponent(interco)}`} className="hover:text-indigo-600 hover:underline">
+                          {interco}
+                        </Link>
+                        {i < poi.intercommunalites.length - 1 && ', '}
+                      </span>
+                    ))
+                  )}
+                  {(poi.city || poi.intercommunalites?.length > 0) && poi.region && ' · '}
                   {poi.region && (
                     <Link to={`/?region=${encodeURIComponent(poi.region)}`} className="hover:text-indigo-600 hover:underline">
                       {poi.region}
                     </Link>
                   )}
-                  {!poi.city && !poi.region && 'Localisation non spécifiée'}
+                  {!poi.city && !poi.intercommunalites?.length && !poi.region && 'Localisation non spécifiée'}
                 </span>
               </div>
-              {poi.intercommunalites?.length > 0 && (
-                <div className="text-sm text-gray-400 pl-5.5 truncate">
-                  {poi.intercommunalites.map((interco, i) => (
-                    <span key={interco}>
-                      <Link to={`/?intercommunalite=${encodeURIComponent(interco)}`} className="hover:text-indigo-600 hover:underline">
-                        {interco}
-                      </Link>
-                      {i < poi.intercommunalites.length - 1 && ', '}
-                    </span>
-                  ))}
-                </div>
-              )}
               {poi.latitude != null && poi.longitude != null && (
                 <a
                   href={`https://www.google.com/maps/dir/?api=1&destination=${poi.latitude},${poi.longitude}`}
@@ -237,10 +239,9 @@ const PoiEmbedPage = () => {
 
             <Divider />
 
-            {/* ---- CARDS DATA : grid 2 colonnes (comme le popup) ---- */}
-            {(poi.show_capacity !== false || poi.show_realtime !== false) && (
+            {/* ---- Ligne 1 : Capacité + CO2 ---- */}
+            {(poi.show_capacity !== false || (poi.co2_avoided_tons && poi.show_co2 !== false)) && (
               <div className="grid grid-cols-2 gap-3">
-                {/* Card Capacité */}
                 {poi.show_capacity !== false && (
                   <div className="bg-gray-50 rounded-xl px-4 py-3">
                     <div className="text-xs uppercase tracking-wide text-gray-400 mb-1">Capacité</div>
@@ -254,8 +255,19 @@ const PoiEmbedPage = () => {
                     )}
                   </div>
                 )}
+                {poi.co2_avoided_tons && poi.show_co2 !== false && (
+                  <div className="bg-emerald-50 rounded-xl px-4 py-3 border border-emerald-100 text-center">
+                    <Leaf className="w-5 h-5 text-emerald-500 mx-auto mb-1" />
+                    <div className="text-lg font-bold text-emerald-700">{Number(poi.co2_avoided_tons).toLocaleString('fr-FR')}</div>
+                    <div className="text-xs text-emerald-400">tonnes CO2/an évitées</div>
+                  </div>
+                )}
+              </div>
+            )}
 
-                {/* Card Production live */}
+            {/* ---- Ligne 2 : Temps réel + Voitures ---- */}
+            {(poi.show_realtime !== false || (carsCount != null && poi.show_cars !== false)) && (
+              <div className="grid grid-cols-2 gap-3 mt-3">
                 {poi.show_realtime !== false && (
                   <div className="bg-green-50 rounded-xl px-4 py-3 border border-green-200">
                     <div className="flex items-center gap-1.5 mb-1">
@@ -275,25 +287,12 @@ const PoiEmbedPage = () => {
                     </div>
                   </div>
                 )}
-              </div>
-            )}
-
-            {/* Cards équivalences : voitures + CO2 */}
-            {((carsCount != null && poi.show_cars !== false) || (poi.co2_avoided_tons && poi.show_co2 !== false)) && (
-              <div className="grid grid-cols-2 gap-3 mt-3">
                 {carsCount != null && poi.show_cars !== false && (
                   <div className="bg-blue-50 rounded-xl px-4 py-3 border border-blue-100 text-center">
                     <Car className="w-5 h-5 text-blue-500 mx-auto mb-1" />
                     <div className="text-lg font-bold text-blue-700">= {carsCount.toLocaleString('fr-FR')}</div>
                     <div className="text-xs text-blue-400">voitures roulant</div>
                     <div className="text-[10px] text-blue-300">a 100 km/h (conso. elec.)</div>
-                  </div>
-                )}
-                {poi.co2_avoided_tons && poi.show_co2 !== false && (
-                  <div className="bg-emerald-50 rounded-xl px-4 py-3 border border-emerald-100 text-center">
-                    <Leaf className="w-5 h-5 text-emerald-500 mx-auto mb-1" />
-                    <div className="text-lg font-bold text-emerald-700">{Number(poi.co2_avoided_tons).toLocaleString('fr-FR')}</div>
-                    <div className="text-xs text-emerald-400">tonnes CO2/an évitées</div>
                   </div>
                 )}
               </div>
@@ -306,10 +305,10 @@ const PoiEmbedPage = () => {
                 <a
                   href={`mailto:${poi.contact_email || 'contact@quelia.fr'}`}
                   className="bg-gray-50 rounded-xl px-4 py-4 flex items-center gap-3 hover:bg-indigo-50 transition-colors"
-                  title="Signaler par email"
+                  title="Message par email"
                 >
                   <Mail className="w-6 h-6 text-indigo-600 flex-shrink-0" />
-                  <span className="text-sm text-gray-600 leading-tight">Signaler par email</span>
+                  <span className="text-sm text-gray-600 leading-tight">Message par email</span>
                 </a>
               )}
               {poi.show_voice_report !== false && (
@@ -318,10 +317,10 @@ const PoiEmbedPage = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-gray-50 rounded-xl px-4 py-4 flex items-center gap-3 hover:bg-indigo-50 transition-colors"
-                  title="Signaler par vocal"
+                  title="Message par vocal"
                 >
                   <Mic className="w-6 h-6 text-indigo-600 flex-shrink-0" />
-                  <span className="text-sm text-gray-600 leading-tight">Signaler par vocal</span>
+                  <span className="text-sm text-gray-600 leading-tight">Message par vocal</span>
                 </a>
               )}
               {poi.show_newsletter !== false && (
