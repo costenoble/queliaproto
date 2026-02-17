@@ -91,10 +91,17 @@ CREATE TABLE IF NOT EXISTS projects (
     live_data_url TEXT,
     live_data_path TEXT,
 
-    -- Options d'affichage POI
+    -- Options d'affichage POI (actions)
     show_email_report BOOLEAN DEFAULT true,
     show_voice_report BOOLEAN DEFAULT true,
     show_newsletter BOOLEAN DEFAULT true,
+
+    -- Options d'affichage POI (cartes données)
+    show_capacity BOOLEAN DEFAULT true,
+    show_realtime BOOLEAN DEFAULT true,
+    show_households BOOLEAN DEFAULT true,
+    show_cars BOOLEAN DEFAULT true,
+    show_annual_production BOOLEAN DEFAULT true,
 
     -- Autres
     description TEXT,

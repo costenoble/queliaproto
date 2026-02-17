@@ -6,7 +6,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import {
   AlertCircle, Calendar, MapPin, Save, Zap, Building, Flag, AlignLeft,
   Globe, Link as LinkIcon, Loader2, User, Mail, Mic, Info, Image, Hash,
-  Map as MapIcon, Home, X, Plus
+  Map as MapIcon, Home, X, Plus, Car, Activity, BarChart3
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { ENERGY_CATEGORIES, POWER_UNITS, EQUIVALENT_TYPES } from '@/utils/mapUtils.jsx';
@@ -134,10 +134,16 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
     description: '',
     urlType: 'Website URL',
     projectUrl: '',
-    // Display options
+    // Display options (actions)
     showEmailReport: true,
     showVoiceReport: true,
     showNewsletter: true,
+    // Display options (cartes données)
+    showCapacity: true,
+    showRealtime: true,
+    showHouseholds: true,
+    showCars: true,
+    showAnnualProduction: true,
     // URLs personnalisables
     voiceReportUrl: '',
     newsletterUrl: ''
@@ -182,6 +188,11 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
         showEmailReport: project.show_email_report !== false,
         showVoiceReport: project.show_voice_report !== false,
         showNewsletter: project.show_newsletter !== false,
+        showCapacity: project.show_capacity !== false,
+        showRealtime: project.show_realtime !== false,
+        showHouseholds: project.show_households !== false,
+        showCars: project.show_cars !== false,
+        showAnnualProduction: project.show_annual_production !== false,
         voiceReportUrl: project.voice_report_url || '',
         newsletterUrl: project.newsletter_url || ''
       });
@@ -330,6 +341,11 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
         show_email_report: formData.showEmailReport,
         show_voice_report: formData.showVoiceReport,
         show_newsletter: formData.showNewsletter,
+        show_capacity: formData.showCapacity,
+        show_realtime: formData.showRealtime,
+        show_households: formData.showHouseholds,
+        show_cars: formData.showCars,
+        show_annual_production: formData.showAnnualProduction,
         voice_report_url: formData.voiceReportUrl || null,
         newsletter_url: formData.newsletterUrl || null,
         client_id: finalClientId,
@@ -853,6 +869,63 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
             </h3>
             <p className="text-xs text-gray-500 -mt-2 mb-3">Choisissez les éléments visibles dans le popup du POI.</p>
             <div className="space-y-3">
+              {/* --- Cartes données --- */}
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Cartes données</p>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.showCapacity}
+                  onChange={(e) => setFormData(prev => ({ ...prev, showCapacity: e.target.checked }))}
+                  className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                />
+                <Zap className="w-4 h-4 text-gray-500" />
+                <span className="text-sm text-gray-700">Capacité (puissance nominale)</span>
+              </label>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.showRealtime}
+                  onChange={(e) => setFormData(prev => ({ ...prev, showRealtime: e.target.checked }))}
+                  className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                />
+                <Activity className="w-4 h-4 text-gray-500" />
+                <span className="text-sm text-gray-700">Production temps réel</span>
+              </label>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.showHouseholds}
+                  onChange={(e) => setFormData(prev => ({ ...prev, showHouseholds: e.target.checked }))}
+                  className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                />
+                <Home className="w-4 h-4 text-gray-500" />
+                <span className="text-sm text-gray-700">Équivalent foyers</span>
+              </label>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.showCars}
+                  onChange={(e) => setFormData(prev => ({ ...prev, showCars: e.target.checked }))}
+                  className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                />
+                <Car className="w-4 h-4 text-gray-500" />
+                <span className="text-sm text-gray-700">Équivalent voitures</span>
+              </label>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.showAnnualProduction}
+                  onChange={(e) => setFormData(prev => ({ ...prev, showAnnualProduction: e.target.checked }))}
+                  className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                />
+                <BarChart3 className="w-4 h-4 text-gray-500" />
+                <span className="text-sm text-gray-700">Production annuelle (MWh/an)</span>
+              </label>
+
+              <div className="border-t border-gray-100 my-2" />
+
+              {/* --- Actions --- */}
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</p>
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"

@@ -217,52 +217,58 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunal
         <Divider />
 
         {/* ---- CARDS DATA : grid 2 colonnes ---- */}
-        <div className="grid grid-cols-2 gap-2 min-w-0">
-          {/* Card Capacité */}
-          <div className="bg-gray-50 rounded-xl px-3 py-2.5 min-w-0">
-            <div className="text-[10px] uppercase tracking-wide text-gray-400 mb-1">Capacité</div>
-            {poi.nominal_power ? (
-              <div className="flex items-baseline gap-0.5">
-                <span className="text-lg font-extrabold text-gray-800">{poi.nominal_power}</span>
-                <span className="text-[10px] text-gray-400">{poi.nominal_power_unit || 'MW'}</span>
+        {(poi.show_capacity !== false || poi.show_realtime !== false) && (
+          <div className="grid grid-cols-2 gap-2 min-w-0">
+            {/* Card Capacité */}
+            {poi.show_capacity !== false && (
+              <div className="bg-gray-50 rounded-xl px-3 py-2.5 min-w-0">
+                <div className="text-[10px] uppercase tracking-wide text-gray-400 mb-1">Capacité</div>
+                {poi.nominal_power ? (
+                  <div className="flex items-baseline gap-0.5">
+                    <span className="text-lg font-extrabold text-gray-800">{poi.nominal_power}</span>
+                    <span className="text-[10px] text-gray-400">{poi.nominal_power_unit || 'MW'}</span>
+                  </div>
+                ) : (
+                  <span className="text-lg font-extrabold text-gray-300">—</span>
+                )}
               </div>
-            ) : (
-              <span className="text-lg font-extrabold text-gray-300">—</span>
+            )}
+
+            {/* Card Production live */}
+            {poi.show_realtime !== false && (
+              <div className="bg-green-50 rounded-xl px-3 py-2.5 border border-green-200 min-w-0">
+                <div className="flex items-center gap-1 mb-1">
+                  <span className="text-[10px] uppercase tracking-wide text-gray-500">Temps réel</span>
+                  {liveData?.value != null && (
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-green-500" />
+                    </span>
+                  )}
+                  <span className="text-[10px] text-gray-400 ml-auto">
+                    {currentTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
+                <div className="flex items-baseline gap-0.5">
+                  {renderLiveValue()}
+                </div>
+              </div>
             )}
           </div>
+        )}
 
-          {/* Card Production live */}
-          <div className="bg-green-50 rounded-xl px-3 py-2.5 border border-green-200 min-w-0">
-            <div className="flex items-center gap-1 mb-1">
-              <span className="text-[10px] uppercase tracking-wide text-gray-500">Temps réel</span>
-              {liveData?.value != null && (
-                <span className="relative flex h-1.5 w-1.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-green-500" />
-                </span>
-              )}
-              <span className="text-[10px] text-gray-400 ml-auto">
-                {currentTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-              </span>
-            </div>
-            <div className="flex items-baseline gap-0.5">
-              {renderLiveValue()}
-            </div>
-          </div>
-        </div>
-
-        {/* ---- Cards équivalences : foyers (gauche) + voitures (droite, sous temps réel) ---- */}
-        {(carsCount != null || poi.households_equivalent) && (
+        {/* ---- Cards équivalences : foyers (gauche) + voitures (droite) ---- */}
+        {((carsCount != null && poi.show_cars !== false) || (poi.households_equivalent && poi.show_households !== false)) && (
           <div className="grid grid-cols-2 gap-2 min-w-0">
-            {poi.households_equivalent && (
+            {poi.households_equivalent && poi.show_households !== false && (
               <div className="bg-amber-50 rounded-xl px-3 py-2 border border-amber-100 min-w-0 text-center">
                 <Home className="w-4 h-4 text-amber-500 mx-auto mb-0.5" />
                 <div className="text-sm font-bold text-amber-700">{poi.households_equivalent.toLocaleString('fr-FR')}</div>
                 <div className="text-[9px] text-amber-400">foyers</div>
               </div>
             )}
-            {carsCount != null && (
-              <div className={`bg-blue-50 rounded-xl px-3 py-2 border border-blue-100 min-w-0 text-center${poi.households_equivalent ? '' : ' col-start-2'}`}>
+            {carsCount != null && poi.show_cars !== false && (
+              <div className={`bg-blue-50 rounded-xl px-3 py-2 border border-blue-100 min-w-0 text-center${poi.households_equivalent && poi.show_households !== false ? '' : ' col-start-2'}`}>
                 <Car className="w-4 h-4 text-blue-500 mx-auto mb-0.5" />
                 <div className="text-sm font-bold text-blue-700">= {carsCount.toLocaleString('fr-FR')}</div>
                 <div className="text-[9px] text-blue-400">voitures roulant</div>
@@ -273,7 +279,7 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunal
         )}
 
         {/* ---- Production annuelle ---- */}
-        {poi.annual_production_mwh && (
+        {poi.annual_production_mwh && poi.show_annual_production !== false && (
           <div className="bg-indigo-50 rounded-xl px-3 py-2 border border-indigo-100 min-w-0 text-center">
             <Zap className="w-4 h-4 text-indigo-500 mx-auto mb-0.5" />
             <div className="text-sm font-bold text-indigo-700">{poi.annual_production_mwh.toLocaleString('fr-FR')}</div>

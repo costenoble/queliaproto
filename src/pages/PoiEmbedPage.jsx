@@ -239,52 +239,58 @@ const PoiEmbedPage = () => {
             <Divider />
 
             {/* ---- CARDS DATA : grid 2 colonnes (comme le popup) ---- */}
-            <div className="grid grid-cols-2 gap-3">
-              {/* Card Capacité */}
-              <div className="bg-gray-50 rounded-xl px-4 py-3">
-                <div className="text-xs uppercase tracking-wide text-gray-400 mb-1">Capacité</div>
-                {poi.nominal_power ? (
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-2xl font-extrabold text-gray-800">{poi.nominal_power}</span>
-                    <span className="text-sm text-gray-400">{poi.nominal_power_unit || 'MW'}</span>
+            {(poi.show_capacity !== false || poi.show_realtime !== false) && (
+              <div className="grid grid-cols-2 gap-3">
+                {/* Card Capacité */}
+                {poi.show_capacity !== false && (
+                  <div className="bg-gray-50 rounded-xl px-4 py-3">
+                    <div className="text-xs uppercase tracking-wide text-gray-400 mb-1">Capacité</div>
+                    {poi.nominal_power ? (
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-2xl font-extrabold text-gray-800">{poi.nominal_power}</span>
+                        <span className="text-sm text-gray-400">{poi.nominal_power_unit || 'MW'}</span>
+                      </div>
+                    ) : (
+                      <span className="text-2xl font-extrabold text-gray-300">—</span>
+                    )}
                   </div>
-                ) : (
-                  <span className="text-2xl font-extrabold text-gray-300">—</span>
+                )}
+
+                {/* Card Production live */}
+                {poi.show_realtime !== false && (
+                  <div className="bg-green-50 rounded-xl px-4 py-3 border border-green-200">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <span className="text-xs uppercase tracking-wide text-gray-500">Temps réel</span>
+                      {liveData?.value != null && (
+                        <span className="relative flex h-2 w-2">
+                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                          <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+                        </span>
+                      )}
+                      <span className="text-xs text-gray-400 ml-auto">
+                        {currentTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                    <div className="flex items-baseline gap-0.5">
+                      {renderLiveValue()}
+                    </div>
+                  </div>
                 )}
               </div>
+            )}
 
-              {/* Card Production live */}
-              <div className="bg-green-50 rounded-xl px-4 py-3 border border-green-200">
-                <div className="flex items-center gap-1.5 mb-1">
-                  <span className="text-xs uppercase tracking-wide text-gray-500">Temps réel</span>
-                  {liveData?.value != null && (
-                    <span className="relative flex h-2 w-2">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-                      <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
-                    </span>
-                  )}
-                  <span className="text-xs text-gray-400 ml-auto">
-                    {currentTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                </div>
-                <div className="flex items-baseline gap-0.5">
-                  {renderLiveValue()}
-                </div>
-              </div>
-            </div>
-
-            {/* Cards équivalences : foyers (gauche) + voitures (droite, sous temps réel) */}
-            {(carsCount != null || poi.households_equivalent) && (
+            {/* Cards équivalences : foyers + voitures */}
+            {((carsCount != null && poi.show_cars !== false) || (poi.households_equivalent && poi.show_households !== false)) && (
               <div className="grid grid-cols-2 gap-3 mt-3">
-                {poi.households_equivalent && (
+                {poi.households_equivalent && poi.show_households !== false && (
                   <div className="bg-amber-50 rounded-xl px-4 py-3 border border-amber-100 text-center">
                     <Home className="w-5 h-5 text-amber-500 mx-auto mb-1" />
                     <div className="text-lg font-bold text-amber-700">{poi.households_equivalent.toLocaleString('fr-FR')}</div>
                     <div className="text-xs text-amber-400">foyers</div>
                   </div>
                 )}
-                {carsCount != null && (
-                  <div className={`bg-blue-50 rounded-xl px-4 py-3 border border-blue-100 text-center${poi.households_equivalent ? '' : ' col-start-2'}`}>
+                {carsCount != null && poi.show_cars !== false && (
+                  <div className={`bg-blue-50 rounded-xl px-4 py-3 border border-blue-100 text-center${poi.households_equivalent && poi.show_households !== false ? '' : ' col-start-2'}`}>
                     <Car className="w-5 h-5 text-blue-500 mx-auto mb-1" />
                     <div className="text-lg font-bold text-blue-700">= {carsCount.toLocaleString('fr-FR')}</div>
                     <div className="text-xs text-blue-400">voitures roulant</div>
@@ -295,7 +301,7 @@ const PoiEmbedPage = () => {
             )}
 
             {/* Production annuelle */}
-            {poi.annual_production_mwh && (
+            {poi.annual_production_mwh && poi.show_annual_production !== false && (
               <div className="bg-indigo-50 rounded-xl px-4 py-3 border border-indigo-100 text-center mt-3">
                 <Zap className="w-5 h-5 text-indigo-500 mx-auto mb-1" />
                 <div className="text-lg font-bold text-indigo-700">{poi.annual_production_mwh.toLocaleString('fr-FR')}</div>
