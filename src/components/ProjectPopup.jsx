@@ -281,17 +281,17 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunal
           </div>
         )}
 
-        {/* ---- Actions : grid d'icônes ---- */}
+        {/* ---- Actions : grid 2×2 d'icônes ---- */}
         <Divider />
-        <div className="grid grid-cols-4 gap-2 min-w-0">
+        <div className="grid grid-cols-2 gap-2 min-w-0">
           {poi.show_email_report !== false && (
             <a
               href={`mailto:${poi.contact_email || 'contact@quelia.fr'}`}
-              className="bg-gray-50 rounded-xl px-2 py-2.5 flex flex-col items-center gap-1 hover:bg-indigo-50 transition-colors"
+              className="bg-gray-50 rounded-xl px-3 py-3 flex items-center gap-2.5 hover:bg-indigo-50 transition-colors"
               title="Signaler par email"
             >
-              <Mail className="w-5 h-5 text-indigo-600" />
-              <span className="text-[9px] text-gray-500 text-center leading-tight">Email</span>
+              <Mail className="w-5 h-5 text-indigo-600 flex-shrink-0" />
+              <span className="text-xs text-gray-600 leading-tight">Signaler par email</span>
             </a>
           )}
           {poi.show_voice_report !== false && (
@@ -299,11 +299,11 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunal
               href={poi.voice_report_url || "https://app.ekoo.co/capture"}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-gray-50 rounded-xl px-2 py-2.5 flex flex-col items-center gap-1 hover:bg-indigo-50 transition-colors"
+              className="bg-gray-50 rounded-xl px-3 py-3 flex items-center gap-2.5 hover:bg-indigo-50 transition-colors"
               title="Signaler par vocal"
             >
-              <Mic className="w-5 h-5 text-indigo-600" />
-              <span className="text-[9px] text-gray-500 text-center leading-tight">Vocal</span>
+              <Mic className="w-5 h-5 text-indigo-600 flex-shrink-0" />
+              <span className="text-xs text-gray-600 leading-tight">Signaler par vocal</span>
             </a>
           )}
           {poi.show_newsletter !== false && (
@@ -311,11 +311,11 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunal
               href={poi.newsletter_url || "#"}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-gray-50 rounded-xl px-2 py-2.5 flex flex-col items-center gap-1 hover:bg-indigo-50 transition-colors"
-              title="L'actu du parc"
+              className="bg-gray-50 rounded-xl px-3 py-3 flex items-center gap-2.5 hover:bg-indigo-50 transition-colors"
+              title="L'actu du parc par email"
             >
-              <Info className="w-5 h-5 text-indigo-600" />
-              <span className="text-[9px] text-gray-500 text-center leading-tight">Infos</span>
+              <Info className="w-5 h-5 text-indigo-600 flex-shrink-0" />
+              <span className="text-xs text-gray-600 leading-tight">L'actu du parc par email</span>
             </a>
           )}
           {poi.project_url && (
@@ -323,11 +323,11 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunal
               href={poi.project_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-gray-50 rounded-xl px-2 py-2.5 flex flex-col items-center gap-1 hover:bg-indigo-50 transition-colors"
+              className="bg-gray-50 rounded-xl px-3 py-3 flex items-center gap-2.5 hover:bg-indigo-50 transition-colors"
               title="Site web du projet"
             >
-              <ExternalLink className="w-5 h-5 text-indigo-600" />
-              <span className="text-[9px] text-gray-500 text-center leading-tight">Site web</span>
+              <ExternalLink className="w-5 h-5 text-indigo-600 flex-shrink-0" />
+              <span className="text-xs text-gray-600 leading-tight">Site web</span>
             </a>
           )}
         </div>
