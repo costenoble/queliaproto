@@ -972,7 +972,7 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
                   className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                 />
                 <Info className="w-4 h-4 text-gray-500" />
-                <span className="text-sm text-gray-700">Newsletter / Actu du parc</span>
+                <span className="text-sm text-gray-700">Newsletter / Actu du site</span>
               </label>
               {formData.showNewsletter && (
                 <div className="pl-11">

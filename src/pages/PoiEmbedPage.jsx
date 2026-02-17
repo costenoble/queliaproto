@@ -292,10 +292,11 @@ const PoiEmbedPage = () => {
                 )}
                 {carsCount != null && poi.show_cars !== false && (
                   <div className="bg-blue-50 rounded-xl px-4 py-3 border border-blue-100 flex flex-col items-center justify-center h-[88px]">
-                    <Car className="w-5 h-5 text-blue-500 mb-1" />
-                    <div className="text-lg font-bold text-blue-700">= {carsCount.toLocaleString('fr-FR')}</div>
-                    <div className="text-xs text-blue-400">voitures roulant</div>
-                    <div className="text-[10px] text-blue-300">a 100 km/h (conso. elec.)</div>
+                    <div className="text-[10px] text-blue-400 leading-tight text-center mb-1">voitures électriques roulant à 100 km/h</div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-lg font-bold text-blue-700">= {carsCount.toLocaleString('fr-FR')}</span>
+                      <Car className="w-5 h-5 text-blue-500" />
+                    </div>
                   </div>
                 )}
               </div>
@@ -332,10 +333,10 @@ const PoiEmbedPage = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-gray-50 rounded-xl px-4 py-4 flex items-center gap-3 hover:bg-indigo-50 transition-colors"
-                  title="L'actu du parc par email"
+                  title="L'actu du site par email"
                 >
                   <Info className="w-6 h-6 text-indigo-600 flex-shrink-0" />
-                  <span className="text-sm text-gray-600 leading-tight">L'actu du parc par email</span>
+                  <span className="text-sm text-gray-600 leading-tight">L'actu du site par email</span>
                 </a>
               )}
               {poi.project_url && (

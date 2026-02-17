@@ -269,11 +269,12 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunal
               </div>
             )}
             {carsCount != null && poi.show_cars !== false && (
-              <div className="bg-blue-50 rounded-xl px-3 py-2.5 border border-blue-100 min-w-0 flex flex-col items-center justify-center h-[72px]">
-                <Car className="w-4 h-4 text-blue-500 mb-0.5" />
-                <div className="text-sm font-bold text-blue-700">= {carsCount.toLocaleString('fr-FR')}</div>
-                <div className="text-[9px] text-blue-400">voitures roulant</div>
-                <div className="text-[8px] text-blue-300">a 100 km/h (conso. elec.)</div>
+              <div className="bg-blue-50 rounded-xl px-3 py-2 border border-blue-100 min-w-0 flex flex-col items-center justify-center h-[72px]">
+                <div className="text-[8px] text-blue-400 leading-tight text-center mb-1">voitures électriques roulant à 100 km/h</div>
+                <div className="flex items-center gap-1">
+                  <span className="text-sm font-bold text-blue-700">= {carsCount.toLocaleString('fr-FR')}</span>
+                  <Car className="w-4 h-4 text-blue-500" />
+                </div>
               </div>
             )}
           </div>
@@ -310,10 +311,10 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunal
               target="_blank"
               rel="noopener noreferrer"
               className="bg-gray-50 rounded-xl px-3 py-3 flex items-center gap-2.5 hover:bg-indigo-50 transition-colors"
-              title="L'actu du parc par email"
+              title="L'actu du site par email"
             >
               <Info className="w-5 h-5 text-indigo-600 flex-shrink-0" />
-              <span className="text-xs text-gray-600 leading-tight">L'actu du parc par email</span>
+              <span className="text-xs text-gray-600 leading-tight">L'actu du site par email</span>
             </a>
           )}
           {poi.project_url && (
