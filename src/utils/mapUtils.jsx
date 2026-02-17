@@ -147,14 +147,15 @@ export const ENERGY_CATEGORIES = {
       { value: 'agri-pv', label: 'Agri-PV' },
       { value: 'ombrières', label: 'Ombrières' },
       { value: 'toiture', label: 'Toiture' },
-      { value: 'au sol', label: 'Au sol' }
+      { value: 'au sol', label: 'Au sol' },
+      { value: 'flottant', label: 'Flottant' }
     ]
   },
   éolien: {
     label: 'Éolien',
     subtypes: [
       { value: 'off shore', label: 'Off shore' },
-      { value: 'on shore', label: 'On shore' }
+      { value: 'on shore', label: 'Terrestre' }
     ]
   },
   biométhane: {
