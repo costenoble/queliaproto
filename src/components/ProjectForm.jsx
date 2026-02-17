@@ -6,7 +6,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import {
   AlertCircle, Calendar, MapPin, Save, Zap, Building, Flag, AlignLeft,
   Globe, Link as LinkIcon, Loader2, User, Mail, Mic, Info, Image, Hash,
-  Map as MapIcon, Home, X, Plus, Car, Activity, BarChart3
+  Map as MapIcon, Home, X, Plus, Car, Activity, Leaf
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { ENERGY_CATEGORIES, POWER_UNITS, EQUIVALENT_TYPES } from '@/utils/mapUtils.jsx';
@@ -141,9 +141,10 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
     // Display options (cartes données)
     showCapacity: true,
     showRealtime: true,
-    showHouseholds: true,
     showCars: true,
-    showAnnualProduction: true,
+    showCo2: true,
+    // Valeur CO2 économisé
+    co2AvoidedTons: '',
     // URLs personnalisables
     voiceReportUrl: '',
     newsletterUrl: ''
@@ -190,9 +191,9 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
         showNewsletter: project.show_newsletter !== false,
         showCapacity: project.show_capacity !== false,
         showRealtime: project.show_realtime !== false,
-        showHouseholds: project.show_households !== false,
         showCars: project.show_cars !== false,
-        showAnnualProduction: project.show_annual_production !== false,
+        showCo2: project.show_co2 !== false,
+        co2AvoidedTons: project.co2_avoided_tons || '',
         voiceReportUrl: project.voice_report_url || '',
         newsletterUrl: project.newsletter_url || ''
       });
@@ -343,9 +344,9 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
         show_newsletter: formData.showNewsletter,
         show_capacity: formData.showCapacity,
         show_realtime: formData.showRealtime,
-        show_households: formData.showHouseholds,
         show_cars: formData.showCars,
-        show_annual_production: formData.showAnnualProduction,
+        show_co2: formData.showCo2,
+        co2_avoided_tons: formData.co2AvoidedTons ? parseFloat(formData.co2AvoidedTons) : null,
         voice_report_url: formData.voiceReportUrl || null,
         newsletter_url: formData.newsletterUrl || null,
         client_id: finalClientId,
@@ -894,16 +895,6 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={formData.showHouseholds}
-                  onChange={(e) => setFormData(prev => ({ ...prev, showHouseholds: e.target.checked }))}
-                  className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                />
-                <Home className="w-4 h-4 text-gray-500" />
-                <span className="text-sm text-gray-700">Équivalent foyers</span>
-              </label>
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
                   checked={formData.showCars}
                   onChange={(e) => setFormData(prev => ({ ...prev, showCars: e.target.checked }))}
                   className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
@@ -914,13 +905,27 @@ const ProjectForm = ({ project, onSuccess, onCancel, clientId, clients }) => {
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={formData.showAnnualProduction}
-                  onChange={(e) => setFormData(prev => ({ ...prev, showAnnualProduction: e.target.checked }))}
+                  checked={formData.showCo2}
+                  onChange={(e) => setFormData(prev => ({ ...prev, showCo2: e.target.checked }))}
                   className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                 />
-                <BarChart3 className="w-4 h-4 text-gray-500" />
-                <span className="text-sm text-gray-700">Production annuelle (MWh/an)</span>
+                <Leaf className="w-4 h-4 text-gray-500" />
+                <span className="text-sm text-gray-700">CO2 économisé</span>
               </label>
+              {formData.showCo2 && (
+                <div className="pl-11">
+                  <input
+                    type="number"
+                    name="co2AvoidedTons"
+                    value={formData.co2AvoidedTons}
+                    onChange={handleChange}
+                    className={inputClass}
+                    placeholder="Ex: 1500 (en tonnes/an)"
+                    step="0.01"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">Tonnes de CO2 évitées par an</p>
+                </div>
+              )}
 
               <div className="border-t border-gray-100 my-2" />
 

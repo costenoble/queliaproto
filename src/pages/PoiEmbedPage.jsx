@@ -5,7 +5,6 @@ import { getStatusColorClass, getMarkerColor, getMarkerIconComponent, ENERGY_CAT
 import {
   Building,
   ExternalLink,
-  Home,
   Mic,
   Mail,
   Info,
@@ -13,7 +12,7 @@ import {
   Car,
   Navigation,
   Calendar,
-  Zap,
+  Leaf,
 } from 'lucide-react';
 import useHybridLiveData from '@/hooks/useHybridLiveData';
 
@@ -279,33 +278,24 @@ const PoiEmbedPage = () => {
               </div>
             )}
 
-            {/* Cards équivalences : foyers + voitures */}
-            {((carsCount != null && poi.show_cars !== false) || (poi.households_equivalent && poi.show_households !== false)) && (
+            {/* Cards équivalences : voitures + CO2 */}
+            {((carsCount != null && poi.show_cars !== false) || (poi.co2_avoided_tons && poi.show_co2 !== false)) && (
               <div className="grid grid-cols-2 gap-3 mt-3">
-                {poi.households_equivalent && poi.show_households !== false && (
-                  <div className="bg-amber-50 rounded-xl px-4 py-3 border border-amber-100 text-center">
-                    <Home className="w-5 h-5 text-amber-500 mx-auto mb-1" />
-                    <div className="text-lg font-bold text-amber-700">{poi.households_equivalent.toLocaleString('fr-FR')}</div>
-                    <div className="text-xs text-amber-400">foyers</div>
-                  </div>
-                )}
                 {carsCount != null && poi.show_cars !== false && (
-                  <div className={`bg-blue-50 rounded-xl px-4 py-3 border border-blue-100 text-center${poi.households_equivalent && poi.show_households !== false ? '' : ' col-start-2'}`}>
+                  <div className="bg-blue-50 rounded-xl px-4 py-3 border border-blue-100 text-center">
                     <Car className="w-5 h-5 text-blue-500 mx-auto mb-1" />
                     <div className="text-lg font-bold text-blue-700">= {carsCount.toLocaleString('fr-FR')}</div>
                     <div className="text-xs text-blue-400">voitures roulant</div>
                     <div className="text-[10px] text-blue-300">a 100 km/h (conso. elec.)</div>
                   </div>
                 )}
-              </div>
-            )}
-
-            {/* Production annuelle */}
-            {poi.annual_production_mwh && poi.show_annual_production !== false && (
-              <div className="bg-indigo-50 rounded-xl px-4 py-3 border border-indigo-100 text-center mt-3">
-                <Zap className="w-5 h-5 text-indigo-500 mx-auto mb-1" />
-                <div className="text-lg font-bold text-indigo-700">{poi.annual_production_mwh.toLocaleString('fr-FR')}</div>
-                <div className="text-xs text-indigo-400">MWh/an</div>
+                {poi.co2_avoided_tons && poi.show_co2 !== false && (
+                  <div className="bg-emerald-50 rounded-xl px-4 py-3 border border-emerald-100 text-center">
+                    <Leaf className="w-5 h-5 text-emerald-500 mx-auto mb-1" />
+                    <div className="text-lg font-bold text-emerald-700">{Number(poi.co2_avoided_tons).toLocaleString('fr-FR')}</div>
+                    <div className="text-xs text-emerald-400">tonnes CO2/an évitées</div>
+                  </div>
+                )}
               </div>
             )}
 

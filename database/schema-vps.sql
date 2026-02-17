@@ -99,9 +99,8 @@ CREATE TABLE IF NOT EXISTS projects (
     -- Options d'affichage POI (cartes données)
     show_capacity BOOLEAN DEFAULT true,
     show_realtime BOOLEAN DEFAULT true,
-    show_households BOOLEAN DEFAULT true,
     show_cars BOOLEAN DEFAULT true,
-    show_annual_production BOOLEAN DEFAULT true,
+    show_co2 BOOLEAN DEFAULT true,
 
     -- Autres
     description TEXT,

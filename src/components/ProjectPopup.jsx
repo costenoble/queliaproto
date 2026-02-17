@@ -15,8 +15,7 @@ import {
   Car,
   Navigation,
   Calendar,
-  Zap,
-  Home,
+  Leaf,
 } from 'lucide-react';
 import useHybridLiveData from '@/hooks/useHybridLiveData';
 
@@ -257,33 +256,24 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunal
           </div>
         )}
 
-        {/* ---- Cards équivalences : foyers (gauche) + voitures (droite) ---- */}
-        {((carsCount != null && poi.show_cars !== false) || (poi.households_equivalent && poi.show_households !== false)) && (
+        {/* ---- Cards équivalences : voitures + CO2 ---- */}
+        {((carsCount != null && poi.show_cars !== false) || (poi.co2_avoided_tons && poi.show_co2 !== false)) && (
           <div className="grid grid-cols-2 gap-2 min-w-0">
-            {poi.households_equivalent && poi.show_households !== false && (
-              <div className="bg-amber-50 rounded-xl px-3 py-2 border border-amber-100 min-w-0 text-center">
-                <Home className="w-4 h-4 text-amber-500 mx-auto mb-0.5" />
-                <div className="text-sm font-bold text-amber-700">{poi.households_equivalent.toLocaleString('fr-FR')}</div>
-                <div className="text-[9px] text-amber-400">foyers</div>
-              </div>
-            )}
             {carsCount != null && poi.show_cars !== false && (
-              <div className={`bg-blue-50 rounded-xl px-3 py-2 border border-blue-100 min-w-0 text-center${poi.households_equivalent && poi.show_households !== false ? '' : ' col-start-2'}`}>
+              <div className="bg-blue-50 rounded-xl px-3 py-2 border border-blue-100 min-w-0 text-center">
                 <Car className="w-4 h-4 text-blue-500 mx-auto mb-0.5" />
                 <div className="text-sm font-bold text-blue-700">= {carsCount.toLocaleString('fr-FR')}</div>
                 <div className="text-[9px] text-blue-400">voitures roulant</div>
                 <div className="text-[8px] text-blue-300">a 100 km/h (conso. elec.)</div>
               </div>
             )}
-          </div>
-        )}
-
-        {/* ---- Production annuelle ---- */}
-        {poi.annual_production_mwh && poi.show_annual_production !== false && (
-          <div className="bg-indigo-50 rounded-xl px-3 py-2 border border-indigo-100 min-w-0 text-center">
-            <Zap className="w-4 h-4 text-indigo-500 mx-auto mb-0.5" />
-            <div className="text-sm font-bold text-indigo-700">{poi.annual_production_mwh.toLocaleString('fr-FR')}</div>
-            <div className="text-[9px] text-indigo-400">MWh/an</div>
+            {poi.co2_avoided_tons && poi.show_co2 !== false && (
+              <div className="bg-emerald-50 rounded-xl px-3 py-2 border border-emerald-100 min-w-0 text-center">
+                <Leaf className="w-4 h-4 text-emerald-500 mx-auto mb-0.5" />
+                <div className="text-sm font-bold text-emerald-700">{Number(poi.co2_avoided_tons).toLocaleString('fr-FR')}</div>
+                <div className="text-[9px] text-emerald-400">tonnes CO2/an évitées</div>
+              </div>
+            )}
           </div>
         )}
 
