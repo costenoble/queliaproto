@@ -159,9 +159,9 @@ const ProjectPopup = ({ poi, onSelectCity, onSelectRegion, onSelectIntercommunal
         {/* ---- Localisation ---- */}
         <div className="space-y-0.5 min-w-0">
           {/* Ligne 1 : Commune · Intercommunalité */}
-          <div className="flex items-center text-xs text-gray-600 gap-1 min-w-0">
-            <Building className="w-3 h-3 flex-shrink-0 text-gray-400" />
-            <span className="truncate min-w-0">
+          <div className="flex items-start text-xs text-gray-600 gap-1 min-w-0">
+            <Building className="w-3 h-3 flex-shrink-0 text-gray-400 mt-0.5" />
+            <span className="min-w-0 break-words">
               {poi.city ? (
                 <button
                   onClick={() => onSelectCity?.(poi.city)}

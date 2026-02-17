@@ -197,9 +197,9 @@ const PoiEmbedPage = () => {
             {/* Localisation */}
             <div className="space-y-1 mb-1">
               {/* Ligne 1 : Commune · Intercommunalité */}
-              <div className="flex items-center text-base text-gray-600 gap-1.5">
-                <Building className="w-4 h-4 flex-shrink-0 text-gray-400" />
-                <span>
+              <div className="flex items-start text-base text-gray-600 gap-1.5">
+                <Building className="w-4 h-4 flex-shrink-0 text-gray-400 mt-1" />
+                <span className="break-words">
                   {poi.city && (
                     <Link to={`/?city=${encodeURIComponent(poi.city)}`} className="hover:text-indigo-600 hover:underline font-medium">
                       {poi.city}
